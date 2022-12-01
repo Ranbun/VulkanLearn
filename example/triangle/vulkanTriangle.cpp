@@ -2,6 +2,9 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <unordered_set>
+
+#include "GLFW2VulkanToolFunctionsSet.h"
 
 
 void HelloTriangleApplication::run()
@@ -57,31 +60,29 @@ void HelloTriangleApplication::createInstance()
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    /// 获取glfw的扩展
-    uint32_t glfwExtensionCount = 0;
-    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-    std::cout << "GLFW available extension: " << std::endl;
-    for(auto i = 0;i < glfwExtensionCount;i++)
     {
-        std::cout << "\t" << *(glfwExtensions+i) << std::endl;
+        /// 获取glfw的扩展
+        uint32_t glfwExtensionCount = 0;
+        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        auto glfwExtensionV = std::unordered_set<std::string>{ *glfwExtensions,*(glfwExtensions + glfwExtensionCount - 1) };
+        
+        /// 获取VulKan的扩展
+        uint32_t extensionCounts = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCounts, nullptr);
+        std::vector<VkExtensionProperties> extensions(extensionCounts);
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCounts, extensions.data());
+        auto supportExtensions = GLFW2Vulkan::matchGLFWExtensionsInVulKanExtensions(glfwExtensionV, extensions);
+
+        std::cout << "GLFW Extensions Support By VulKan: " << std::endl;
+        for (auto& extension : supportExtensions)
+        {
+            std::cout << "\t" << extension << std::endl;
+        }
+
+        createInfo.enabledExtensionCount = glfwExtensionCount; ///< 扩展数量 
+        createInfo.ppEnabledExtensionNames = glfwExtensions;  ///< 扩展名称
     }
 
-
-    /// 获取VulKan的扩展
-    uint32_t extensionCounts = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCounts
-        , nullptr);
-    std::vector<VkExtensionProperties> extensions(extensionCounts);
-
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCounts, extensions.data());
-    std::cout << "VulKan available extension: " << std::endl;
-    for (const auto& it : extensions)
-    {
-        std::cout << "\t" << it.extensionName << std::endl;
-    }
-
-    createInfo.enabledExtensionCount = glfwExtensionCount; ///< 扩展数量 
-    createInfo.ppEnabledExtensionNames = glfwExtensions;  ///< 扩展名称
     createInfo.enabledLayerCount = 0; ///< 全局校验层 
 
     const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_vkInstance);
@@ -90,7 +91,5 @@ void HelloTriangleApplication::createInstance()
     {
         throw std::runtime_error("Failed to create instance!");
     }
-
-
 
 }
