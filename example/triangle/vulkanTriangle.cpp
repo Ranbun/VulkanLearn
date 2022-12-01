@@ -40,6 +40,12 @@ void HelloTriangleApplication::mainLoop() const
 
 void HelloTriangleApplication::cleanup()
 {
+    /// 删除Vk Instance
+    /// 在VK Instance 被清除之前清除其余的实例
+    // TODO: destroy others vk Objects
+
+    vkDestroyInstance(m_vkInstance,nullptr);
+
     glfwDestroyWindow(m_window);
     glfwTerminate();
     m_window = nullptr;
@@ -84,6 +90,11 @@ void HelloTriangleApplication::createInstance()
     }
 
     createInfo.enabledLayerCount = 0; ///< 全局校验层 
+
+    if(enableValidationLayers && !checkValidationLayerSupport())
+    {
+        throw std::runtime_error("validation layers requested, but not available");
+    }
 
     const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_vkInstance);
 
