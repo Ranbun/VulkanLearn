@@ -17,11 +17,14 @@
             //"externalConsole": false,
             "console": "externalTerminal",
 
-            "osx": { //macOS的特定配置
+            "osx":
+            { //macOS的特定配置
                 // "miDebuggerPath": "/Applications/Xcode.app/Contents/ Developer/usr/bin/lldb-mi", //修改使用的lldb-mi，一般不需要修改
                 "MIMode": "lldb" //指定使用lldb进行调试
             },
-            "linux": { //linux的特定配置
+
+            "linux":
+            { //linux的特定配置
                 "MIMode": "gdb", //指定使用gdb调试
                 "setupCommands": [
                     {
@@ -31,7 +34,9 @@
                     }
                 ]
             },
-            "windows": { //windows的特定配置
+
+            "windows":
+            { //windows的特定配置
                 "type": "cppvsdbg", //指定使用msvc进行调试
                 "program": "${workspaceFolder}/build/example/triangle/triangle.exe", //指定C/C++程序位置
             }
