@@ -18,3 +18,9 @@ out
 .vs 
 .vs/
 
+# VS Code Create Dir
+build
+build/
+
+
+
