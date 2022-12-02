@@ -12,7 +12,7 @@ const int HEIGHT = 600;
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_LUNAGR_standard_validation"};
 
-/// �Ƿ�ʹ�ü���� 
+/// 是否使用检验层 
 #ifdef NODEBUG
 constexpr bool enableValidationLayers = false;
 #else
@@ -46,7 +46,7 @@ private:
         vkEnumerateInstanceLayerProperties(&layerCount, avaliableLayers.data());
 
 
-        /// ������еļ���㶼�ܴ��б����ҵ�
+        /// 检测所有的检验层都能从列表中找到
         for(auto layerName: validationLayers)
         {
             bool layerFound = false;

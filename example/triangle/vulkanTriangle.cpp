@@ -19,8 +19,8 @@ void HelloTriangleApplication::initWindow()
 {
     glfwInit();
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); ///< ◊Ë÷πGLFW¥¥Ω®…œœ¬Œƒ(OpenGL Context)
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); ///< Ω˚÷πresize
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); ///< ÈòªÊ≠¢GLFWÂàõÂª∫‰∏ä‰∏ãÊñá(OpenGL Context)
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);   ///< Á¶ÅÊ≠¢resize
 
     m_window = glfwCreateWindow(WIDTH, HEIGHT, "VulKan Window", nullptr, nullptr);
 }
@@ -40,8 +40,8 @@ void HelloTriangleApplication::mainLoop() const
 
 void HelloTriangleApplication::cleanup()
 {
-    /// …æ≥˝Vk Instance
-    /// ‘⁄VK Instance ±ª«Â≥˝÷Æ«∞«Â≥˝∆‰”‡µƒ µ¿˝
+    /// Âà†Èô§Vk Instance
+    /// Âú®VK Instance Ë¢´Ê∏ÖÈô§‰πãÂâçÊ∏ÖÈô§ÂÖ∂‰ΩôÁöÑÂÆû‰æã
     // TODO: destroy others vk Objects
 
     vkDestroyInstance(m_vkInstance,nullptr);
@@ -67,12 +67,12 @@ void HelloTriangleApplication::createInstance()
     createInfo.pApplicationInfo = &appInfo;
 
     {
-        /// ªÒ»°glfwµƒ¿©’π
+        /// Ëé∑ÂèñglfwÁöÑÊâ©Â±ï
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
         auto glfwExtensionV = std::unordered_set<std::string>{ *glfwExtensions,*(glfwExtensions + glfwExtensionCount - 1) };
         
-        /// ªÒ»°VulKanµƒ¿©’π
+        /// Ëé∑ÂèñVulKanÁöÑÊâ©Â±ï
         uint32_t extensionCounts = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCounts, nullptr);
         std::vector<VkExtensionProperties> extensions(extensionCounts);
@@ -85,11 +85,11 @@ void HelloTriangleApplication::createInstance()
             std::cout << "\t" << extension << std::endl;
         }
 
-        createInfo.enabledExtensionCount = glfwExtensionCount; ///< ¿©’π ˝¡ø 
-        createInfo.ppEnabledExtensionNames = glfwExtensions;  ///< ¿©’π√˚≥∆
+        createInfo.enabledExtensionCount = glfwExtensionCount; ///< Êâ©Â±ïÊï∞Èáè 
+        createInfo.ppEnabledExtensionNames = glfwExtensions;  ///< Êâ©Â±ïÂêçÁß∞
     }
 
-    createInfo.enabledLayerCount = 0; ///< »´æ÷–£—È≤„ 
+    createInfo.enabledLayerCount = 0; ///< ÂÖ®Â±ÄÊ†°È™åÂ±Ç 
 
     if(enableValidationLayers && !checkValidationLayerSupport())
     {
