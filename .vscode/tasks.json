@@ -4,20 +4,25 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build_dir",
+            "label": "create build dir",
             "command": "mkdir",
             "type": "shell",
-            "args": [
+            "args":
+            [
                 "-p",
                 "build"
             ],
-            "windows": {
-                "options": {
-                    "shell": {
+            "windows":
+            {
+                "options":
+                {
+                    "shell":
+                    {
                         "executable": "powershell.exe"
                     }
                 },
-                "args": [
+                "args":
+                [
                     "-Force",
                     "build"
                 ]
@@ -27,26 +32,33 @@
             "label": "cmake",
             "type": "shell",
             "command": "cmake",
-            "args": [
+            "args": 
+            [
                 "-DCMAKE_BUILD_TYPE=Debug",
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
                 "../"
             ],
-            "options": {
+            "options": 
+            {
                 "cwd": "${workspaceFolder}/build"
             },
-            "windows": {
-                "args": [
+            "windows": 
+            {
+                "args": 
+                [
                     "-DCMAKE_BUILD_TYPE=Debug",
                     "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
                     "../",
                     "-G",
                     "\"CodeBlocks - NMake Makefiles\""
                 ],
-                "options": {
-                    "shell": {
+                "options": 
+                {
+                    "shell": 
+                    {
                         "executable": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat",
-                        "args": [
+                        "args": 
+                        [
                             "amd64",
                             "-vcvars_ver=14.3",
                             "&&"
@@ -54,15 +66,19 @@
                     }
                 }
             },
-            "dependsOn": [
-                "build_dir"
+
+            "dependsOn": 
+            [
+                "create build dir"
             ],
-            "problemMatcher": [
+
+            "problemMatcher": 
+            [
                 "$gcc"
             ]
         },
         {
-            "label": "build",
+            "label": "build Debug",
             "group": "build",
             "type": "shell",
             "command": "cmake",
@@ -73,7 +89,8 @@
                 "all",
                 "--"
             ],
-            "options": {
+            "options": 
+            {
                 "cwd": "${workspaceFolder}/build"
             },
             "problemMatcher": "$gcc",
@@ -90,7 +107,8 @@
                 },
                 "problemMatcher": "$msCompile"
             },
-            "dependsOn": [
+            "dependsOn": 
+            [
                 "cmake"
             ]
         }
