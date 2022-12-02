@@ -8,8 +8,8 @@ add_executable(${target_}
                 ${courcefiles}
 )
 
-target_include_directories(${target_} 
-    PRIVATE 
+target_include_directories(${target_}
+    PRIVATE
     includeDIR
 )
 

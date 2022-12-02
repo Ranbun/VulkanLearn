@@ -1,4 +1,3 @@
-
 #include <vulkan/vulkan.h>
 #include <iostream>
 #include <memory>
@@ -19,7 +18,6 @@ public:
             std::cout << "\t" << extension << std::endl;
         }
 
-
         std::cout << "VulKan available extension: " << std::endl;
         for (const auto& it : vkExtensions)
         {
@@ -33,8 +31,5 @@ public:
 
         return std::move(GLFWSupportExtensionsInVk);
     }
-
-
-
 
 };

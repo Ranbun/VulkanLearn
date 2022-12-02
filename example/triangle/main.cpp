@@ -10,7 +10,6 @@
 #include <iostream>
 #include "vulkanTriangle.h"
 
-
 int main()
 {
     try
