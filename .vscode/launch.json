@@ -12,7 +12,7 @@
             "args": [], //指定运行参数
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}", //指定工作目录
-            "preLaunchTask": "build Debug",    //在调试前会先调用build_debug这个task编译构建程序
+            // "preLaunchTask": "build Debug",    //在调试前会先调用build_debug这个task编译构建程序
             "environment": [],
             "console": "externalTerminal",
 
