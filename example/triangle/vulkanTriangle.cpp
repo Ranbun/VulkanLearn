@@ -65,6 +65,7 @@ void HelloTriangleApplication::createInstance()
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
+#if 0
     // get glfw extensions
     uint32_t glfwExtensionCount = 0;
     const char ** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -86,7 +87,24 @@ void HelloTriangleApplication::createInstance()
     createInfo.enabledExtensionCount = glfwExtensionCount; ///< extension counts
     createInfo.ppEnabledExtensionNames = glfwExtensions;   ///< extension names
 
-    createInfo.enabledLayerCount = 0; ///< gloabl avalidation layers Counts
+#endif 
+
+    auto extensions = getRequireExtensions();
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size()); ///< extension counts
+    createInfo.ppEnabledExtensionNames = extensions.data();   ///< extension names
+
+
+    /// ÆôÓÃ¼ìÑé²ã
+    if(enableValidationLayers)
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size()); ///< gloabl avalidation layers Counts
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    }
+    else
+    {
+        createInfo.enabledLayerCount = 0; ///< gloabl avalidation layers Counts
+    }
+
 
     if (enableValidationLayers && !checkValidationLayerSupport())
     {
@@ -99,4 +117,48 @@ void HelloTriangleApplication::createInstance()
     {
         throw std::runtime_error("Failed to create instance!");
     }
+}
+
+bool HelloTriangleApplication::checkValidationLayerSupport()
+{
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    std::vector<VkLayerProperties> avaliableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, avaliableLayers.data());
+
+    for(auto layerName: validationLayers)
+    {
+        bool layerFound = false;
+        for(const auto& layerProperties: avaliableLayers )
+        {
+            if(strcmp(layerName,layerProperties.layerName) == 0)
+            {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if (!layerFound)
+        {
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
+std::vector<const char*> HelloTriangleApplication::getRequireExtensions()
+{
+    uint32_t glfwExtensionCount = 0;
+    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+    if(enableValidationLayers)
+    {
+        extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    }
+
+    return std::move(extensions);
 }

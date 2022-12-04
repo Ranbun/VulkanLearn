@@ -41,34 +41,10 @@ private:
     void createInstance();
 
     /// @brief 检测所有的检验层都能从列表中找到
-    bool checkValidationLayerSupport()
-    {
-        uint32_t layerCount;
-        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-        std::vector<VkLayerProperties> avaliableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, avaliableLayers.data());
+    static bool checkValidationLayerSupport();
 
-        for(auto layerName: validationLayers)
-        {
-            bool layerFound = false;
-            for(const auto& layerProperties: avaliableLayers )
-            {
-                if(strcmp(layerName,layerProperties.layerName) == 0)
-                {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound)
-            {
-                return false;
-            }
-
-        }
-
-        return true;
-    }
+    /// message callback
+    std::vector<const char *> getRequireExtensions();
 
 
 private:
