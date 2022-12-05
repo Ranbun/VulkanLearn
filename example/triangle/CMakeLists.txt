@@ -10,7 +10,7 @@ add_executable(${target_}
 
 target_include_directories(${target_}
     PRIVATE
-    includeDIR
+    ${includeDIR}
 )
 
 target_link_libraries(${target_} PRIVATE glfw glm::glm Vulkan::Vulkan)

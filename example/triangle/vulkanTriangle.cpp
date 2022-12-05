@@ -1,4 +1,4 @@
-#include "vulkanTriangle.h"
+﻿#include "vulkanTriangle.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "GLFW2VulkanToolFunctionsSet.h"
+#include "VkCallback.h"
 
 void HelloTriangleApplication::run()
 {
@@ -29,6 +30,28 @@ void HelloTriangleApplication::initVulKan()
 {
     createInstance();
 }
+
+void HelloTriangleApplication::setupDebugCallback()
+{
+    if constexpr (!enableValidationLayers)
+    {
+        return;
+    }
+
+    VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+
+    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+
+    createInfo.pfnUserCallback = debugCallback;
+    createInfo.pUserData = nullptr;
+}
+
 
 void HelloTriangleApplication::mainLoop() const
 {
@@ -89,12 +112,12 @@ void HelloTriangleApplication::createInstance()
 
 #endif 
 
-    auto extensions = getRequireExtensions();
+    const auto extensions = getRequireExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size()); ///< extension counts
     createInfo.ppEnabledExtensionNames = extensions.data();   ///< extension names
 
 
-    /// ���ü����
+    /// 启用检验层
     if(enableValidationLayers)
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size()); ///< gloabl avalidation layers Counts
@@ -148,7 +171,7 @@ bool HelloTriangleApplication::checkValidationLayerSupport()
     return true;
 }
 
-std::vector<const char*> HelloTriangleApplication::getRequireExtensions()
+std::vector<const char*> HelloTriangleApplication::getRequireExtensions() const
 {
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -157,8 +180,26 @@ std::vector<const char*> HelloTriangleApplication::getRequireExtensions()
 
     if(enableValidationLayers)
     {
+        /// 添加扩展 获得检验层的调试信息
         extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
     return std::move(extensions);
+}
+
+
+VkResult HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
+    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pCallback)
+{
+    auto pFunc = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerExt");
+    if(pFunc != nullptr)
+    {
+        return pFunc(instance, pCreateInfo, pAllocator, pCallback);
+    }
+    else
+    {
+        return  VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+
 }

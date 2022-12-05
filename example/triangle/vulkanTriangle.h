@@ -34,6 +34,8 @@ private:
 
     void initVulKan();
 
+    void setupDebugCallback();
+
     void mainLoop() const;
 
     void cleanup();
@@ -43,15 +45,31 @@ private:
     /// @brief 检测所有的检验层都能从列表中找到
     static bool checkValidationLayerSupport();
 
-    /// message callback
-    std::vector<const char *> getRequireExtensions();
+    /// @brief message callback
+    [[nodiscard]] std::vector<const char *> getRequireExtensions() const;
+
+    /**
+     * @brief 创建VkDebugUtilsMessengerEXT对象
+     * @param instance 
+     * @param pCreateInfo 
+     * @param pAllocator 
+     * @param pCallback 
+     * @return 
+     */
+    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                          const VkDebugUtilsMessengerCreateInfoEXT * pCreateInfo,
+                                          const VkAllocationCallbacks * pAllocator,
+                                          VkDebugUtilsMessengerEXT * pCallback);
 
 
 private:
 
+    /**
+     * @brief 当前的绘制的窗口 
+     */
     GLFWwindow* m_window{nullptr};
 
-    /// VulKan
+    /// VulKan instance 
     VkInstance m_vkInstance = nullptr;
 
 };
