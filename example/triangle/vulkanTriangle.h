@@ -50,17 +50,27 @@ private:
 
     /**
      * @brief 创建VkDebugUtilsMessengerEXT对象
-     * @param instance 
-     * @param pCreateInfo 
-     * @param pAllocator 
-     * @param pCallback 
-     * @return 
+     * @param instance vk实例
+     * @param pCreateInfo debug 调试创建对象
+     * @param pAllocator 分配器
+     * @param pCallback 回调函数
+     * @return 结果
      */
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
                                           const VkDebugUtilsMessengerCreateInfoEXT * pCreateInfo,
                                           const VkAllocationCallbacks * pAllocator,
                                           VkDebugUtilsMessengerEXT * pCallback);
 
+
+    /**
+     * @brief 删除debugmessengerEXT对象
+     * @param instance 
+     * @param callback 
+     * @param pAllocator 
+     */
+    void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+                                       VkDebugUtilsMessengerEXT callback,
+                                       const VkAllocationCallbacks* pAllocator);
 
 private:
 
@@ -71,6 +81,8 @@ private:
 
     /// VulKan instance 
     VkInstance m_vkInstance = nullptr;
+
+    VkDebugUtilsMessengerEXT m_callBack;
 
 };
 
