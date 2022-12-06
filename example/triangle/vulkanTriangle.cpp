@@ -135,7 +135,6 @@ void HelloTriangleApplication::createInstance()
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         ///< gloabl avalidation layers Counts
         createInfo.ppEnabledLayerNames = validationLayers.data();
-        createInfo.pNext;
     }
     else
     {
