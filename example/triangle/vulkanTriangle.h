@@ -72,6 +72,12 @@ private:
                                        VkDebugUtilsMessengerEXT callback,
                                        const VkAllocationCallbacks* pAllocator);
 
+
+    /**
+     * @brief 选择物理设备
+     */
+    void pickPhysicalDevice();
+
 private:
 
     /**
@@ -82,7 +88,12 @@ private:
     /// VulKan instance 
     VkInstance m_vkInstance = nullptr;
 
-    VkDebugUtilsMessengerEXT m_callBack;
+    VkDebugUtilsMessengerEXT m_callBack = nullptr;
+
+    /**
+     * @brief 存储选择使用的显卡信息
+     */
+    VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
 
 };
 

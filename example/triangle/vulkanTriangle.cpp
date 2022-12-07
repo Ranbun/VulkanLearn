@@ -31,6 +31,8 @@ void HelloTriangleApplication::initVulKan()
 {
     createInstance();
     setupDebugCallback();
+
+    pickPhysicalDevice();
 }
 
 void HelloTriangleApplication::setupDebugCallback()
@@ -227,4 +229,18 @@ void HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance
     {
         p_func(instance, callback, pAllocator);
     }
+}
+
+void HelloTriangleApplication::pickPhysicalDevice()
+{
+    m_physicalDevice = VK_NULL_HANDLE;
+
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
+
+    if(deviceCount == 0)
+    {
+        throw std::runtime_error("failed to find GPUs with VulKan support!");
+    }
+
 }
