@@ -1,11 +1,13 @@
-#include <vulkan/vulkan.h>
+#ifndef  VULKANTRIANGLE_H_
+#define  VULKANTRIANGLE_H_
 
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <functional>
 #include <iostream>
 #include <stdexcept>
-#include <functional>
-#include <cstdlib>
-#include <cstdint>
-#include <cstring>
+#include <vulkan/vulkan.h>
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -20,6 +22,20 @@ constexpr bool enableValidationLayers = false;
 #else
 constexpr bool enableValidationLayers = true;
 #endif
+
+
+/**
+ * @brief 满足需求队列族的索引
+ */
+struct  QueueFamilyIndices
+{
+    int m_graphicsFamily = -1;
+
+    bool isComplete()
+    {
+        return m_graphicsFamily >= 0;
+    }
+};
 
 class GLFWwindow;
 
@@ -78,6 +94,18 @@ private:
      */
     void pickPhysicalDevice();
 
+    bool isDeviceSuitable(VkPhysicalDevice device);
+
+    int rateDeviceSuitability(VkPhysicalDevice device);
+
+    /**
+     * @brief 查找满足要求的队列族
+     * @param device 传入的设备
+     * @return 队列族的索引
+     */
+    QueueFamilyIndices findQueueFamily(VkPhysicalDevice device);
+
+
 private:
 
     /**
@@ -95,5 +123,9 @@ private:
      */
     VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
 
+
+
+
 };
 
+#endif 

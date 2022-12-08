@@ -2,9 +2,10 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <cassert>
-#include <GLFW/glfw3.h>
+#include <map>
 #include <unordered_set>
 #include <vector>
+#include <GLFW/glfw3.h>
 
 #include "GLFW2VulkanToolFunctionsSet.h"
 #include "VkCallback.h"
@@ -243,4 +244,126 @@ void HelloTriangleApplication::pickPhysicalDevice()
         throw std::runtime_error("failed to find GPUs with VulKan support!");
     }
 
+    // 存储 物理设备对象
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, devices.data());
+
+    for (const auto& device : devices) {
+        if (isDeviceSuitable(device)) {
+            m_physicalDevice = device;
+            break;
+        }
+    }
+
+    if (m_physicalDevice == VK_NULL_HANDLE) 
+    {
+        throw std::runtime_error("failed to find a suitable GPU!");
+    }
+
+#if 0
+    std::multimap<int, VkPhysicalDevice> candidates;
+
+    for (const auto& device : devices)
+    {
+        int score = rateDeviceSuitability(device);
+        candidates.insert(std::make_pair(score, device));
+    }
+
+
+    if(candidates.rbegin()->first > 0)
+    {
+        m_physicalDevice = candidates.rbegin()->second;
+        
+        if(!isDeviceSuitable(m_physicalDevice))
+        {
+            throw std::runtime_error("failed to find a suitable GPU!");
+        }
+    }
+    else
+    {
+        throw std::runtime_error("failed to find a suitable GPU!");
+    }
+#endif
+
+}
+
+QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device)
+{
+    assert(this);
+    QueueFamilyIndices indices;
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    /// VkQueueFamilyProperties 支持的操作类型 和可以创建队列的个数
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto& queueFamily : queueFamilies)
+    {
+        if (queueFamily.queueCount > 0 &&
+            queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.m_graphicsFamily = i;
+        }
+
+        if(indices.isComplete())
+        {
+            break;
+        }
+
+        i++;
+    }
+
+    return indices;
+}
+
+
+bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device)
+{
+    assert(this);
+
+#if 0
+    // 获取设备的属性 name type support VulKan versions
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+    // 纹理压缩 64位浮点 多视口渲染支持查询
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+#endif 
+
+    auto indices = findQueueFamily(device);
+
+    return indices.isComplete();
+
+}
+
+int HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device)
+{
+    assert(this);
+    // 获取设备的属性 name type support VulKan versions
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+    // 纹理压缩 64位浮点 多视口渲染支持查询
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    int score = 0;
+
+    if(deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+    {
+        score += 1000;
+    }
+
+    score += static_cast<int>(deviceProperties.limits.maxImageDimension2D);
+
+    if(!deviceFeatures.geometryShader)
+    {
+        return 0;
+    }
+
+    return score;
 }
