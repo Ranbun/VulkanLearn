@@ -1,18 +1,14 @@
 #ifndef  VULKANTRIANGLE_H_
 #define  VULKANTRIANGLE_H_
 
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
 #include <functional>
 #include <iostream>
-#include <stdexcept>
 #include <vulkan/vulkan.h>
 
 #define GLFW_INCLUDE_VULKAN
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+constexpr int WIDTH = 800;
+constexpr int HEIGHT = 600;
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -31,7 +27,7 @@ struct  QueueFamilyIndices
 {
     int m_graphicsFamily = -1;
 
-    bool isComplete()
+    [[nodiscard]] bool isComplete() const
     {
         return m_graphicsFamily >= 0;
     }
@@ -45,23 +41,45 @@ public:
     void run();
 
 private:
-
+    /**
+     * @brief 初始化窗口
+     */
     void initWindow();
 
+    /**
+     * @brief 初始化vk的环境
+     */
     void initVulKan();
 
+    /**
+     * @brief 设置调试的回调
+     */
     void setupDebugCallback();
 
+    /**
+     * @brief 渲染循环
+     */
     void mainLoop() const;
 
+    /**
+     * @brief 退出时候的清空
+     */
     void cleanup();
 
+    /**
+     * @brief 创建VulKan实例
+     */
     void createInstance();
 
-    /// @brief 检测所有的检验层都能从列表中找到
+    /**
+     * @brief 检测所有的检验层都能从列表中找到
+     * @return 检测结果
+     */
     static bool checkValidationLayerSupport();
 
-    /// @brief message callback
+    /**
+    * @brief message callback
+    */
     [[nodiscard]] std::vector<const char *> getRequireExtensions() const;
 
     /**
@@ -75,14 +93,14 @@ private:
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
                                           const VkDebugUtilsMessengerCreateInfoEXT * pCreateInfo,
                                           const VkAllocationCallbacks * pAllocator,
-                                          VkDebugUtilsMessengerEXT * pCallback);
+                                          VkDebugUtilsMessengerEXT * pCallback) const;
 
 
     /**
-     * @brief 删除debugmessengerEXT对象
-     * @param instance 
-     * @param callback 
-     * @param pAllocator 
+     * @brief 删除 DebugUtilsMessenger 对象
+     * @param instance vk实例
+     * @param callback 被创建的调试对象
+     * @param pAllocator 分配器
      */
     void DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                        VkDebugUtilsMessengerEXT callback,
@@ -94,8 +112,18 @@ private:
      */
     void pickPhysicalDevice();
 
-    bool isDeviceSuitable(VkPhysicalDevice device);
+    /**
+     * @brief 设被是否可用
+     * @param device 被选择的设备
+     * @return 判定结果
+     */
+    bool isDeviceSuitable(VkPhysicalDevice device) const;
 
+    /**
+     * @brief 为选择的设备打分
+     * @param device 被选择的设备
+     * @return 分数
+     */
     int rateDeviceSuitability(VkPhysicalDevice device);
 
     /**
@@ -103,7 +131,12 @@ private:
      * @param device 传入的设备
      * @return 队列族的索引
      */
-    QueueFamilyIndices findQueueFamily(VkPhysicalDevice device);
+    QueueFamilyIndices findQueueFamily(VkPhysicalDevice device) const;
+
+    /**
+     * @brief 创建逻辑设备
+     */
+    void createLogicDevice();
 
 
 private:
@@ -113,9 +146,14 @@ private:
      */
     GLFWwindow* m_window{nullptr};
 
-    /// VulKan instance 
+    /**
+     * @brief VulKan instance 
+     */
     VkInstance m_vkInstance = nullptr;
 
+    /**
+     * @brief 回调对象
+     */
     VkDebugUtilsMessengerEXT m_callBack = nullptr;
 
     /**
@@ -123,6 +161,10 @@ private:
      */
     VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
 
+    /**
+     * @brief 逻辑设备对象
+     */
+    VkDevice m_device = nullptr;
 
 
 

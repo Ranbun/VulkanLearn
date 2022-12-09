@@ -1,9 +1,12 @@
 ﻿#include "vulkanTriangle.h"
 
 #define GLFW_INCLUDE_VULKAN
+
 #include <cassert>
+#include <cstdint>
+#include <cstring>
 #include <map>
-#include <unordered_set>
+#include <stdexcept>
 #include <vector>
 #include <GLFW/glfw3.h>
 
@@ -34,6 +37,7 @@ void HelloTriangleApplication::initVulKan()
     setupDebugCallback();
 
     pickPhysicalDevice();
+    createLogicDevice();
 }
 
 void HelloTriangleApplication::setupDebugCallback()
@@ -199,14 +203,14 @@ std::vector<const char*> HelloTriangleApplication::getRequireExtensions() const
         extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
-    return std::move(extensions);
+    return std::move(extensions);  // NOLINT(clang-diagnostic-pessimizing-move)
 }
 
 
 VkResult HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
                                                                 const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                                                 const VkAllocationCallbacks* pAllocator,
-                                                                VkDebugUtilsMessengerEXT* pCallback)
+                                                                VkDebugUtilsMessengerEXT* pCallback) const
 {
     assert(this);
 
@@ -287,7 +291,7 @@ void HelloTriangleApplication::pickPhysicalDevice()
 
 }
 
-QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device)
+QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const
 {
     assert(this);
     QueueFamilyIndices indices;
@@ -319,8 +323,52 @@ QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice de
     return indices;
 }
 
+void HelloTriangleApplication::createLogicDevice()
+{
+    /// 查找队列族
+    const auto indices = findQueueFamily(m_physicalDevice);
 
-bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device)
+    /// <summary>
+    /// 填充创建队列的结构体
+    /// </summary>
+    VkDeviceQueueCreateInfo queueCreateInfo = {};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.m_graphicsFamily;
+    queueCreateInfo.queueCount = 1;
+
+    ///队列优先级
+    constexpr float queuePriority = 1.0f;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    /// 指定设备的特性
+    VkPhysicalDeviceFeatures deviceFeatures = {};
+    // TODO 设备特性
+
+    /// 创建逻辑设备
+    VkDeviceCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.pQueueCreateInfos = &queueCreateInfo;
+    createInfo.pEnabledFeatures = &deviceFeatures;
+
+    if(enableValidationLayers)
+    {
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    }
+    else
+    {
+        createInfo.enabledExtensionCount = 0;
+    }
+
+    if(vkCreateDevice(m_physicalDevice,&createInfo,nullptr,&m_device) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create logical device");
+    }
+
+}
+
+
+bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
 {
     assert(this);
 

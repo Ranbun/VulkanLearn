@@ -1,8 +1,8 @@
 #include <vulkan/vulkan.h>
 #include <iostream>
-#include <memory>
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 class GLFW2Vulkan
 {
