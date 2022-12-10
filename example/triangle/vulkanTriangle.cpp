@@ -47,6 +47,9 @@ void HelloTriangleApplication::setupDebugMessenger()
         return;
     }
 
+    /// <summary>
+    /// 设置调试信息
+    /// </summary>
     VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
@@ -112,7 +115,7 @@ void HelloTriangleApplication::createInstance()
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    auto extensions = getRequireExtensions();
+    const auto extensions = getRequireExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -124,11 +127,11 @@ void HelloTriangleApplication::createInstance()
 
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = &debugCreateInfo;
+        // createInfo.pNext = nullptr;
     }
     else
     {
         createInfo.enabledLayerCount = 0;
-
         createInfo.pNext = nullptr;
     }
 
@@ -219,7 +222,7 @@ void HelloTriangleApplication::pickPhysicalDevice()
 
     if (deviceCount == 0)
     {
-        throw std::runtime_error("failed to find GPUs with Vulkan support!");
+        throw std::runtime_error("failed to find GPUs with VulKan support!");
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -274,17 +277,17 @@ QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice de
 
 void HelloTriangleApplication::createLogicDevice()
 {
-    QueueFamilyIndices indices = findQueueFamily(m_physicalDevice);
+    const QueueFamilyIndices indices = findQueueFamily(m_physicalDevice);
 
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.queueFamilyIndex = indices.m_graphicsFamily.value();
     queueCreateInfo.queueCount = 1;
 
-    float queuePriority = 1.0f;
+    constexpr float queuePriority = 1.0f;
     queueCreateInfo.pQueuePriorities = &queuePriority;
 
-    VkPhysicalDeviceFeatures deviceFeatures{};
+    constexpr VkPhysicalDeviceFeatures deviceFeatures{};
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -293,7 +296,6 @@ void HelloTriangleApplication::createLogicDevice()
     createInfo.queueCreateInfoCount = 1;
 
     createInfo.pEnabledFeatures = &deviceFeatures;
-
     createInfo.enabledExtensionCount = 0;
 
     if (enableValidationLayers)
@@ -313,6 +315,17 @@ void HelloTriangleApplication::createLogicDevice()
 
 }
 
+void HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+{
+    createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    createInfo.pfnUserCallback = debugCallback;
+}
+
 
 bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
 {
@@ -328,7 +341,7 @@ bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 #endif 
 
-    auto indices = findQueueFamily(device);
+    const auto indices = findQueueFamily(device);
 
     return indices.isComplete();
 

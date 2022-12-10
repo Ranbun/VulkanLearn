@@ -44,6 +44,7 @@ public:
     void run();
 
 private:
+
     /**
      * @brief 初始化窗口
      */
@@ -98,7 +99,6 @@ private:
                                           const VkAllocationCallbacks * pAllocator,
                                           VkDebugUtilsMessengerEXT * pCallback) const;
 
-
     /**
      * @brief 删除 DebugUtilsMessenger 对象
      * @param instance vk实例
@@ -108,7 +108,6 @@ private:
     void DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                        VkDebugUtilsMessengerEXT callback,
                                        const VkAllocationCallbacks* pAllocator);
-
 
     /**
      * @brief 选择物理设备
@@ -141,18 +140,11 @@ private:
      */
     void createLogicDevice();
 
-
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
-    {
-        createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        createInfo.pfnUserCallback = debugCallback;
-    }
-
+    /**
+     * @brief 设置结构体的属性
+     * @param createInfo 被设置的结构体
+     */
+    static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
 private:
 
@@ -180,7 +172,6 @@ private:
      * @brief 逻辑设备对象
      */
     VkDevice m_device = nullptr;
-
 
 
 };
