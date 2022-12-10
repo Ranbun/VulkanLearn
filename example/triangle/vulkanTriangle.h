@@ -3,7 +3,10 @@
 
 #include <functional>
 #include <iostream>
+#include <optional>
 #include <vulkan/vulkan.h>
+
+#include "VkCallback.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -25,11 +28,11 @@ constexpr bool enableValidationLayers = true;
  */
 struct  QueueFamilyIndices
 {
-    int m_graphicsFamily = -1;
+    std::optional<uint32_t> m_graphicsFamily = -1;
 
     [[nodiscard]] bool isComplete() const
     {
-        return m_graphicsFamily >= 0;
+        return m_graphicsFamily.has_value();
     }
 };
 
@@ -54,7 +57,7 @@ private:
     /**
      * @brief 设置调试的回调
      */
-    void setupDebugCallback();
+    void setupDebugMessenger();
 
     /**
      * @brief 渲染循环
@@ -137,6 +140,18 @@ private:
      * @brief 创建逻辑设备
      */
     void createLogicDevice();
+
+
+    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+    {
+        createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = debugCallback;
+    }
 
 
 private:
