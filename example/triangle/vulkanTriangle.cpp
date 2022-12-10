@@ -80,6 +80,9 @@ void HelloTriangleApplication::mainLoop() const
 
 void HelloTriangleApplication::cleanup()
 {
+    /// 逻辑设备
+    vkDestroyDevice(m_device, nullptr);
+
     /// delete Vk Instance
     /// clean others objects before VK Instance
     // TODO: destroy others vk Objects
@@ -312,6 +315,9 @@ void HelloTriangleApplication::createLogicDevice()
     {
         throw std::runtime_error("failed to create logical device!");
     }
+
+    vkGetDeviceQueue(m_device, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
+
 
 }
 

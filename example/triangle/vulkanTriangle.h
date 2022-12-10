@@ -174,6 +174,17 @@ private:
     VkDevice m_device = nullptr;
 
 
+    /**
+     * @brief 逻辑设备队列
+     */
+    VkQueue m_graphicsQueue = nullptr;
+
+    /**
+     * @brief 窗口表面
+     */
+    VkSurfaceKHR m_surface;
+
+
 };
 
 #endif 
