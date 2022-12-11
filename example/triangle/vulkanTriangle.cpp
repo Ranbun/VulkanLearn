@@ -1,17 +1,19 @@
-﻿#include "vulkanTriangle.h"
+﻿#define VK_USE_PLATFORM_WIN32_KHR 
 
-#define GLFW_INCLUDE_VULKAN
-
+#include "vulkanTriangle.h"
 #include <cassert>
 #include <cstdint>
 #include <cstring>
-#include <map>
 #include <stdexcept>
 #include <vector>
-#include <GLFW/glfw3.h>
 
 #include "GLFW2VulkanToolFunctionsSet.h"
 #include "VkCallback.h"
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 void HelloTriangleApplication::run()
 {
@@ -35,6 +37,11 @@ void HelloTriangleApplication::initVulKan()
 {
     createInstance();
     setupDebugMessenger();
+
+    /// <summary>
+    /// 创建surface 
+    /// </summary>
+    createSurface();
 
     pickPhysicalDevice();
     createLogicDevice();
@@ -330,6 +337,30 @@ void HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMess
     createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     createInfo.pfnUserCallback = debugCallback;
+}
+
+void HelloTriangleApplication::createSurface()
+{
+
+#if 0
+    VkWin32SurfaceCreateInfoKHR createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_KHR;
+    createInfo.hwnd = glfwGetWin32Window(m_window);
+    createInfo.hinstance = GetModuleHandle(nullptr);
+
+    const auto CreateWin32SurfaceKHR = reinterpret_cast<PFN_vkCreateWin32SurfaceKHR>(vkGetInstanceProcAddr(m_vkInstance, "vkCreateWin32SurfaceKHR"));
+
+    if (!CreateWin32SurfaceKHR || CreateWin32SurfaceKHR(m_vkInstance,&createInfo,nullptr,&m_surface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create window surface");
+    }
+#endif
+
+    if(glfwCreateWindowSurface(m_vkInstance,m_window,nullptr,&m_surface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create window surface");
+    }
+
 }
 
 

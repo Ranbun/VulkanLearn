@@ -6,10 +6,6 @@
 #include <optional>
 #include <vulkan/vulkan.h>
 
-#include "VkCallback.h"
-
-#define GLFW_INCLUDE_VULKAN
-
 constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
 
@@ -146,6 +142,9 @@ private:
      */
     static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
+    void createSurface();
+
+
 private:
 
     /**
@@ -182,7 +181,7 @@ private:
     /**
      * @brief 窗口表面
      */
-    VkSurfaceKHR m_surface;
+    VkSurfaceKHR m_surface = nullptr;
 
 
 };
