@@ -309,14 +309,14 @@ void HelloTriangleApplication::createLogicDevice()
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<int> uniqueQueueFamilies = { static_cast<int>(indices.m_graphicsFamily.value()),static_cast<int>(indices.m_presentFamily.value()) };
 
-    constexpr float queuePrioority = 1.0f;
+    constexpr float queuePriority = 1.0f;
     for(const int queueFamily: uniqueQueueFamilies)
     {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily;
         queueCreateInfo.queueCount = 1.0;
-        queueCreateInfo.pQueuePriorities = &queuePrioority;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
         queueCreateInfos.emplace_back(queueCreateInfo);
     }
 
