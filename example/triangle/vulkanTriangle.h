@@ -25,10 +25,13 @@ constexpr bool enableValidationLayers = true;
 struct  QueueFamilyIndices
 {
     std::optional<uint32_t> m_graphicsFamily = -1;
+    std::optional<uint32_t> m_presentFamily = -1;
+
 
     [[nodiscard]] bool isComplete() const
     {
-        return m_graphicsFamily.has_value();
+        return (m_graphicsFamily.has_value() && m_presentFamily.has_value())?
+            m_graphicsFamily.value() != -1 && m_presentFamily.value() != -1 : false;
     }
 };
 
@@ -182,6 +185,13 @@ private:
      * @brief 窗口表面
      */
     VkSurfaceKHR m_surface = nullptr;
+
+
+    /**
+     * @brief 显示队列
+     * @note 确保渲染结果能在我们创建的表面上显示(需要选择的物理设备支持)
+     */
+    VkQueue m_presentQueue = nullptr;
 
 
 };
