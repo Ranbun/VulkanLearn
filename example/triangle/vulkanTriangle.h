@@ -10,6 +10,7 @@ constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
 /// use validation layers ?
 #ifdef NODEBUG
@@ -145,7 +146,15 @@ private:
      */
     static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
+    /**
+     * @brief 创建显示的表面
+     */
     void createSurface();
+
+    /**
+     * @brief 检查设备支持情况
+     */
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device) const;
 
 
 private:

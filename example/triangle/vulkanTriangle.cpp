@@ -428,6 +428,16 @@ void HelloTriangleApplication::createSurface()
 
 }
 
+bool HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) const
+{
+    assert(this);
+
+
+
+
+    return true;
+}
+
 
 bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
 {
@@ -444,8 +454,10 @@ bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
 #endif 
 
     const auto indices = findQueueFamily(device);
+    const auto extensionSupport = checkDeviceExtensionSupport(device);
 
-    return indices.isComplete();
+
+    return indices.isComplete() && extensionSupport;
 
 }
 
