@@ -1,9 +1,7 @@
 #ifndef  VULKANTRIANGLE_H_
 #define  VULKANTRIANGLE_H_
 
-#include <functional>
-#include <iostream>
-#include <optional>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 constexpr int WIDTH = 1000;
@@ -19,27 +17,38 @@ constexpr bool enableValidationLayers = false;
 constexpr bool enableValidationLayers = true;
 #endif
 
-
-/**
- * @brief 满足需求队列族的索引
- */
-struct QueueFamilyIndices
-{
-    std::optional<uint32_t> m_graphicsFamily = -1;
-    std::optional<uint32_t> m_presentFamily = -1;
-
-
-    [[nodiscard]] auto isComplete() const -> bool;
-};
-
 /**
  * @brief  前置申明
  */
 class GLFWwindow;
 
+/**
+ * @brief 交换链的的检测
+ */
+struct SwapChainSupportDetails;
+
+/**
+ * @brief 队列的信息
+ */
+struct QueueFamilyIndices;
+
+
+
+/**
+ * @brief VulKan渲染三角形基类
+ */
 class HelloTriangleApplication
 {
 public:
+    HelloTriangleApplication() = default;
+    virtual ~HelloTriangleApplication() = default;
+
+    HelloTriangleApplication(const HelloTriangleApplication&) = delete;
+    HelloTriangleApplication(const HelloTriangleApplication&&) = delete;
+
+    auto operator=(const HelloTriangleApplication&) -> HelloTriangleApplication& = delete;
+    auto operator=(const HelloTriangleApplication&&) -> HelloTriangleApplication& = delete;
+
     auto run() -> void;
 
 private:

@@ -17,10 +17,9 @@
 #include <set>
 #include <GLFW/glfw3native.h>
 
-auto QueueFamilyIndices::isComplete() const -> bool
-{
-    return m_graphicsFamily.has_value() && m_presentFamily.has_value();
-}
+#include "QueueFamilyIndices.h"
+#include "SwapChainSupportDetails.h"
+
 
 auto HelloTriangleApplication::run() -> void
 {
@@ -56,9 +55,7 @@ auto HelloTriangleApplication::setupDebugMessenger() -> void
         return;
     }
 
-    /// <summary>
     /// 设置调试信息
-    /// </summary>
     VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
@@ -161,13 +158,13 @@ auto HelloTriangleApplication::checkValidationLayerSupport() -> bool
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-    std::vector<VkLayerProperties> avaliableLayers(layerCount);
-    vkEnumerateInstanceLayerProperties(&layerCount, avaliableLayers.data());
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
     for (const auto layerName : validationLayers)
     {
         auto layerFound = false;
-        for (const auto& layerProperties : avaliableLayers)
+        for (const auto& layerProperties : availableLayers)
         {
             if (strcmp(layerName, layerProperties.layerName) == 0)
             {
@@ -278,11 +275,12 @@ auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const ->
     for (const auto& queueFamily : queueFamilies)
     {
         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) ///< 是否支持渲染命令
         {
             indices.m_graphicsFamily = i;
         }
 
+        /// 显示命令
         if (queueFamily.queueCount > 0 && presentSupport)
         {
             indices.m_presentFamily = i;
@@ -340,15 +338,18 @@ auto HelloTriangleApplication::createLogicDevice() -> void
         createInfo.enabledLayerCount = 0;
     }
 
+    /// 启用交换链
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+
     if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create logical device!");
     }
 
-
     vkGetDeviceQueue(m_device, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
     vkGetDeviceQueue(m_device, indices.m_presentFamily.value(), 0, &m_presentQueue);
-
 
 #if 0
     const QueueFamilyIndices indices = findQueueFamily(m_physicalDevice);
@@ -428,9 +429,20 @@ auto HelloTriangleApplication::createSurface() -> void
 auto HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool
 {
     assert(this);
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
+    /// 确保我们所需要的扩展能被当前设备支持
+    std::set<std::string> requireExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
-    return true;
+    for (const auto & extension: availableExtensions)
+    {
+        requireExtensions.erase(extension.extensionName);
+    }
+
+    return requireExtensions.empty();
 }
 
 

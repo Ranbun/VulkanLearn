@@ -1,19 +1,22 @@
-#include <vulkan/vulkan.h>
+#ifndef GLFW2VULKANTOOLFUNCTIONSETS_H_
+#define GLFW2VULKANTOOLFUNCTIONSETS_H_
+
 #include <iostream>
-#include <vector>
 #include <string>
 #include <unordered_set>
+#include <vector>
+#include <vulkan/vulkan.h>
 
-class GLFW2Vulkan
+class GLFW2VulKan
 {
 public:
-    static std::vector<std::string> matchGLFWExtensionsInVulKanExtensions(
-        std::unordered_set<std::string>& GLFWExtensions,
-        std::vector<VkExtensionProperties>& vkExtensions)
+    static auto matchGlfwExtensionsInVulKanExtensions(
+        std::unordered_set<std::string>& glfwExtensions,
+        const std::vector<VkExtensionProperties>& vkExtensions) -> std::vector<std::string>
     {
         std::cout << "GLFW available extension: " << std::endl;
         std::vector<std::string> GLFWSupportExtensionsInVk;
-        for (auto & extension : GLFWExtensions)
+        for (auto & extension : glfwExtensions)
         {
             std::cout << "\t" << extension << std::endl;
         }
@@ -23,7 +26,7 @@ public:
         {
             std::cout << "\t" << it.extensionName << std::endl;
 
-            if (GLFWExtensions.find(it.extensionName) != GLFWExtensions.end())
+            if (glfwExtensions.find(it.extensionName) != glfwExtensions.end())
             {
                 GLFWSupportExtensionsInVk.emplace_back(it.extensionName);
             }
@@ -33,3 +36,6 @@ public:
     }
 
 };
+
+
+#endif 
