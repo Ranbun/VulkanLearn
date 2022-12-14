@@ -6,7 +6,7 @@
 
 struct SwapChainSupportDetails
 {
-    VkSurfaceCapabilitiesKHR m_capabilities;
+    VkSurfaceCapabilitiesKHR m_capabilities{};
     std::vector<VkSurfaceFormatKHR> m_format;
     std::vector<VkPresentModeKHR> m_presentModes;
 };

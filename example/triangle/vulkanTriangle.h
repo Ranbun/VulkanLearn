@@ -163,7 +163,36 @@ private:
      */
     auto checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool;
 
+    /**
+     * @brief 获取交换链的属性 
+     * @param device 物理设备
+     * @return 获取的结果
+     */
     auto querySwapChainSupport(VkPhysicalDevice device) const -> SwapChainSupportDetails;
+
+    /**
+     * @brief 选择合适的表面格式
+     * @param availableFormats 当前物理设备的所有的表面格式 
+     * @return 选中的表面格式
+     */
+    auto chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) -> VkSurfaceFormatKHR;
+
+
+    /**
+     * @brief 查找最佳显示模式
+     * @param availablePresentModes 对应物理设备的呈现模式
+     * @return 查找的最佳显示模式
+     */
+    auto chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) -> VkPresentModeKHR;
+
+    /**
+     * @brief 选择合适的交换范围  - 图像的分辨率
+     * @param capabilities 表面的基础属性
+     * @return 选择的结果
+     */
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+    auto createSwapChain() -> void;
 
 
 private:
@@ -207,6 +236,12 @@ private:
      * @note 确保渲染结果能在我们创建的表面上显示(需要选择的物理设备支持)
      */
     VkQueue m_presentQueue = nullptr;
+
+    /**
+     * @brief 被创建的交换链的句柄
+     */
+    VkSwapchainKHR m_swapChain;
+
 };
 
 #endif
