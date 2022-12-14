@@ -163,6 +163,9 @@ private:
      */
     auto checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool;
 
+    auto querySwapChainSupport(VkPhysicalDevice device) const -> SwapChainSupportDetails;
+
+
 private:
     /**
      * @brief 当前的绘制的窗口 

@@ -445,6 +445,32 @@ auto HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice devi
     return requireExtensions.empty();
 }
 
+auto HelloTriangleApplication::querySwapChainSupport(VkPhysicalDevice device) const -> SwapChainSupportDetails
+{
+    assert(this);
+    SwapChainSupportDetails details;
+
+    ///获取表面属性 
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.m_capabilities);
+
+    /// 表面支持的格式
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, nullptr);
+
+    if(formatCount != 0)
+    {
+        details.m_format.resize(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.m_format.data());
+    }
+
+    /// 可用的呈现模式
+    ///
+
+
+
+    return details;
+}
+
 
 auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -> bool
 {
