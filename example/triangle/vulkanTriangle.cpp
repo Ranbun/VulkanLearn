@@ -1,6 +1,7 @@
 ﻿#define VK_USE_PLATFORM_WIN32_KHR 
 
 #include "vulkanTriangle.h"
+
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -16,7 +17,12 @@
 #include <set>
 #include <GLFW/glfw3native.h>
 
-void HelloTriangleApplication::run()
+auto QueueFamilyIndices::isComplete() const -> bool
+{
+    return m_graphicsFamily.has_value() && m_presentFamily.has_value();
+}
+
+auto HelloTriangleApplication::run() -> void
 {
     initWindow();
     initVulKan();
@@ -24,31 +30,26 @@ void HelloTriangleApplication::run()
     cleanup();
 }
 
-void HelloTriangleApplication::initWindow()
+auto HelloTriangleApplication::initWindow() -> void
 {
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); ///< make GLFW don't create it(OpenGL Context)
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); ///< no resizing
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);   ///< no resizing
 
     m_window = glfwCreateWindow(WIDTH, HEIGHT, "VulKan Window", nullptr, nullptr);
 }
 
-void HelloTriangleApplication::initVulKan()
+auto HelloTriangleApplication::initVulKan() -> void
 {
     createInstance();
     setupDebugMessenger();
-
-    /// <summary>
-    /// 创建surface 
-    /// </summary>
-    createSurface();
-
+    createSurface();///< 创建绘制的表面
     pickPhysicalDevice();
     createLogicDevice();
 }
 
-void HelloTriangleApplication::setupDebugMessenger()
+auto HelloTriangleApplication::setupDebugMessenger() -> void
 {
     if constexpr (!enableValidationLayers)
     {
@@ -78,7 +79,7 @@ void HelloTriangleApplication::setupDebugMessenger()
 }
 
 
-void HelloTriangleApplication::mainLoop() const
+auto HelloTriangleApplication::mainLoop() const -> void
 {
     while (!glfwWindowShouldClose(m_window))
     {
@@ -86,7 +87,7 @@ void HelloTriangleApplication::mainLoop() const
     }
 }
 
-void HelloTriangleApplication::cleanup()
+auto HelloTriangleApplication::cleanup() -> void
 {
     /// 逻辑设备
     vkDestroyDevice(m_device, nullptr);
@@ -112,7 +113,7 @@ void HelloTriangleApplication::cleanup()
     m_window = nullptr;
 }
 
-void HelloTriangleApplication::createInstance()
+auto HelloTriangleApplication::createInstance() -> void
 {
     if (enableValidationLayers && !checkValidationLayerSupport())
     {
@@ -143,7 +144,6 @@ void HelloTriangleApplication::createInstance()
 
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = &debugCreateInfo;
-        // createInfo.pNext = nullptr;
     }
     else
     {
@@ -157,7 +157,7 @@ void HelloTriangleApplication::createInstance()
     }
 }
 
-bool HelloTriangleApplication::checkValidationLayerSupport()
+auto HelloTriangleApplication::checkValidationLayerSupport() -> bool
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -166,7 +166,7 @@ bool HelloTriangleApplication::checkValidationLayerSupport()
 
     for (const auto layerName : validationLayers)
     {
-        bool layerFound = false;
+        auto layerFound = false;
         for (const auto& layerProperties : avaliableLayers)
         {
             if (strcmp(layerName, layerProperties.layerName) == 0)
@@ -185,12 +185,12 @@ bool HelloTriangleApplication::checkValidationLayerSupport()
     return true;
 }
 
-std::vector<const char*> HelloTriangleApplication::getRequireExtensions() const
+auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const char *>
 {
     uint32_t glfwExtensionCount = 0;
-    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+    std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     if (enableValidationLayers)
     {
@@ -198,14 +198,14 @@ std::vector<const char*> HelloTriangleApplication::getRequireExtensions() const
         extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
-    return std::move(extensions);  // NOLINT(clang-diagnostic-pessimizing-move)
+    return std::move(extensions); // NOLINT(clang-diagnostic-pessimizing-move)
 }
 
 
-VkResult HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                                                const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                                                                const VkAllocationCallbacks* pAllocator,
-                                                                VkDebugUtilsMessengerEXT* pCallback) const
+auto HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                                            const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+                                                            const VkAllocationCallbacks* pAllocator,
+                                                            VkDebugUtilsMessengerEXT* pCallback) const -> VkResult
 {
     assert(this);
 
@@ -218,8 +218,8 @@ VkResult HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance insta
     return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
-void HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback,
-                                                             const VkAllocationCallbacks* pAllocator)
+auto HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback,
+                                                             const VkAllocationCallbacks* pAllocator) const -> void
 {
     assert(this);
 
@@ -231,7 +231,7 @@ void HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance
     }
 }
 
-void HelloTriangleApplication::pickPhysicalDevice()
+auto HelloTriangleApplication::pickPhysicalDevice() -> void
 {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
@@ -257,10 +257,9 @@ void HelloTriangleApplication::pickPhysicalDevice()
     {
         throw std::runtime_error("failed to find a suitable GPU!");
     }
-
 }
 
-QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const
+auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const -> QueueFamilyIndices
 {
     assert(this);
     QueueFamilyIndices indices;
@@ -275,7 +274,7 @@ QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice de
     VkBool32 presentSupport = false;
 
 
-    int i = 0;
+    auto i = 0;
     for (const auto& queueFamily : queueFamilies)
     {
         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
@@ -284,11 +283,11 @@ QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice de
             indices.m_graphicsFamily = i;
         }
 
-        if(queueFamily.queueCount > 0 && presentSupport)
+        if (queueFamily.queueCount > 0 && presentSupport)
         {
             indices.m_presentFamily = i;
         }
-        
+
 
         if (indices.isComplete())
         {
@@ -301,16 +300,17 @@ QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice de
     return indices;
 }
 
-void HelloTriangleApplication::createLogicDevice()
+auto HelloTriangleApplication::createLogicDevice() -> void
 {
-
-    const QueueFamilyIndices indices = findQueueFamily(m_physicalDevice);
+    const auto indices = findQueueFamily(m_physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<int> uniqueQueueFamilies = { static_cast<int>(indices.m_graphicsFamily.value()),static_cast<int>(indices.m_presentFamily.value()) };
+    std::set<int> uniqueQueueFamilies = {
+        static_cast<int>(indices.m_graphicsFamily.value()), static_cast<int>(indices.m_presentFamily.value())
+    };
 
-    constexpr float queuePriority = 1.0f;
-    for(const int queueFamily: uniqueQueueFamilies)
+    constexpr auto queuePriority = 1.0f;
+    for (const auto queueFamily : uniqueQueueFamilies)
     {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -324,7 +324,7 @@ void HelloTriangleApplication::createLogicDevice()
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
     createInfo.pQueueCreateInfos = queueCreateInfos.data();
-    createInfo.queueCreateInfoCount = queueCreateInfos.size();
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 
     constexpr VkPhysicalDeviceFeatures deviceFeatures{};
     createInfo.pEnabledFeatures = &deviceFeatures;
@@ -389,11 +389,10 @@ void HelloTriangleApplication::createLogicDevice()
 
 
     vkGetDeviceQueue(m_device, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
-#endif 
-
+#endif
 }
 
-void HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+auto HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) -> void
 {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -404,9 +403,8 @@ void HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMess
     createInfo.pfnUserCallback = debugCallback;
 }
 
-void HelloTriangleApplication::createSurface()
+auto HelloTriangleApplication::createSurface() -> void
 {
-
 #if 0
     VkWin32SurfaceCreateInfoKHR createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_KHR;
@@ -421,25 +419,22 @@ void HelloTriangleApplication::createSurface()
     }
 #endif
 
-    if(glfwCreateWindowSurface(m_vkInstance,m_window,nullptr,&m_surface) != VK_SUCCESS)
+    if (glfwCreateWindowSurface(m_vkInstance, m_window, nullptr, &m_surface) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create window surface");
     }
-
 }
 
-bool HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) const
+auto HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool
 {
     assert(this);
-
-
 
 
     return true;
 }
 
 
-bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
+auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -> bool
 {
     assert(this);
 
@@ -451,17 +446,16 @@ bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
     // 纹理压缩 64位浮点 多视口渲染支持查询
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-#endif 
+#endif
 
     const auto indices = findQueueFamily(device);
     const auto extensionSupport = checkDeviceExtensionSupport(device);
 
 
     return indices.isComplete() && extensionSupport;
-
 }
 
-int HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device)
+auto HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) const -> int
 {
     assert(this);
     // 获取设备的属性 name type support VulKan versions
@@ -472,16 +466,16 @@ int HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device)
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-    int score = 0;
+    auto score = 0;
 
-    if(deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
     {
         score += 1000;
     }
 
     score += static_cast<int>(deviceProperties.limits.maxImageDimension2D);
 
-    if(!deviceFeatures.geometryShader)
+    if (!deviceFeatures.geometryShader)
     {
         return 0;
     }

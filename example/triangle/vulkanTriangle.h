@@ -6,11 +6,11 @@
 #include <optional>
 #include <vulkan/vulkan.h>
 
-constexpr int WIDTH = 800;
-constexpr int HEIGHT = 600;
+constexpr int WIDTH = 1000;
+constexpr int HEIGHT = 800;
 
-const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
-const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+const std::vector validationLayers = {"VK_LAYER_KHRONOS_validation"};
+const std::vector deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 /// use validation layers ?
 #ifdef NODEBUG
@@ -23,68 +23,66 @@ constexpr bool enableValidationLayers = true;
 /**
  * @brief 满足需求队列族的索引
  */
-struct  QueueFamilyIndices
+struct QueueFamilyIndices
 {
     std::optional<uint32_t> m_graphicsFamily = -1;
     std::optional<uint32_t> m_presentFamily = -1;
 
 
-    [[nodiscard]] bool isComplete() const
-    {
-        return (m_graphicsFamily.has_value() && m_presentFamily.has_value())?
-            m_graphicsFamily.value() != -1 && m_presentFamily.value() != -1 : false;
-    }
+    [[nodiscard]] auto isComplete() const -> bool;
 };
 
+/**
+ * @brief  前置申明
+ */
 class GLFWwindow;
 
 class HelloTriangleApplication
 {
 public:
-    void run();
+    auto run() -> void;
 
 private:
-
     /**
      * @brief 初始化窗口
      */
-    void initWindow();
+    auto initWindow() -> void;
 
     /**
      * @brief 初始化vk的环境
      */
-    void initVulKan();
+    auto initVulKan() -> void;
 
     /**
      * @brief 设置调试的回调
      */
-    void setupDebugMessenger();
+    auto setupDebugMessenger() -> void;
 
     /**
      * @brief 渲染循环
      */
-    void mainLoop() const;
+    auto mainLoop() const -> void;
 
     /**
      * @brief 退出时候的清空
      */
-    void cleanup();
+    auto cleanup() -> void;
 
     /**
      * @brief 创建VulKan实例
      */
-    void createInstance();
+    auto createInstance() -> void;
 
     /**
      * @brief 检测所有的检验层都能从列表中找到
      * @return 检测结果
      */
-    static bool checkValidationLayerSupport();
+    static auto checkValidationLayerSupport() -> bool;
 
     /**
     * @brief message callback
     */
-    [[nodiscard]] std::vector<const char *> getRequireExtensions() const;
+    [[nodiscard]] auto getRequireExtensions() const -> std::vector<const char *>;
 
     /**
      * @brief 创建VkDebugUtilsMessengerEXT对象
@@ -94,10 +92,10 @@ private:
      * @param pCallback 回调函数
      * @return 结果
      */
-    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                          const VkDebugUtilsMessengerCreateInfoEXT * pCreateInfo,
-                                          const VkAllocationCallbacks * pAllocator,
-                                          VkDebugUtilsMessengerEXT * pCallback) const;
+    auto CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                      const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+                                      const VkAllocationCallbacks* pAllocator,
+                                      VkDebugUtilsMessengerEXT* pCallback) const -> VkResult;
 
     /**
      * @brief 删除 DebugUtilsMessenger 对象
@@ -105,60 +103,58 @@ private:
      * @param callback 被创建的调试对象
      * @param pAllocator 分配器
      */
-    void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+    auto DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                        VkDebugUtilsMessengerEXT callback,
-                                       const VkAllocationCallbacks* pAllocator);
+                                       const VkAllocationCallbacks* pAllocator) const -> void;
 
     /**
      * @brief 选择物理设备
      */
-    void pickPhysicalDevice();
+    auto pickPhysicalDevice() -> void;
 
     /**
      * @brief 设被是否可用
      * @param device 被选择的设备
      * @return 判定结果
      */
-    bool isDeviceSuitable(VkPhysicalDevice device) const;
+    auto isDeviceSuitable(VkPhysicalDevice device) const -> bool;
 
     /**
      * @brief 为选择的设备打分
      * @param device 被选择的设备
      * @return 分数
      */
-    int rateDeviceSuitability(VkPhysicalDevice device);
+    auto rateDeviceSuitability(VkPhysicalDevice device) const -> int;
 
     /**
      * @brief 查找满足要求的队列族
      * @param device 传入的设备
      * @return 队列族的索引
      */
-    QueueFamilyIndices findQueueFamily(VkPhysicalDevice device) const;
+    auto findQueueFamily(VkPhysicalDevice device) const -> QueueFamilyIndices;
 
     /**
      * @brief 创建逻辑设备
      */
-    void createLogicDevice();
+    auto createLogicDevice() -> void;
 
     /**
      * @brief 设置结构体的属性
      * @param createInfo 被设置的结构体
      */
-    static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+    static auto populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) -> void;
 
     /**
      * @brief 创建显示的表面
      */
-    void createSurface();
+    auto createSurface() -> void;
 
     /**
      * @brief 检查设备支持情况
      */
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device) const;
-
+    auto checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool;
 
 private:
-
     /**
      * @brief 当前的绘制的窗口 
      */
@@ -184,7 +180,6 @@ private:
      */
     VkDevice m_device = nullptr;
 
-
     /**
      * @brief 逻辑设备队列
      */
@@ -195,14 +190,11 @@ private:
      */
     VkSurfaceKHR m_surface = nullptr;
 
-
     /**
      * @brief 显示队列
      * @note 确保渲染结果能在我们创建的表面上显示(需要选择的物理设备支持)
      */
     VkQueue m_presentQueue = nullptr;
-
-
 };
 
-#endif 
+#endif

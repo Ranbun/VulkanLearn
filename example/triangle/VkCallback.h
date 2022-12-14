@@ -22,6 +22,4 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 }
 
 
-
-
 #endif // !VKCALLBACK_H_
