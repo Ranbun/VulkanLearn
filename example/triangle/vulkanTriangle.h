@@ -192,7 +192,11 @@ private:
      */
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+    /**
+     * @brief  创建交换链
+     */
     auto createSwapChain() -> void;
+
 
 
 private:
@@ -241,6 +245,22 @@ private:
      * @brief 被创建的交换链的句柄
      */
     VkSwapchainKHR m_swapChain;
+
+
+    /**
+     * @brief 交换链图像
+     */
+    std::vector<VkImage> m_swapChainImages;
+
+    /**
+     * @brief 交换链图像格式
+     */
+    VkFormat m_swapChainImageFormat;
+
+    /**
+     * @brief 交换链图像范围
+     */
+    VkExtent2D m_swapChainExtent;
 
 };
 

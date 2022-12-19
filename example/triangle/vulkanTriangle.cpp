@@ -91,7 +91,7 @@ void HelloTriangleApplication::mainLoop() const
 
 void HelloTriangleApplication::cleanup()
 {
-    /// 交换链
+    /// 删除交换链
     vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
 
     /// 逻辑设备
@@ -606,7 +606,14 @@ auto HelloTriangleApplication::createSwapChain() -> void
         throw std::runtime_error("Failed to create swap chain");
     }
 
+    /// 获取交换链图像的数量
+    vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, nullptr);
+    m_swapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
 
+    /// 记录交换链图像格式与图像范围
+    m_swapChainImageFormat = surfaceFormat.format;
+    m_swapChainExtent = extent;
 }
 
 
