@@ -197,6 +197,16 @@ private:
      */
     auto createSwapChain() -> void;
 
+    /**
+     * @brief 创建图像视图
+     */
+    auto createImageViews() -> void ;
+
+
+    /**
+     * @brief  创建管线
+     */
+    void createGraphicsPipeline();
 
 
 private:
@@ -223,7 +233,7 @@ private:
     /**
      * @brief 逻辑设备对象
      */
-    VkDevice m_device = nullptr;
+    VkDevice m_logicDevice = nullptr;
 
     /**
      * @brief 逻辑设备队列
@@ -251,6 +261,12 @@ private:
      * @brief 交换链图像
      */
     std::vector<VkImage> m_swapChainImages;
+
+    /**
+     * @brief 访问图像创建的图像试图 
+     */                                                                          
+    std::vector<VkImageView> m_swapChainImagesViews;
+
 
     /**
      * @brief 交换链图像格式

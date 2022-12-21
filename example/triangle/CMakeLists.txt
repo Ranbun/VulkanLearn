@@ -14,3 +14,6 @@ target_include_directories(${target_}
 )
 
 target_link_libraries(${target_} PRIVATE glfw glm::glm Vulkan::Vulkan)
+
+FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/sources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
