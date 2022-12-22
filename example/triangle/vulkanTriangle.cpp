@@ -678,6 +678,77 @@ auto HelloTriangleApplication::createGraphicsPipeline() const -> void
     vertShaderStageInfo.pName = "main";
 
 
+    VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
+    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragShaderStageInfo.module = fragShaderModule;
+    fragShaderStageInfo.pName = "main";
+
+    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo,fragShaderStageInfo};
+
+    {   /// 顶点输入
+        VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+        vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertexInputInfo.vertexBindingDescriptionCount = 0;
+        vertexInputInfo.pVertexBindingDescriptions = nullptr;
+        vertexInputInfo.vertexAttributeDescriptionCount = 0;
+        vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+    }
+
+    {   /// 输入装配 
+        VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
+        inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        inputAssembly.primitiveRestartEnable = VK_TRUE;
+    }
+
+    /// 视口和裁剪矩形
+    {    
+        VkPipelineViewportStateCreateInfo viewportState = {};
+        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+
+        /// 视口和裁剪 
+        VkViewport viewport = {};
+
+        {
+            viewportState.viewportCount = 1;
+            viewport.x = 0.0f;
+            viewport.y = 0.0f;
+            viewport.width = static_cast<float>(m_swapChainExtent.width);
+            viewport.height = static_cast<float>(m_swapChainExtent.height);
+
+            viewport.minDepth = 0.0f;
+            viewport.maxDepth = 1.0f;
+        }
+        viewportState.pViewports = &viewport;
+    
+        VkRect2D scissor = {};
+        {
+            viewportState.scissorCount = 1;
+            scissor.offset = { 0,0 };
+            scissor.extent = m_swapChainExtent;
+        }
+        viewportState.pScissors = &scissor;
+
+    }
+
+    /// 光栅化
+    {
+        VkPipelineRasterizationStateCreateInfo rasterizer = {};
+        rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterizer.depthClampEnable = VK_TRUE;
+        rasterizer.rasterizerDiscardEnable = VK_FALSE;
+        rasterizer.lineWidth = 1.0f;
+        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+
+        rasterizer.depthBiasEnable = VK_FALSE;
+        rasterizer.depthBiasConstantFactor = 0.0f;
+        rasterizer.depthBiasClamp = 0.0f;
+        rasterizer.depthBiasSlopeFactor = 0.0f;
+
+    }
+
 
     vkDestroyShaderModule(m_logicDevice, vertShaderModule, nullptr);
     vkDestroyShaderModule(m_logicDevice, fragShaderModule, nullptr);
