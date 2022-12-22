@@ -190,7 +190,7 @@ private:
      * @param capabilities 表面的基础属性
      * @return 选择的结果
      */
-    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    auto chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) -> VkExtent2D;
 
     /**
      * @brief  创建交换链
@@ -206,7 +206,7 @@ private:
     /**
      * @brief  创建管线
      */
-    void createGraphicsPipeline();
+    auto createGraphicsPipeline() const -> void;
 
 
 private:

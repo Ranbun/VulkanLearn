@@ -14,16 +14,16 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
+#include <cmath>
+#include <limits>
 #include <set>
 #include <GLFW/glfw3native.h>
 
 #include "QueueFamilyIndices.h"
 #include "SwapChainSupportDetails.h"
-#include <limits>
-#include <cmath>
 
 
-void HelloTriangleApplication::run()
+auto HelloTriangleApplication::run() -> void
 {
     initWindow();
     initVulKan();
@@ -31,7 +31,7 @@ void HelloTriangleApplication::run()
     cleanup();
 }
 
-void HelloTriangleApplication::initWindow()
+auto HelloTriangleApplication::initWindow() -> void
 {
     glfwInit();
 
@@ -41,7 +41,7 @@ void HelloTriangleApplication::initWindow()
     m_window = glfwCreateWindow(WIDTH, HEIGHT, "VulKan Window", nullptr, nullptr);
 }
 
-void HelloTriangleApplication::initVulKan()
+auto HelloTriangleApplication::initVulKan() -> void
 {
     createInstance();
     setupDebugMessenger();
@@ -57,10 +57,9 @@ void HelloTriangleApplication::initVulKan()
 
     /// 创建图像管线 
     createGraphicsPipeline();
-
 }
 
-void HelloTriangleApplication::setupDebugMessenger()
+auto HelloTriangleApplication::setupDebugMessenger() -> void
 {
     if constexpr (!enableValidationLayers)
     {
@@ -88,7 +87,7 @@ void HelloTriangleApplication::setupDebugMessenger()
 }
 
 
-void HelloTriangleApplication::mainLoop() const
+auto HelloTriangleApplication::mainLoop() const -> void
 {
     while (!glfwWindowShouldClose(m_window))
     {
@@ -96,9 +95,9 @@ void HelloTriangleApplication::mainLoop() const
     }
 }
 
-void HelloTriangleApplication::cleanup()
+auto HelloTriangleApplication::cleanup() -> void
 {
-    for(const auto & imageView: m_swapChainImagesViews)
+    for (const auto& imageView : m_swapChainImagesViews)
     {
         vkDestroyImageView(m_logicDevice, imageView, nullptr);
     }
@@ -130,7 +129,7 @@ void HelloTriangleApplication::cleanup()
     m_window = nullptr;
 }
 
-void HelloTriangleApplication::createInstance()
+auto HelloTriangleApplication::createInstance() -> void
 {
     if (enableValidationLayers && !checkValidationLayerSupport())
     {
@@ -174,7 +173,7 @@ void HelloTriangleApplication::createInstance()
     }
 }
 
-bool HelloTriangleApplication::checkValidationLayerSupport()
+auto HelloTriangleApplication::checkValidationLayerSupport() -> bool
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -202,12 +201,12 @@ bool HelloTriangleApplication::checkValidationLayerSupport()
     return true;
 }
 
-std::vector<const char*> HelloTriangleApplication::getRequireExtensions() const
+auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const char *>
 {
     uint32_t glfwExtensionCount = 0;
     auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+    std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     if (enableValidationLayers)
     {
@@ -219,10 +218,10 @@ std::vector<const char*> HelloTriangleApplication::getRequireExtensions() const
 }
 
 
-VkResult HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                                                const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                                                                const VkAllocationCallbacks* pAllocator,
-                                                                VkDebugUtilsMessengerEXT* pCallback) const
+auto HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                                            const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+                                                            const VkAllocationCallbacks* pAllocator,
+                                                            VkDebugUtilsMessengerEXT* pCallback) const -> VkResult
 {
     assert(this);
 
@@ -235,8 +234,8 @@ VkResult HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance insta
     return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
-void HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback,
-                                                             const VkAllocationCallbacks* pAllocator) const
+auto HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback,
+                                                             const VkAllocationCallbacks* pAllocator) const -> void
 {
     assert(this);
 
@@ -248,7 +247,7 @@ void HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance
     }
 }
 
-void HelloTriangleApplication::pickPhysicalDevice()
+auto HelloTriangleApplication::pickPhysicalDevice() -> void
 {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
@@ -276,7 +275,7 @@ void HelloTriangleApplication::pickPhysicalDevice()
     }
 }
 
-QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const
+auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const -> QueueFamilyIndices
 {
     assert(this);
     QueueFamilyIndices indices;
@@ -318,7 +317,7 @@ QueueFamilyIndices HelloTriangleApplication::findQueueFamily(VkPhysicalDevice de
     return indices;
 }
 
-void HelloTriangleApplication::createLogicDevice()
+auto HelloTriangleApplication::createLogicDevice() -> void
 {
     const auto indices = findQueueFamily(m_physicalDevice);
 
@@ -413,7 +412,7 @@ void HelloTriangleApplication::createLogicDevice()
 #endif
 }
 
-void HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+auto HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) -> void
 {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -424,7 +423,7 @@ void HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMess
     createInfo.pfnUserCallback = debugCallback;
 }
 
-void HelloTriangleApplication::createSurface()
+auto HelloTriangleApplication::createSurface() -> void
 {
 #if 0
     VkWin32SurfaceCreateInfoKHR createInfo = {};
@@ -446,7 +445,7 @@ void HelloTriangleApplication::createSurface()
     }
 }
 
-bool HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) const
+auto HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool
 {
     assert(this);
     uint32_t extensionCount;
@@ -465,7 +464,7 @@ bool HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice devi
     return requireExtensions.empty();
 }
 
-SwapChainSupportDetails HelloTriangleApplication::querySwapChainSupport(VkPhysicalDevice device) const
+auto HelloTriangleApplication::querySwapChainSupport(VkPhysicalDevice device) const -> SwapChainSupportDetails
 {
     assert(this);
     SwapChainSupportDetails details;
@@ -495,8 +494,8 @@ SwapChainSupportDetails HelloTriangleApplication::querySwapChainSupport(VkPhysic
     return details;
 }
 
-VkSurfaceFormatKHR HelloTriangleApplication::chooseSwapSurfaceFormat(
-    const std::vector<VkSurfaceFormatKHR>& availableFormats)
+auto HelloTriangleApplication::chooseSwapSurfaceFormat(
+    const std::vector<VkSurfaceFormatKHR>& availableFormats) -> VkSurfaceFormatKHR
 {
     assert(this);
     if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED)
@@ -507,7 +506,7 @@ VkSurfaceFormatKHR HelloTriangleApplication::chooseSwapSurfaceFormat(
 
     for (const auto& availableFormat : availableFormats)
     {
-        if(availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && 
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
             availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {
             return availableFormat;
@@ -523,14 +522,14 @@ auto HelloTriangleApplication::chooseSwapPresentMode(
 
     auto bestMode = VK_PRESENT_MODE_FIFO_KHR;
 
-    for(const auto & presentMode: availablePresentModes)
+    for (const auto& presentMode : availablePresentModes)
     {
-        if(presentMode == VK_PRESENT_MODE_MAILBOX_KHR)  ///< 三缓冲
+        if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR) ///< 三缓冲
         {
             return presentMode;
         }
 
-        if(presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) ///< 立即显示
+        if (presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) ///< 立即显示
         {
             bestMode = presentMode;
         }
@@ -539,26 +538,25 @@ auto HelloTriangleApplication::chooseSwapPresentMode(
     return bestMode;
 }
 
-VkExtent2D HelloTriangleApplication::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
+auto HelloTriangleApplication::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) -> VkExtent2D
 {
 #undef max
 #undef min
     assert(this);
 
-    if(capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
     {
         return capabilities.currentExtent;
     }
 
-    VkExtent2D actualExtent = { WIDTH,HEIGHT };
+    VkExtent2D actualExtent = {WIDTH, HEIGHT};
     actualExtent.width = std::max(capabilities.minImageExtent.width,
-    std::min(capabilities.maxImageExtent.width, actualExtent.width));
+                                  std::min(capabilities.maxImageExtent.width, actualExtent.width));
 
     actualExtent.width = std::max(capabilities.minImageExtent.height,
-        std::min(capabilities.maxImageExtent.height, actualExtent.height));
+                                  std::min(capabilities.maxImageExtent.height, actualExtent.height));
 
     return actualExtent;
-
 }
 
 auto HelloTriangleApplication::createSwapChain() -> void
@@ -572,7 +570,7 @@ auto HelloTriangleApplication::createSwapChain() -> void
 
     auto imageCount = swapChainSupport.m_capabilities.minImageCount + 1;
 
-    if(swapChainSupport.m_capabilities.maxImageCount > 0 && 
+    if (swapChainSupport.m_capabilities.maxImageCount > 0 &&
         imageCount > swapChainSupport.m_capabilities.maxImageCount)
     {
         imageCount = swapChainSupport.m_capabilities.maxImageCount;
@@ -585,15 +583,18 @@ auto HelloTriangleApplication::createSwapChain() -> void
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
-    createInfo.imageExtent = extent; createInfo.imageArrayLayers = 1; ///< 指定图像所包含的层次
-    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;  ///< 指定在图像上的操作
+    createInfo.imageExtent = extent;
+    createInfo.imageArrayLayers = 1; ///< 指定图像所包含的层次
+    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; ///< 指定在图像上的操作
 
     const auto indices = findQueueFamily(m_physicalDevice);
 
-    const uint32_t queueFamilyIndices[] = { static_cast<uint32_t>(indices.m_graphicsFamily.value()),
-    static_cast<uint32_t>(indices.m_presentFamily.value()) };
+    const uint32_t queueFamilyIndices[] = {
+        static_cast<uint32_t>(indices.m_graphicsFamily.value()),
+        static_cast<uint32_t>(indices.m_presentFamily.value())
+    };
 
-    if(indices.m_graphicsFamily.value() != indices.m_presentFamily.value())
+    if (indices.m_graphicsFamily.value() != indices.m_presentFamily.value())
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 2;
@@ -613,7 +614,7 @@ auto HelloTriangleApplication::createSwapChain() -> void
     createInfo.clipped = VK_TRUE;
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    if(vkCreateSwapchainKHR(m_logicDevice,&createInfo,nullptr,&m_swapChain)!= VK_SUCCESS)
+    if (vkCreateSwapchainKHR(m_logicDevice, &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create swap chain");
     }
@@ -633,7 +634,7 @@ auto HelloTriangleApplication::createImageViews() -> void
     assert(this);
     m_swapChainImagesViews.resize(m_swapChainImages.size());
 
-    for(auto i = 0;i < m_swapChainImages.size();i++)
+    for (auto i = 0; i < m_swapChainImages.size(); i++)
     {
         VkImageViewCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -652,25 +653,20 @@ auto HelloTriangleApplication::createImageViews() -> void
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if(vkCreateImageView(m_logicDevice,&createInfo,nullptr,&m_swapChainImagesViews[i]) != VK_SUCCESS)
+        if (vkCreateImageView(m_logicDevice, &createInfo, nullptr, &m_swapChainImagesViews[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create image view!");
         }
     }
-
 }
 
-auto HelloTriangleApplication::createGraphicsPipeline() -> void
+auto HelloTriangleApplication::createGraphicsPipeline() const -> void
 {
     assert(this);
-
-
-
-
 }
 
 
-bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
+auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -> bool
 {
     assert(this);
 
@@ -687,18 +683,18 @@ bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const
     const auto indices = findQueueFamily(device);
     const auto extensionSupport = checkDeviceExtensionSupport(device);
 
-    bool swapChainAdequate = false;
+    auto swapChainAdequate = false;
 
     if (extensionSupport)
     {
-        const SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+        const auto swapChainSupport = querySwapChainSupport(device);
         swapChainAdequate = !swapChainSupport.m_format.empty() && !swapChainSupport.m_presentModes.empty();
     }
 
     return indices.isComplete() && extensionSupport && swapChainAdequate;
 }
 
-int HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) const
+auto HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) const -> int
 {
     assert(this);
     // 获取设备的属性 name type support VulKan versions
