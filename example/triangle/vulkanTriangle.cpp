@@ -663,6 +663,41 @@ auto HelloTriangleApplication::createImageViews() -> void
 auto HelloTriangleApplication::createGraphicsPipeline() const -> void
 {
     assert(this);
+
+    const auto vertShaderCode = ToolSets::readFile("./sources/shaders/vert.spv");
+    const auto fragShaderCode =ToolSets::readFile("./sources/shaders/frag.spv");
+
+    const auto vertShaderModule = createShaderModule(vertShaderCode);
+    const auto fragShaderModule = createShaderModule(fragShaderCode);
+
+    /// 顶点着色器阶段 - 设置
+    VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
+    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vertShaderStageInfo.module = vertShaderModule;
+    vertShaderStageInfo.pName = "main";
+
+
+
+    vkDestroyShaderModule(m_logicDevice, vertShaderModule, nullptr);
+    vkDestroyShaderModule(m_logicDevice, fragShaderModule, nullptr);
+
+}
+
+auto HelloTriangleApplication::createShaderModule(const std::vector<char>& code) const -> VkShaderModule
+{
+    VkShaderModuleCreateInfo createInfo = {};
+
+    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    createInfo.codeSize = code.size();
+    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+    VkShaderModule shaderModule;
+    if(vkCreateShaderModule(m_logicDevice,&createInfo,nullptr,&shaderModule) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create shader module!");
+    }
+    return shaderModule;
 }
 
 

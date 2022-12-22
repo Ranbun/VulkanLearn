@@ -208,6 +208,14 @@ private:
      */
     auto createGraphicsPipeline() const -> void;
 
+    /**
+     * @brief 创建shader module
+     * @param code 着色器文件
+     * @return 创建的module
+     */
+    [[nodiscard]] auto createShaderModule(const std::vector<char>& code) const ->VkShaderModule;
+
+
 
 private:
     /**
