@@ -215,6 +215,12 @@ private:
      */
     [[nodiscard]] auto createShaderModule(const std::vector<char>& code) const ->VkShaderModule;
 
+    /**
+     * @brief 设置帧缓冲附着
+     * @return none
+     */
+    auto createRenderPass()->void;
+
 
 
 private:
@@ -286,6 +292,11 @@ private:
      */
     VkExtent2D m_swapChainExtent;
 
+
+    /**
+     * @brief  渲染流程
+     */
+    VkRenderPass m_renderPass;
 
     /**
      * @brief  管线布局

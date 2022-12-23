@@ -55,6 +55,9 @@ auto HelloTriangleApplication::initVulKan() -> void
     /// 创建图片视图
     createImageViews();
 
+    /// 创建渲染流程
+    createRenderPass();
+
     /// 创建图像管线 
     createGraphicsPipeline();
 }
@@ -98,6 +101,7 @@ auto HelloTriangleApplication::mainLoop() const -> void
 auto HelloTriangleApplication::cleanup() -> void
 {
     vkDestroyPipelineLayout(m_logicDevice, m_pipelineLayout, nullptr);
+    vkDestroyRenderPass(m_logicDevice, m_renderPass, nullptr);
 
 
     for (const auto& imageView : m_swapChainImagesViews)
@@ -820,6 +824,51 @@ auto HelloTriangleApplication::createShaderModule(const std::vector<char>& code)
         throw std::runtime_error("failed to create shader module!");
     }
     return shaderModule;
+}
+
+auto HelloTriangleApplication::createRenderPass() -> void
+{
+    assert(this);
+
+    /// 附着描述 
+    VkAttachmentDescription colorAttachment = {};
+    colorAttachment.format = m_swapChainImageFormat;
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+
+    /// 渲染前后的处理 - 颜色和深度处理  
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+    /// 模板缓冲的处理  
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+    /// 图像布局 - 纹理的处理 
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;  ///< 流程开始前的图像的布局 
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; ///< 流程结束后的图形的布局
+
+    VkAttachmentReference colorAttachmentRef = {};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpass = {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+
+    VkRenderPassCreateInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = 1;
+    renderPassInfo.pAttachments = &colorAttachment;
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+
+    if(vkCreateRenderPass(m_logicDevice,&renderPassInfo,nullptr,&m_renderPass) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create render pass!");
+    }
+
 }
 
 
