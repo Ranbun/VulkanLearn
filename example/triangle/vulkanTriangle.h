@@ -206,7 +206,7 @@ private:
     /**
      * @brief  创建管线
      */
-    auto createGraphicsPipeline() const -> void;
+    auto createGraphicsPipeline() -> void;
 
     /**
      * @brief 创建shader module
@@ -285,6 +285,12 @@ private:
      * @brief 交换链图像范围
      */
     VkExtent2D m_swapChainExtent;
+
+
+    /**
+     * @brief  管线布局
+     */
+    VkPipelineLayout m_pipelineLayout;
 
 };
 
