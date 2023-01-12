@@ -22,5 +22,10 @@ out
 build
 build/
 
+# IDE - clion
+cmake-build-debug-visual-studio
+cmake-build-debug-visual-studio/
+.idea
+.idea/
 
 
