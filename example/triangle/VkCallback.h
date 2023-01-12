@@ -5,12 +5,12 @@
 #include <vulkan/vulkan.h>
 
 /**
- * @brief ½ÓÊÕµ÷ÊÔĞÅÏ¢µÄ»Øµ÷º¯Êı - ±»VulKanµ÷ÓÃ
- * @param messageServerity ÏûÏ¢µÄ¼¶±ğ
- * @param messageType ÏûÏ¢µÄÀàĞÍ
- * @param pCallbackData Ò»¸öVkDebugUtilsMessengerCallbackDataEXTµÄÖ¸Õë(°üº¬µ÷ÊÔĞÅÏ¢......)
- * @param pUserData Ö¸ÏòÉèÖÃ»Øµ÷º¯ÊıÊ±ºòÉèÖÃµÄÊı¾İµÄÖ¸Õë
- * @return ±íÊ¾Òı·¢¼ìÑé²ã´¦ÀíµÄVK_APIÊÇ·ñ±»ÖĞ¶Ï Í¨³£Ö»ÓĞÔÚ²âÊÔ¼ìÑé²ã±¾ÉíµÄÊ±ºò²Å»á·µ»Øtrue
+ * @brief æ¥æ”¶è°ƒè¯•ä¿¡æ¯çš„å›è°ƒå‡½æ•° - è¢«VulKanè°ƒç”¨
+ * @param messageServerity æ¶ˆæ¯çš„çº§åˆ«
+ * @param messageType æ¶ˆæ¯çš„ç±»å‹
+ * @param pCallbackData ä¸€ä¸ªVkDebugUtilsMessengerCallbackDataEXTçš„æŒ‡é’ˆ(åŒ…å«è°ƒè¯•ä¿¡æ¯......)
+ * @param pUserData æŒ‡å‘è®¾ç½®å›è°ƒå‡½æ•°æ—¶å€™è®¾ç½®çš„æ•°æ®çš„æŒ‡é’ˆ
+ * @return è¡¨ç¤ºå¼•å‘æ£€éªŒå±‚å¤„ç†çš„VK_APIæ˜¯å¦è¢«ä¸­æ–­ é€šå¸¸åªæœ‰åœ¨æµ‹è¯•æ£€éªŒå±‚æœ¬èº«çš„æ—¶å€™æ‰ä¼šè¿”å›true
  */
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageServerity,

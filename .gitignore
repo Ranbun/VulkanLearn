@@ -11,11 +11,11 @@ CTestTestfile.cmake
 _deps
 
 
-# IDE - VS 
+# IDE - VS
 out/
 out
 
-.vs 
+.vs
 .vs/
 
 # VS Code Create Dir
@@ -25,7 +25,11 @@ build/
 # IDE - clion
 cmake-build-debug-visual-studio
 cmake-build-debug-visual-studio/
+
 .idea
 .idea/
+
+
+
 
 

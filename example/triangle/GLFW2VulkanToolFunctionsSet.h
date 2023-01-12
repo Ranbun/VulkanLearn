@@ -46,14 +46,14 @@ class ToolSets
 {
 public:
     /**
-     * @brief ¶ÁÈ¡×ª»»ºóµÄ×ÅÉ«Æ÷ÎÄ¼ş
-     * @param filename ±»¶ÁÈ¡µÄÎÄ¼şÃû³Æ(Ïà¶ÔÂ·¾¶)
-     * @return ¶ÁÈ¡µÄÎÄ¼şµÄÄÚÈİ
+     * @brief è¯»å–è½¬æ¢åçš„ç€è‰²å™¨æ–‡ä»¶
+     * @param filename è¢«è¯»å–çš„æ–‡ä»¶åç§°(ç›¸å¯¹è·¯å¾„)
+     * @return è¯»å–çš„æ–‡ä»¶çš„å†…å®¹
      */
     static auto readFile(const std::string& filename) -> std::vector<char>
     {
-        /// std::ios::ate ´ÓÎÄ¼şÎ²²¿¿ªÊ¼¶Á
-        /// binary ÒÔ¶ş½øÖÆ·½Ê½¶ÁÈ¡ÎÄ¼ş
+        /// std::ios::ate ä»æ–‡ä»¶å°¾éƒ¨å¼€å§‹è¯»
+        /// binary ä»¥äºŒè¿›åˆ¶æ–¹å¼è¯»å–æ–‡ä»¶
         std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
         if (!file.is_open())
@@ -61,15 +61,15 @@ public:
             throw std::runtime_error("failed to open file!");
         }
 
-        /// »ñÈ¡ÎÄ¼ş³¤¶È 
+        /// è·å–æ–‡ä»¶é•¿åº¦ 
         const auto fileSize = static_cast<size_t>(file.tellg());
         std::vector<char> buffer(fileSize);
 
-        /// ¶ÁÈ¡ÎÄ¼ş
-        file.seekg(0);  ///< Ìø×ªµ½ÎÄ¼şÆğÊ¼Î»ÖÃ
-        file.read(buffer.data(), static_cast<std::streamsize>(fileSize)); ///< ¶ÁÈ¡ÎÄ¼ş 
+        /// è¯»å–æ–‡ä»¶
+        file.seekg(0);  ///< è·³è½¬åˆ°æ–‡ä»¶èµ·å§‹ä½ç½®
+        file.read(buffer.data(), static_cast<std::streamsize>(fileSize)); ///< è¯»å–æ–‡ä»¶ 
 
-        /// ¹Ø±ÕÎÄ¼ş
+        /// å…³é—­æ–‡ä»¶
         file.close();
         return { buffer };
     }

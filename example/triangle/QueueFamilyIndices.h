@@ -7,7 +7,7 @@
 #include <vulkan/vulkan.h>
 
 /**
-* @brief Âú×ãĞèÇó¶ÓÁĞ×åµÄË÷Òı
+* @brief æ»¡è¶³éœ€æ±‚é˜Ÿåˆ—æ—çš„ç´¢å¼•
 */
 
 struct QueueFamilyIndices

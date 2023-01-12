@@ -40,7 +40,7 @@ struct QueueFamilyIndices;
 class HelloTriangleApplication
 {
 public:
-    HelloTriangleApplication() = default;
+    HelloTriangleApplication();
     virtual ~HelloTriangleApplication() = default;
 
     HelloTriangleApplication(const HelloTriangleApplication&) = delete;
@@ -164,7 +164,7 @@ private:
     auto checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool;
 
     /**
-     * @brief 获取交换链的属性 
+     * @brief 获取交换链的属性
      * @param device 物理设备
      * @return 获取的结果
      */
@@ -172,7 +172,7 @@ private:
 
     /**
      * @brief 选择合适的表面格式
-     * @param availableFormats 当前物理设备的所有的表面格式 
+     * @param availableFormats 当前物理设备的所有的表面格式
      * @return 选中的表面格式
      */
     auto chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) -> VkSurfaceFormatKHR;
@@ -225,12 +225,12 @@ private:
 
 private:
     /**
-     * @brief 当前的绘制的窗口 
+     * @brief 当前的绘制的窗口
      */
     GLFWwindow* m_window{nullptr};
 
     /**
-     * @brief VulKan instance 
+     * @brief VulKan instance
      */
     VkInstance m_vkInstance = nullptr;
 
@@ -277,8 +277,8 @@ private:
     std::vector<VkImage> m_swapChainImages;
 
     /**
-     * @brief 访问图像创建的图像试图 
-     */                                                                          
+     * @brief 访问图像创建的图像试图
+     */
     std::vector<VkImageView> m_swapChainImagesViews;
 
 

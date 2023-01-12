@@ -1,4 +1,4 @@
-﻿#define VK_USE_PLATFORM_WIN32_KHR 
+﻿#define VK_USE_PLATFORM_WIN32_KHR
 
 #include "vulkanTriangle.h"
 
@@ -58,7 +58,7 @@ auto HelloTriangleApplication::initVulKan() -> void
     /// 创建渲染流程
     createRenderPass();
 
-    /// 创建图像管线 
+    /// 创建图像管线
     createGraphicsPipeline();
 }
 
@@ -476,7 +476,7 @@ auto HelloTriangleApplication::querySwapChainSupport(VkPhysicalDevice device) co
     assert(this);
     SwapChainSupportDetails details;
 
-    ///获取表面属性 
+    ///获取表面属性
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.m_capabilities);
 
     /// 表面支持的格式
@@ -507,7 +507,7 @@ auto HelloTriangleApplication::chooseSwapSurfaceFormat(
     assert(this);
     if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED)
     {
-        /// use B G R A 
+        /// use B G R A
         return {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
     }
 
@@ -701,7 +701,7 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     vertexInputInfo.vertexAttributeDescriptionCount = 0;
     vertexInputInfo.pVertexAttributeDescriptions = nullptr;
 
-    /// 输入装配 
+    /// 输入装配
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -712,7 +712,7 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
     viewportState.scissorCount = 1;
-    /// 视口和裁剪 
+    /// 视口和裁剪
     VkViewport viewport = {};
     {
         viewport.x = 0.0f;
@@ -756,9 +756,9 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     multisampling.alphaToCoverageEnable = VK_FALSE;
     multisampling.alphaToOneEnable = VK_FALSE;
 
-    /// 深度与模板测试 
+    /// 深度与模板测试
     {
-        /// 暂时先不进行深度与模板测试的配置 
+        /// 暂时先不进行深度与模板测试的配置
     }
 
     /// 颜色混合
@@ -784,7 +784,7 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
-    ///动态修改的管线状态 
+    ///动态修改的管线状态
     std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH};
 
     VkPipelineDynamicStateCreateInfo dynamicState = {};
@@ -830,21 +830,21 @@ auto HelloTriangleApplication::createRenderPass() -> void
 {
     assert(this);
 
-    /// 附着描述 
+    /// 附着描述
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = m_swapChainImageFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
-    /// 渲染前后的处理 - 颜色和深度处理  
+    /// 渲染前后的处理 - 颜色和深度处理
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-    /// 模板缓冲的处理  
+    /// 模板缓冲的处理
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
-    /// 图像布局 - 纹理的处理 
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;  ///< 流程开始前的图像的布局 
+    /// 图像布局 - 纹理的处理
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;  ///< 流程开始前的图像的布局
     colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; ///< 流程结束后的图形的布局
 
     VkAttachmentReference colorAttachmentRef = {};
@@ -926,4 +926,8 @@ auto HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) co
     }
 
     return score;
+}
+HelloTriangleApplication::HelloTriangleApplication()
+{
+    
 }
