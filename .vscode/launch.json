@@ -23,6 +23,9 @@
                 "type": "cppdbg", //指定使用msvc进行调试
                 "program": "${workspaceFolder}/build/example/triangle/triangle.exe", //指定C/C++程序位置
             },
+            // 指定使用GDB调试
+            "MIMode": "gdb",
+            "miDebuggerPath": "D:/Program Files/LLVM/bin/gdb.exe"
         }
     ]
 }
