@@ -4,13 +4,21 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "create build dir",
-            "command": "mkdir",
+            "label": "Create BuildDir",
             "type": "shell",
+            "command": "mkdir",
             "args": [
                 "-p",
                 "build"
             ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": true
+            },
             "windows": {
                 "options": {
                     "shell": {
@@ -23,8 +31,9 @@
                 ]
             }
         },
+        // CMake 生成
         {
-            "label": "cmake",
+            "label": "CMake::Generate",
             "type": "shell",
             "command": "cmake",
             "args": [
@@ -39,11 +48,14 @@
                 "args": [
                     "-DCMAKE_BUILD_TYPE=Debug",
                     "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-                    "../",
+                    "-S",
+                    "${workspaceFolder}",
+                    "-B",
+                    "${workspaceFolder}/build",
                     "-G",
-                    //"\"CodeBlocks - NMake Makefiles\""
                     "Ninja"
                 ],
+                // 设置VC的环境
                 "options": {
                     "shell": {
                         "executable": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat",
@@ -56,15 +68,19 @@
                 }
             },
             "dependsOn": [
-                "create build dir"
+                "Create BuildDir"
             ],
             "problemMatcher": [
                 "$gcc"
             ]
         },
+        //CMake 编译
         {
-            "label": "build Debug",
-            "group": "build",
+            "label": "CMake::Build_Debug",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "type": "shell",
             "command": "cmake",
             "args": [
@@ -91,8 +107,9 @@
                 },
                 "problemMatcher": "$msCompile"
             },
+            "dependsOrder": "sequence", // 按照顺序执行
             "dependsOn": [
-                "cmake"
+                "CMake::Generate"
             ]
         }
     ]

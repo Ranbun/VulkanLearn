@@ -20,4 +20,36 @@
         }
     ],
     "version": 4
+    /*
+    "configurations": [
+        {
+            "name": "g++",
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "D:/Program Files/LLVM/bin/g++.exe",
+            "includePath": [
+                "${workspaceFolder}",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/example/triangle/*.*",
+                "${vcpkgRoot}/x64-windows/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "${workspaceFolder}/example/triangle/*.*",
+                    "${vcpkgRoot}/x64-windows/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+    */
 }

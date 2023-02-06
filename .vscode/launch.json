@@ -12,15 +12,17 @@
             "args": [], //指定运行参数
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}", //指定工作目录
-            // "preLaunchTask": "build Debug",    //在调试前会先调用build_debug这个task编译构建程序
+            "preLaunchTask": "CMake::Build_Debug", //在调试前会先调用CMake::Build_Debug这个task编译构建程序
             "environment": [],
-            "console": "externalTerminal",
-
+            // "console": "externalTerminal",
+            "externalConsole": false,
             "windows": //windows的特定配置
             {
-                "type": "cppvsdbg",  //指定使用msvc进行调试
+                "name": "Triangle-VulKan",
+                "request": "launch",
+                "type": "cppdbg", //指定使用msvc进行调试
                 "program": "${workspaceFolder}/build/example/triangle/triangle.exe", //指定C/C++程序位置
-            }
+            },
         }
     ]
 }
