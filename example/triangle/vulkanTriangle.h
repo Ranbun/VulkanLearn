@@ -133,7 +133,7 @@ private:
      * @param device 被选择的设备
      * @return 分数
      */
-    auto rateDeviceSuitability(VkPhysicalDevice device) const -> int;
+    [[maybe_unused]] auto rateDeviceSuitability(VkPhysicalDevice device) const -> int;
 
     /**
      * @brief 查找满足要求的队列族
@@ -221,7 +221,20 @@ private:
      */
     auto createRenderPass()->void;
 
+    /**
+     * @brief 创建帧缓冲对象
+     */
+    void createFramebuffers();
 
+    /**
+     * @brief 创建指令池
+     */
+    void createCommandPool();
+
+    /**
+     * @brief 创建指令缓冲对象
+     */
+    void createCommandBuffers();
 
 private:
     /**
@@ -268,8 +281,7 @@ private:
     /**
      * @brief 被创建的交换链的句柄
      */
-    VkSwapchainKHR m_swapChain;
-
+    VkSwapchainKHR m_swapChain{};
 
     /**
      * @brief 交换链图像
@@ -277,10 +289,9 @@ private:
     std::vector<VkImage> m_swapChainImages;
 
     /**
-     * @brief 访问图像创建的图像试图
+     * @brief 访问图像创建的图像视图
      */
     std::vector<VkImageView> m_swapChainImagesViews;
-
 
     /**
      * @brief 交换链图像格式
@@ -290,18 +301,37 @@ private:
     /**
      * @brief 交换链图像范围
      */
-    VkExtent2D m_swapChainExtent;
-
+    VkExtent2D m_swapChainExtent{};
 
     /**
      * @brief  渲染流程
      */
-    VkRenderPass m_renderPass;
+    VkRenderPass m_renderPass{};
 
     /**
      * @brief  管线布局
      */
-    VkPipelineLayout m_pipelineLayout;
+    VkPipelineLayout m_pipelineLayout{};
+
+    /**
+     * @brief  创建的管线对象
+     */
+    VkPipeline m_graphicsPipeline{};
+
+    /**
+     * @brief 帧缓冲对象
+     */
+    std::vector<VkFramebuffer> m_swapChainFramebuffers;
+
+    /**
+     * @brief 指令池
+     */
+    VkCommandPool m_commandPool;
+
+    /**
+     * @brief 指令缓冲对象
+     */
+    std::vector<VkCommandBuffer> m_commandBuffers;
 
 };
 

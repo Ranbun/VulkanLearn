@@ -36,9 +36,6 @@ public:
         return std::move(GLFWSupportExtensionsInVk);
     }
 
-
-
-
 };
 
 
@@ -52,8 +49,9 @@ public:
      */
     static auto readFile(const std::string& filename) -> std::vector<char>
     {
-        /// std::ios::ate 从文件尾部开始读
-        /// binary 以二进制方式读取文件
+        /**
+         * @brief std::ios::ate 从文件尾部开始读(可以获取文件大小) binary 以二进制方式读取文件
+         */
         std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
         if (!file.is_open())
@@ -61,13 +59,13 @@ public:
             throw std::runtime_error("failed to open file!");
         }
 
-        /// 获取文件长度 
+        /// 获取文件长度
         const auto fileSize = static_cast<size_t>(file.tellg());
         std::vector<char> buffer(fileSize);
 
         /// 读取文件
         file.seekg(0);  ///< 跳转到文件起始位置
-        file.read(buffer.data(), static_cast<std::streamsize>(fileSize)); ///< 读取文件 
+        file.read(buffer.data(), static_cast<std::streamsize>(fileSize)); ///< 读取文件
 
         /// 关闭文件
         file.close();
@@ -79,4 +77,4 @@ public:
 
 
 
-#endif 
+#endif

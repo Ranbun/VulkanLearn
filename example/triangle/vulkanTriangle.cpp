@@ -1,4 +1,4 @@
-﻿#define VK_USE_PLATFORM_WIN32_KHR
+#define VK_USE_PLATFORM_WIN32_KHR
 
 #include "vulkanTriangle.h"
 
@@ -14,14 +14,12 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <cmath>
 #include <limits>
 #include <set>
 #include <GLFW/glfw3native.h>
 
 #include "QueueFamilyIndices.h"
 #include "SwapChainSupportDetails.h"
-
 
 auto HelloTriangleApplication::run() -> void
 {
@@ -43,10 +41,29 @@ auto HelloTriangleApplication::initWindow() -> void
 
 auto HelloTriangleApplication::initVulKan() -> void
 {
+    /**
+     * @brief 创建VulKan实例
+     */
     createInstance();
+
+    /**
+     * @brief 设置调试信息
+     */
     setupDebugMessenger();
-    createSurface(); ///< 创建绘制的表面
+
+    /**
+     * @brief 创建绘制的表面
+     */
+    createSurface();
+
+    /**
+     * @brief 选择物理设备
+     */
     pickPhysicalDevice();
+
+    /**
+     * @brief 创建逻辑设备
+     */
     createLogicDevice();
 
     /// 创建交换链
@@ -60,6 +77,18 @@ auto HelloTriangleApplication::initVulKan() -> void
 
     /// 创建图像管线
     createGraphicsPipeline();
+
+    /**
+     * @brief 创建帧缓冲
+     */
+    createFramebuffers();
+
+    /**
+     * @brief 创建指令池
+     */
+     createCommandPool();
+
+     createCommandBuffers();
 }
 
 auto HelloTriangleApplication::setupDebugMessenger() -> void
@@ -89,7 +118,6 @@ auto HelloTriangleApplication::setupDebugMessenger() -> void
     }
 }
 
-
 auto HelloTriangleApplication::mainLoop() const -> void
 {
     while (!glfwWindowShouldClose(m_window))
@@ -100,7 +128,32 @@ auto HelloTriangleApplication::mainLoop() const -> void
 
 auto HelloTriangleApplication::cleanup() -> void
 {
+    /**
+     * @brief 清空指令池对象
+     */
+    vkDestroyCommandPool(m_logicDevice,m_commandPool,nullptr);
+
+    /**
+     * @brief 清楚帧缓冲对象
+     */
+    for(auto framebuffer: m_swapChainFramebuffers)
+    {
+        vkDestroyFramebuffer(m_logicDevice,framebuffer,nullptr);
+    }
+
+    /**
+     * @brief 删除管线
+     */
+    vkDestroyPipeline(m_logicDevice, m_graphicsPipeline,nullptr);
+
+    /**
+     * @brief 清空管线布局
+     */
     vkDestroyPipelineLayout(m_logicDevice, m_pipelineLayout, nullptr);
+
+    /**
+     * @brief 清空渲染流程
+     */
     vkDestroyRenderPass(m_logicDevice, m_renderPass, nullptr);
 
 
@@ -117,8 +170,6 @@ auto HelloTriangleApplication::cleanup() -> void
 
     /// delete Vk Instance
     /// clean others objects before VK Instance
-    // TODO: destroy others vk Objects
-
     if (enableValidationLayers)
     {
         DestroyDebugUtilsMessengerEXT(m_vkInstance, m_callBack, nullptr);
@@ -131,6 +182,9 @@ auto HelloTriangleApplication::cleanup() -> void
 
     vkDestroyInstance(m_vkInstance, nullptr);
 
+    /**
+     * @brief 销毁窗口资源
+     */
     glfwDestroyWindow(m_window);
     glfwTerminate();
     m_window = nullptr;
@@ -210,6 +264,7 @@ auto HelloTriangleApplication::checkValidationLayerSupport() -> bool
 
 auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const char *>
 {
+    assert(this);
     uint32_t glfwExtensionCount = 0;
     auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -223,7 +278,6 @@ auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const
 
     return std::move(extensions); // NOLINT(clang-diagnostic-pessimizing-move)
 }
-
 
 auto HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
                                                             const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -682,22 +736,36 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
     vertShaderStageInfo.module = vertShaderModule;
     vertShaderStageInfo.pName = "main";
+    vertShaderStageInfo.pSpecializationInfo = nullptr;
 
-
+    /**
+     * @brief 片段着色器设置
+     */
     VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
     fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     fragShaderStageInfo.module = fragShaderModule;
     fragShaderStageInfo.pName = "main";
+    fragShaderStageInfo.pSpecializationInfo = nullptr;
 
+    /**
+     * @brief 组装为数组
+     */
     VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
 
-
-    /// 顶点输入
+    /**
+     * @brief 顶点输入
+     */
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    /**
+     * @brief 绑定
+     */
     vertexInputInfo.vertexBindingDescriptionCount = 0;
     vertexInputInfo.pVertexBindingDescriptions = nullptr;
+    /**
+     * @brief 属性
+     */
     vertexInputInfo.vertexAttributeDescriptionCount = 0;
     vertexInputInfo.pVertexAttributeDescriptions = nullptr;
 
@@ -705,7 +773,7 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_TRUE;
+    inputAssembly.primitiveRestartEnable = VK_FALSE;
 
     /// 视口和裁剪矩形
     VkPipelineViewportStateCreateInfo viewportState = {};
@@ -723,7 +791,12 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
     }
+
     viewportState.pViewports = &viewport;
+
+    /**
+     * @brief 设置裁剪
+     */
     VkRect2D scissor = {};
     {
         scissor.offset = {0, 0};
@@ -734,12 +807,16 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     /// 光栅化
     VkPipelineRasterizationStateCreateInfo rasterizer = {};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_TRUE;
-    rasterizer.rasterizerDiscardEnable = VK_FALSE;
+    rasterizer.depthClampEnable = VK_FALSE;
+    rasterizer.rasterizerDiscardEnable = VK_FALSE; ///< 禁止所有图元输出到帧缓冲
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 
+    /**
+     * @brief 下面的值将作用在深度上
+     * @note 此处我们将之屏蔽
+     */
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f;
     rasterizer.depthBiasClamp = 0.0f;
@@ -761,7 +838,10 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
         /// 暂时先不进行深度与模板测试的配置
     }
 
-    /// 颜色混合
+    /**
+     * @brief 颜色混合
+     * @note VkPipelineColorBlendAttachmentState 可以为每个帧缓冲单独配置颜色混合的方式
+     */
     VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
     colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -789,8 +869,12 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
 
     VkPipelineDynamicStateCreateInfo dynamicState = {};
     dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+#if 0
     dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
     dynamicState.pDynamicStates = dynamicStates.data();
+#endif
+    dynamicState.pDynamicStates = nullptr;
+    dynamicState.dynamicStateCount = 0;
 
     /// 管线布局
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
@@ -800,12 +884,79 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     pipelineLayoutInfo.pushConstantRangeCount = 0;
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
+    /**
+     * @brief 创建管线布局
+     */
     if (vkCreatePipelineLayout(m_logicDevice, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
     {
-        throw std::runtime_error("failed to create pipe;ine layout!");
+        throw std::runtime_error("failed to create pipeline layout!");
     }
 
+    /**
+     * @brief 创建渲染管线
+     * @note 引用固定功能 管线布局 渲染流程
+     */
+    VkGraphicsPipelineCreateInfo pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    /**
+     * @brief 引用创建的着色器阶段
+     */
+    pipelineInfo.stageCount = 2;
+    pipelineInfo.pStages = shaderStages;
+    /**
+     * @brief 顶点输入
+     */
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    /**
+     * @brief 输入装配
+     */
+    pipelineInfo.pInputAssemblyState = &inputAssembly;
+    /**
+     * @brief 视口
+     */
+    pipelineInfo.pViewportState = &viewportState;
+    /**
+     * @brief 光栅化
+     */
+    pipelineInfo.pRasterizationState = & rasterizer;
+    /**
+     * @brief 采样
+     */
+    pipelineInfo.pMultisampleState = &multisampling;
+    /**
+     * @brief 深度与裁剪
+     */
+    pipelineInfo.pDepthStencilState = nullptr;
+    /**
+     * @brief 颜色混合
+     */
+    pipelineInfo.pColorBlendState = &colorBlending;
+    /**
+     * @brief 动态更改
+     */
+    pipelineInfo.pDynamicState = nullptr;
 
+    pipelineInfo.layout = m_pipelineLayout;
+
+    pipelineInfo.renderPass = m_renderPass;
+    pipelineInfo.subpass = 0;  ///< 使用的子流程 在子流程数组中的索引
+    /**
+     * @brief 指定已经创建好的管线作为基础管线
+     */
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    /**
+     * @brief 指定将要创建的管线作为基础管线
+     */
+    pipelineInfo.basePipelineIndex = -1;
+
+    if(vkCreateGraphicsPipelines(m_logicDevice,VK_NULL_HANDLE,1,&pipelineInfo,nullptr,&m_graphicsPipeline) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create graphics pipeline!");
+    }
+
+    /**
+     * @brief 清除创建的着色器模块
+     */
     vkDestroyShaderModule(m_logicDevice, vertShaderModule, nullptr);
     vkDestroyShaderModule(m_logicDevice, fragShaderModule, nullptr);
 }
@@ -847,10 +998,16 @@ auto HelloTriangleApplication::createRenderPass() -> void
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;  ///< 流程开始前的图像的布局
     colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; ///< 流程结束后的图形的布局
 
+    /**
+     * @brief 颜色附着
+     */
     VkAttachmentReference colorAttachmentRef = {};
-    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.attachment = 0; ///< 只有一个附着 所以索引为 0
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+    /**
+     * @brief 子流程
+     */
     VkSubpassDescription subpass = {};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
@@ -870,7 +1027,6 @@ auto HelloTriangleApplication::createRenderPass() -> void
     }
 
 }
-
 
 auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -> bool
 {
@@ -900,7 +1056,7 @@ auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -
     return indices.isComplete() && extensionSupport && swapChainAdequate;
 }
 
-auto HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) const -> int
+[[maybe_unused]] auto HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) const -> int
 {
     assert(this);
     // 获取设备的属性 name type support VulKan versions
@@ -927,7 +1083,122 @@ auto HelloTriangleApplication::rateDeviceSuitability(VkPhysicalDevice device) co
 
     return score;
 }
-HelloTriangleApplication::HelloTriangleApplication()
+
+void HelloTriangleApplication::createFramebuffers()
 {
-    
+    m_swapChainFramebuffers.resize(m_swapChainImagesViews.size());
+
+    for(size_t i = 0; i < m_swapChainImagesViews.size(); i++)
+    {
+        VkImageView attachments[] = {m_swapChainImagesViews[i]};
+
+        VkFramebufferCreateInfo framebufferInfo = {};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+
+        /**
+         * @brief 指定渲染流程对象
+         */
+
+        framebufferInfo.renderPass = m_renderPass;
+        /**
+         * @brief 指定附着个数
+         */
+        framebufferInfo.attachmentCount = 1;
+
+        /**
+         * @brief 附着数组
+         */
+        framebufferInfo.pAttachments = attachments;
+
+        /**
+         * @brief 帧缓冲大小
+         */
+        framebufferInfo.width = m_swapChainExtent.width;
+        framebufferInfo.height = m_swapChainExtent.height;
+
+        /**
+         * @brief 图层数
+         */
+        framebufferInfo.layers = 1;
+
+        /**
+         * @brief 创建图层数
+         */
+        if(vkCreateFramebuffer(m_logicDevice,&framebufferInfo, nullptr,&m_swapChainFramebuffers[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create framebuffer!");
+        }
+    }
 }
+void HelloTriangleApplication::createCommandPool()
+{
+    QueueFamilyIndices queueFamilyIndices = findQueueFamily(m_physicalDevice);
+
+    VkCommandPoolCreateInfo poolCreateInfo = {};
+    poolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+
+    /// TODO 此处未判断查找结果是否满足要求
+    poolCreateInfo.queueFamilyIndex = queueFamilyIndices.m_graphicsFamily.value();
+    poolCreateInfo.flags = 0;
+
+    if(vkCreateCommandPool(m_logicDevice,&poolCreateInfo,nullptr,&m_commandPool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create command pool!");
+    }
+}
+
+void HelloTriangleApplication::createCommandBuffers()
+{
+    /**
+     * @brief 为每一个帧缓冲创建一个指令缓冲
+     */
+    m_commandBuffers.resize(m_swapChainFramebuffers.size());
+
+    VkCommandBufferAllocateInfo allocateInfo = {};
+    allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocateInfo.commandPool = m_commandPool;
+    allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocateInfo.commandBufferCount = static_cast<uint32_t>(m_commandBuffers.size());
+
+    if (vkAllocateCommandBuffers(m_logicDevice, &allocateInfo, m_commandBuffers.data()) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
+
+
+
+    for (size_t i = 0; i < m_commandBuffers.size(); i++)
+    {
+        /**
+         * @brief 记录指令到指令缓冲
+        */
+        VkCommandBufferBeginInfo beginInfo = {};
+
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+        beginInfo.pInheritanceInfo = nullptr;  ///< 辅助指令缓冲
+
+        if (vkBeginCommandBuffer(m_commandBuffers[i], &beginInfo) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+        /**
+         * @brief 开始渲染流程
+        */
+        VkRenderPassBeginInfo renderpassInfo = {};
+        renderpassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderpassInfo.renderPass = m_renderPass;
+        renderpassInfo.framebuffer = m_swapChainFramebuffers[i];  ///< 指定使用的渲染流程对象
+        renderpassInfo.renderArea.offset = { 0,0 };
+        renderpassInfo.renderArea.extent = m_swapChainExtent;
+
+        VkClearValue clearColor = { 0.0f,0.0f,0.0f ,0.0f };
+        renderpassInfo.clearValueCount = 1;
+        renderpassInfo.pClearValues = &clearColor;
+
+    }
+
+}
+
+HelloTriangleApplication::HelloTriangleApplication() = default;
