@@ -343,7 +343,7 @@ private:
     /**
      * @brief 指令池
      */
-    VkCommandPool m_commandPool;
+    VkCommandPool m_commandPool{};
 
     /**
      * @brief 指令缓冲对象
