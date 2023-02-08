@@ -32,7 +32,10 @@ struct SwapChainSupportDetails;
  */
 struct QueueFamilyIndices;
 
-
+/**
+ * @brief 每次异步渲染的帧数
+ */
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 /**
  * @brief VulKan渲染三角形基类
@@ -70,7 +73,7 @@ private:
     /**
      * @brief 渲染循环
      */
-    auto mainLoop() const -> void;
+    auto mainLoop() -> void;
 
     /**
      * @brief 退出时候的清空
@@ -202,7 +205,6 @@ private:
      */
     auto createImageViews() -> void ;
 
-
     /**
      * @brief  创建管线
      */
@@ -235,6 +237,21 @@ private:
      * @brief 创建指令缓冲对象
      */
     void createCommandBuffers();
+
+    /**
+     * @brief 记录指令到缓冲
+     */
+    void recordCommandBuffer(VkCommandBuffer commandBuffer,uint32_t imageIndex);
+
+    /**
+     * @brief 渲染一帧
+     */
+    void drawFrame();
+
+    /**
+     * @brief 创建信号量
+     */
+    void createSyncObjects();
 
 private:
     /**
@@ -332,6 +349,26 @@ private:
      * @brief 指令缓冲对象
      */
     std::vector<VkCommandBuffer> m_commandBuffers;
+
+    /**
+     * @brief 信号量
+     */
+    std::vector<VkSemaphore> m_imageAvailableSemaphore;
+
+    /**
+     * @brief 信号量
+    */
+    std::vector<VkSemaphore> m_renderFinishedSemaphore;
+
+    /**
+     * @brief 栅栏 同步CPU & GPU
+    */
+    std::vector<VkFence> m_inFlightFence;
+
+    /**
+     * @brief 当前帧ID
+    */
+    size_t m_currentFrame = 0;
 
 };
 

@@ -88,7 +88,15 @@ auto HelloTriangleApplication::initVulKan() -> void
      */
      createCommandPool();
 
+     /**
+      * @brief 创建指令缓冲
+      */
      createCommandBuffers();
+
+     /**
+      * @brief 创建同步使用的对象  - 信号量与栅栏
+      */
+     createSyncObjects();
 }
 
 auto HelloTriangleApplication::setupDebugMessenger() -> void
@@ -118,23 +126,42 @@ auto HelloTriangleApplication::setupDebugMessenger() -> void
     }
 }
 
-auto HelloTriangleApplication::mainLoop() const -> void
+
+auto HelloTriangleApplication::mainLoop() -> void
 {
     while (!glfwWindowShouldClose(m_window))
     {
         glfwPollEvents();
+        drawFrame();
     }
+
+    /**
+     * @brief 等待一个特定指令队列结束执行
+    */
+    vkDeviceWaitIdle(m_logicDevice);
+
 }
 
 auto HelloTriangleApplication::cleanup() -> void
 {
+    /**
+     * @brief 清空创建的信号量 & 栅栏
+    */
+    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(m_logicDevice,
+            m_renderFinishedSemaphore[i], nullptr);
+        vkDestroySemaphore(m_logicDevice,
+            m_imageAvailableSemaphore[i], nullptr);
+        vkDestroyFence(m_logicDevice, m_inFlightFence[i], nullptr);
+    }
+
     /**
      * @brief 清空指令池对象
      */
     vkDestroyCommandPool(m_logicDevice,m_commandPool,nullptr);
 
     /**
-     * @brief 清楚帧缓冲对象
+     * @brief 清除帧缓冲对象
      */
     for(auto framebuffer: m_swapChainFramebuffers)
     {
@@ -155,7 +182,6 @@ auto HelloTriangleApplication::cleanup() -> void
      * @brief 清空渲染流程
      */
     vkDestroyRenderPass(m_logicDevice, m_renderPass, nullptr);
-
 
     for (const auto& imageView : m_swapChainImagesViews)
     {
@@ -430,47 +456,6 @@ auto HelloTriangleApplication::createLogicDevice() -> void
 
     vkGetDeviceQueue(m_logicDevice, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
     vkGetDeviceQueue(m_logicDevice, indices.m_presentFamily.value(), 0, &m_presentQueue);
-
-#if 0
-    const QueueFamilyIndices indices = findQueueFamily(m_physicalDevice);
-
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.m_graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
-
-    constexpr float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
-
-    constexpr VkPhysicalDeviceFeatures deviceFeatures{};
-
-    VkDeviceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
-
-    createInfo.pEnabledFeatures = &deviceFeatures;
-    createInfo.enabledExtensionCount = 0;
-
-    if (enableValidationLayers)
-    {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
-    }
-    else
-    {
-        createInfo.enabledLayerCount = 0;
-    }
-
-    if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_logicDevice) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create logical device!");
-    }
-
-
-    vkGetDeviceQueue(m_logicDevice, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
-#endif
 }
 
 auto HelloTriangleApplication::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) -> void
@@ -1021,6 +1006,22 @@ auto HelloTriangleApplication::createRenderPass() -> void
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpass;
 
+    VkSubpassDependency dependency = {};
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+
+    /**
+     * @brief 渲染流程开始前的子流程的操作
+    */
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
+
+    renderPassInfo.dependencyCount = 1;
+    renderPassInfo.pDependencies = &dependency;
+
     if(vkCreateRenderPass(m_logicDevice,&renderPassInfo,nullptr,&m_renderPass) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create render pass!");
@@ -1165,8 +1166,7 @@ void HelloTriangleApplication::createCommandBuffers()
         throw std::runtime_error("failed to allocate command buffers!");
     }
 
-
-
+#if 0
     for (size_t i = 0; i < m_commandBuffers.size(); i++)
     {
         /**
@@ -1178,6 +1178,9 @@ void HelloTriangleApplication::createCommandBuffers()
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
         beginInfo.pInheritanceInfo = nullptr;  ///< 辅助指令缓冲
 
+        /**
+         * @brief 开始指令缓冲的记录操作
+         */
         if (vkBeginCommandBuffer(m_commandBuffers[i], &beginInfo) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to begin recording command buffer!");
@@ -1197,6 +1200,209 @@ void HelloTriangleApplication::createCommandBuffers()
         renderpassInfo.clearValueCount = 1;
         renderpassInfo.pClearValues = &clearColor;
 
+        /**
+         * @brief 开始渲染流程的命令
+         */
+        vkCmdBeginRenderPass(m_commandBuffers[i],&renderpassInfo,VK_SUBPASS_CONTENTS_INLINE);
+
+        /**
+         * @brief 基础绘制命令
+         */
+         /**
+          * @brief 绑定图形管线
+          */
+        vkCmdBindPipeline(m_commandBuffers[i],VK_PIPELINE_BIND_POINT_GRAPHICS,m_graphicsPipeline);
+
+        /**
+         * @brief 指令调用三角形的绘制
+         */
+        vkCmdDraw(m_commandBuffers[i],3,1,0,0);
+
+        /**
+         * @brief 结束渲染流程
+         */
+        vkCmdEndRenderPass(m_commandBuffers[i]);
+
+        if(vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed t record command buffer!");
+        }
+    }
+#endif
+}
+void HelloTriangleApplication::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+{
+        /**
+         * @brief 记录指令到指令缓冲
+        */
+        VkCommandBufferBeginInfo beginInfo = {};
+
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+        beginInfo.pInheritanceInfo = nullptr;///< 辅助指令缓冲
+
+        /**
+         * @brief 开始指令缓冲的记录操作
+         */
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+        /**
+         * @brief 开始渲染流程
+        */
+        VkRenderPassBeginInfo renderPassInfo = {};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = m_renderPass;
+        renderPassInfo.framebuffer = m_swapChainFramebuffers[imageIndex];///< 指定使用的渲染流程对象
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = m_swapChainExtent;
+
+        VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+        renderPassInfo.clearValueCount = 1;
+        renderPassInfo.pClearValues = &clearColor;
+
+        /**
+         * @brief 开始渲染流程的命令
+         */
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        /**
+         * @brief 基础绘制命令
+         */
+        /**
+          * @brief 绑定图形管线
+          */
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
+
+        /**
+         * @brief 视口
+         */
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) m_swapChainExtent.width;
+        viewport.height = (float) m_swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        /**
+         * @brief 裁剪
+         */
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = m_swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+        /**
+         * @brief 指令调用三角形的绘制
+         */
+        vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+
+        /**
+         * @brief 结束渲染流程
+         */
+        vkCmdEndRenderPass(commandBuffer);
+
+        /**
+         * @brief 结束命令记录
+         */
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed t record command buffer!");
+        }
+}
+void HelloTriangleApplication::drawFrame()
+{
+    vkWaitForFences(m_logicDevice, 1,& m_inFlightFence[m_currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    vkResetFences(m_logicDevice, 1, &m_inFlightFence[m_currentFrame]);
+
+    /// 从交换链获取一张图像
+    /// 对帧缓冲附着执行指令缓冲中的渲染指令
+    /// 返回渲染后的图像到交换链进行呈现操作
+
+    // 栅栏 and 信号量： 使用栅栏(fence) 来对应用程序本身和渲
+    //染操作进行同步。使用信号量(semaphore) 来对一个指令队列内的操作或
+    //多个不同指令队列的操作进行同步。
+
+    /**
+     * @brief 获取图像
+     */
+    uint32_t imageIndex;
+    vkAcquireNextImageKHR(m_logicDevice,m_swapChain,std::numeric_limits<uint64_t>::max(),m_imageAvailableSemaphore[m_currentFrame], VK_NULL_HANDLE, &imageIndex);
+    vkQueueWaitIdle(m_presentQueue);
+
+    recordCommandBuffer(m_commandBuffers[imageIndex], imageIndex);
+
+    /**
+     * @brief 提交指令缓冲
+     */
+      VkSubmitInfo submitInfo = {};
+      submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+      VkSemaphore waitSemaphore[] = {m_imageAvailableSemaphore[m_currentFrame]};
+
+      VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+      submitInfo.waitSemaphoreCount = 1;
+      submitInfo.pWaitSemaphores = waitSemaphore;
+      submitInfo.pWaitDstStageMask = waitStages;
+      submitInfo.commandBufferCount = 1;
+      submitInfo.pCommandBuffers = &m_commandBuffers[imageIndex];
+
+      VkSemaphore signalSemaphores[] = {m_renderFinishedSemaphore[m_currentFrame]};
+      submitInfo.signalSemaphoreCount = 1;
+      submitInfo.pSignalSemaphores = signalSemaphores;
+
+      if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_inFlightFence[m_currentFrame]) != VK_SUCCESS)
+      {
+          throw std::runtime_error("failed to submit draw commandbuffer!");
+      }
+
+      VkPresentInfoKHR presentInfo = {};
+      presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+      presentInfo.waitSemaphoreCount = 1;
+      presentInfo.pWaitSemaphores = signalSemaphores;
+
+      VkSwapchainKHR swapChains[] = { m_swapChain };
+
+      presentInfo.swapchainCount = 1;
+      presentInfo.pSwapchains = swapChains;
+      presentInfo.pImageIndices = &imageIndex;
+      presentInfo.pResults = nullptr;
+
+      /**
+       * @brief 请求交换链呈现图像
+      */
+      vkQueuePresentKHR(m_presentQueue, &presentInfo);
+
+      m_currentFrame = (m_currentFrame + 1) %
+          MAX_FRAMES_IN_FLIGHT;
+}
+
+void HelloTriangleApplication::createSyncObjects()
+{
+    m_imageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
+    m_renderFinishedSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
+    m_inFlightFence.resize(MAX_FRAMES_IN_FLIGHT);
+
+
+    VkSemaphoreCreateInfo semaphoreInfo = {};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fenceinfo = {};
+    fenceinfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceinfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        if(vkCreateSemaphore(m_logicDevice,&semaphoreInfo,nullptr,&m_imageAvailableSemaphore[i]) != VK_SUCCESS ||
+           vkCreateSemaphore(m_logicDevice, &semaphoreInfo, nullptr, &m_renderFinishedSemaphore[i]) != VK_SUCCESS ||
+            vkCreateFence(m_logicDevice,&fenceinfo,nullptr,&m_inFlightFence[i] ) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create synchronization!");
+        }
     }
 
 }
