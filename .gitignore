@@ -29,6 +29,12 @@ cmake-build-debug-visual-studio/
 .idea
 .idea/
 
+build_Debug/
+build_Debug
+
+build_Release/
+build_Release
+
 
 
 
