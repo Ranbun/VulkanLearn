@@ -1,12 +1,18 @@
 #ifndef  VULKANTRIANGLE_H_
 #define  VULKANTRIANGLE_H_
-
 #include <vector>
 #include <vulkan/vulkan.h>
 
+
+/**
+ * @brief 窗口的 size
+ */
 constexpr int WIDTH = 1000;
 constexpr int HEIGHT = 800;
 
+/**
+ * @brief 检验层
+ */
 const std::vector validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
@@ -52,6 +58,9 @@ public:
     auto operator=(const HelloTriangleApplication&) -> HelloTriangleApplication& = delete;
     auto operator=(const HelloTriangleApplication&&) -> HelloTriangleApplication& = delete;
 
+    /**
+     * @brief 运行程序
+     */
     auto run() -> void;
 
 private:

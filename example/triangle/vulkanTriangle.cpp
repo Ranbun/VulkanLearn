@@ -13,6 +13,7 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <limits>
 #include <set>
@@ -23,9 +24,24 @@
 
 auto HelloTriangleApplication::run() -> void
 {
+    /**
+     * @brief 初始化窗口
+     */
     initWindow();
+
+    /**
+     * @brief 初始化vulkan
+     */
     initVulKan();
+
+    /**
+     * @brief 渲染循环
+     */
     mainLoop();
+
+    /**
+     * @brief 清空资源
+     */
     cleanup();
 }
 
