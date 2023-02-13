@@ -21,6 +21,7 @@
 
 #include "QueueFamilyIndices.h"
 #include "SwapChainSupportDetails.h"
+#include <map>
 
 auto HelloTriangleApplication::run() -> void
 {
@@ -52,6 +53,10 @@ auto HelloTriangleApplication::initWindow() -> void
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); ///< make GLFW don't create it(OpenGL Context)
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); ///< no resizing
 
+    /**
+     * @brief 创建一个窗口
+     * @return 返回创建的窗口
+    */
     m_window = glfwCreateWindow(WIDTH, HEIGHT, "VulKan Window", nullptr, nullptr);
 }
 
@@ -217,11 +222,14 @@ auto HelloTriangleApplication::cleanup() -> void
         DestroyDebugUtilsMessengerEXT(m_vkInstance, m_callBack, nullptr);
     }
 
-    /// <summary>
-    /// 删除SurfaceKHR对象，需要在在实例被清除之前完成此操作
-    /// </summary>
+    /**
+     * @brief 删除SurfaceKHR对象，需要在在实例被清除之前完成此操作
+    */
     vkDestroySurfaceKHR(m_vkInstance, m_surface, nullptr);
 
+    /**
+     * @brief 清空实例对象
+    */
     vkDestroyInstance(m_vkInstance, nullptr);
 
     /**
@@ -234,11 +242,17 @@ auto HelloTriangleApplication::cleanup() -> void
 
 auto HelloTriangleApplication::createInstance() -> void
 {
+    /**
+     * @brief 检测是否支持检验层
+    */
     if (enableValidationLayers && !checkValidationLayerSupport())
     {
         throw std::runtime_error("validation layers requested, but not available!");
     }
 
+    /**
+     * @brief 应用程序创建的信息
+    */
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Triangle";
@@ -247,17 +261,29 @@ auto HelloTriangleApplication::createInstance() -> void
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
+    /**
+     * @brief创建VulKan实例
+    */
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
+    /**
+     * @brief 全局扩展
+    */
     const auto extensions = getRequireExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
+    /**
+     * @brief 设置校验层
+    */
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
     if (enableValidationLayers)
     {
+        /**
+         * @brief 添加检验层
+        */
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
 
@@ -267,9 +293,13 @@ auto HelloTriangleApplication::createInstance() -> void
     else
     {
         createInfo.enabledLayerCount = 0;
+        createInfo.ppEnabledLayerNames = nullptr;
         createInfo.pNext = nullptr;
     }
 
+    /**
+     * @brief 创建实例
+    */
     if (vkCreateInstance(&createInfo, nullptr, &m_vkInstance) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create instance!");
@@ -280,9 +310,16 @@ auto HelloTriangleApplication::checkValidationLayerSupport() -> bool
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    /**
+     * @brief 获取检验层的信息(所有的)
+    */
     std::vector<VkLayerProperties> availableLayers(layerCount);
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
+    /**
+     * @brief 判断请求的检验层是否被支持
+    */
     for (const auto layerName : validationLayers)
     {
         auto layerFound = false;
@@ -310,8 +347,27 @@ auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const
     uint32_t glfwExtensionCount = 0;
     auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
+#if _DEBUG
+    {
+        //获取vulkan支持的扩展列表(名称和版本)
+        uint32_t extensionsCount = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, nullptr);
+        std::vector<VkExtensionProperties> extensions(extensionsCount);
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, extensions.data());
+        std::cout << "available extensions:" << std::endl;
+
+        for (const auto& extension : extensions)
+        {
+            std::cout << "\t" << extension.extensionName << std::endl;
+        }
+    }
+#endif 
+
     std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
+    /**
+     * @brief 添加消息回调
+    */
     if (enableValidationLayers)
     {
         /// 添加扩展 获得检验层的调试信息
@@ -332,8 +388,10 @@ auto HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
         instance, "vkCreateDebugUtilsMessengerEXT"));
     if (p_func != nullptr)
     {
-        return p_func(instance, pCreateInfo, pAllocator, pCallback);
+        return p_func(instance, pCreateInfo, pAllocator, pCallback);   // call func
     }
+
+    /// load error 
     return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
@@ -352,6 +410,9 @@ auto HelloTriangleApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance
 
 auto HelloTriangleApplication::pickPhysicalDevice() -> void
 {
+    /**
+     * @brief 获取物理设备个数
+    */
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
 
@@ -360,8 +421,41 @@ auto HelloTriangleApplication::pickPhysicalDevice() -> void
         throw std::runtime_error("failed to find GPUs with VulKan support!");
     }
 
+    /**
+     * @brief 获取所有的物理设备的信息
+     */
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, devices.data());
+
+#if _DEBUG
+
+    std::multimap<int, VkPhysicalDevice> candidates;
+    for(const auto & device: devices)
+    {
+        int score = 0;
+        // 获取设备的属性 name type support VulKan versions
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+        // 纹理压缩 64位浮点 多视口渲染支持查询
+        VkPhysicalDeviceFeatures deviceFeatures;
+        vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+        if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        {
+            score += 1000;
+        }
+        score += deviceProperties.limits.maxImageDimension2D;
+
+        if (!deviceFeatures.geometryShader)
+        {
+            score = 0;
+        }
+
+        candidates.insert(std::make_pair(score, device));
+    }
+
+#endif 
 
     for (const auto& device : devices)
     {
@@ -383,20 +477,21 @@ auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const ->
     assert(this);
     QueueFamilyIndices indices;
 
-    uint32_t queueFamilyCount = 0;
+    uint32_t queueFamilyCount = 0;  ///< 物理设备队列族个数
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
+
     /// VkQueueFamilyProperties 支持的操作类型 和可以创建队列的个数
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);  ///< 队列族的属性
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
     VkBool32 presentSupport = false;
-
 
     auto i = 0;
     for (const auto& queueFamily : queueFamilies)
     {
         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
+
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) ///< 是否支持渲染命令
         {
             indices.m_graphicsFamily = i;
@@ -1049,7 +1144,7 @@ auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -
 {
     assert(this);
 
-#if 0
+#if _DEBUG >> 1
     // 获取设备的属性 name type support VulKan versions
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -1057,13 +1152,21 @@ auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -
     // 纹理压缩 64位浮点 多视口渲染支持查询
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    /// 显卡必须支持几何着色器的条件
+    auto res = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
 #endif
 
+    /**
+     * @brief 查找队列族
+    */
     const auto indices = findQueueFamily(device);
     const auto extensionSupport = checkDeviceExtensionSupport(device);
 
+    /**
+     * @brief 交换链
+    */
     auto swapChainAdequate = false;
-
     if (extensionSupport)
     {
         const auto swapChainSupport = querySwapChainSupport(device);

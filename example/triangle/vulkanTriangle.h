@@ -12,11 +12,12 @@ constexpr int HEIGHT = 800;
 
 /**
  * @brief 检验层
+ * @note 当前请求使用的检验层
  */
 const std::vector validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-/// use validation layers ?
+/// use validation layers
 #ifdef NODEBUG
 constexpr bool enableValidationLayers = false;
 #else
@@ -97,6 +98,7 @@ private:
     /**
      * @brief 检测所有的检验层都能从列表中找到
      * @return 检测结果
+     * @note 请求所有的检验层
      */
     static auto checkValidationLayerSupport() -> bool;
 
@@ -112,6 +114,7 @@ private:
      * @param pAllocator 分配器
      * @param pCallback 回调函数
      * @return 结果
+     * @note 由于是扩展函数 所以此函数并不会被加载，需要手动加载
      */
     auto CreateDebugUtilsMessengerEXT(VkInstance instance,
                                       const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
