@@ -504,6 +504,9 @@ auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const ->
         }
 
 
+        /**
+         * @brief 当前物理设备满足条件则返回当前的物理设备
+        */
         if (indices.isComplete())
         {
             break;
@@ -517,8 +520,14 @@ auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const ->
 
 auto HelloTriangleApplication::createLogicDevice() -> void
 {
+    /**
+     * @brief 查找队列族信息
+    */
     const auto indices = findQueueFamily(m_physicalDevice);
 
+    /**
+     * @brief 队列族的创建结构体
+    */
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<int> uniqueQueueFamilies = {
         static_cast<int>(indices.m_graphicsFamily.value()), static_cast<int>(indices.m_presentFamily.value())
@@ -535,12 +544,18 @@ auto HelloTriangleApplication::createLogicDevice() -> void
         queueCreateInfos.emplace_back(queueCreateInfo);
     }
 
+    /**
+     * @brief 创建逻辑设备  - 填写结构体
+    */
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
     createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 
+    /**
+     * @brief 设备特性
+    */
     constexpr VkPhysicalDeviceFeatures deviceFeatures{};
     createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = 0;
