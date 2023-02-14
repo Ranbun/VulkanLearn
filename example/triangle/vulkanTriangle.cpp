@@ -427,7 +427,7 @@ auto HelloTriangleApplication::pickPhysicalDevice() -> void
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, devices.data());
 
-#if _DEBUG
+#if _DEBUG  >> 1
 
     std::multimap<int, VkPhysicalDevice> candidates;
     for(const auto & device: devices)
@@ -457,6 +457,10 @@ auto HelloTriangleApplication::pickPhysicalDevice() -> void
 
 #endif 
 
+    /**
+     * @brief 遍历所有物理设备 筛选合适的物理设备
+     * @return 
+    */
     for (const auto& device : devices)
     {
         if (isDeviceSuitable(device))
@@ -521,12 +525,12 @@ auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const ->
 auto HelloTriangleApplication::createLogicDevice() -> void
 {
     /**
-     * @brief 查找队列族信息
+     * @brief 获取物理设备中匹配的队列族
     */
     const auto indices = findQueueFamily(m_physicalDevice);
 
     /**
-     * @brief 队列族的创建结构体
+     * @brief 队列族的创建队列的结构体
     */
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<int> uniqueQueueFamilies = {
@@ -545,18 +549,17 @@ auto HelloTriangleApplication::createLogicDevice() -> void
     }
 
     /**
+     * @brief 设备特性
+    */
+    constexpr VkPhysicalDeviceFeatures deviceFeatures{};
+
+    /**
      * @brief 创建逻辑设备  - 填写结构体
     */
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
     createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-
-    /**
-     * @brief 设备特性
-    */
-    constexpr VkPhysicalDeviceFeatures deviceFeatures{};
     createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = 0;
 
@@ -580,6 +583,9 @@ auto HelloTriangleApplication::createLogicDevice() -> void
         throw std::runtime_error("failed to create logical device!");
     }
 
+    /**
+     * @brief 获取指定队列族的队列句柄
+    */
     vkGetDeviceQueue(m_logicDevice, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
     vkGetDeviceQueue(m_logicDevice, indices.m_presentFamily.value(), 0, &m_presentQueue);
 }
@@ -1173,7 +1179,7 @@ auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -
 #endif
 
     /**
-     * @brief 查找队列族
+     * @brief 查找当前设备中满足要求的队列族
     */
     const auto indices = findQueueFamily(device);
     const auto extensionSupport = checkDeviceExtensionSupport(device);
