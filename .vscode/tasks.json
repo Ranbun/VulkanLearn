@@ -50,12 +50,14 @@
                     "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
                     "-DCMAKE_C_COMPILER=D:/Program Files/MinGW_64/bin/gcc.exe",
                     "-DCMAKE_CXX_COMPILER=D:/Program Files/MinGW_64/bin/g++.exe",
-                    "-S",
-                    "${workspaceFolder}/",
-                    "-B",
-                    "${workspaceFolder}/build",
                     "-G",
-                    "Ninja"
+                    "Ninja",
+                    "-S",
+                    "E:/Github/VulkanLearn/",
+                    //"${workspaceFolder}/",
+                    "-B",
+                    "E:/Github/VulkanLearn/build/",
+                    //"${workspaceFolder}/build",
                 ],
                 // 设置VC的环境
                 /*
@@ -95,7 +97,7 @@
                 "--"
             ],
             "options": {
-                "cwd": "${workspaceFolder}/build"
+                "cwd": "E:/Github/VulkanLearn/build/"
             },
             "problemMatcher": "$gcc",
             /*
