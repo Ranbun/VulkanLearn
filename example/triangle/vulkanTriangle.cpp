@@ -542,7 +542,7 @@ auto HelloTriangleApplication::createLogicDevice() -> void
     {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueFamilyIndex = queueFamily; /// 指定队列族
         queueCreateInfo.queueCount = 1.0;
         queueCreateInfo.pQueuePriorities = &queuePriority;
         queueCreateInfos.emplace_back(queueCreateInfo);
