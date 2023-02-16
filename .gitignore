@@ -38,6 +38,10 @@ build_Release
 .cache/
 .cache
 
+# clang directory
+cmake-build-debug-clang/
+cmake-build-debug-clang
+
 
 
 
