@@ -542,14 +542,14 @@ auto HelloTriangleApplication::createLogicDevice() -> void
         static_cast<int>(indices.m_graphicsFamily.value()), static_cast<int>(indices.m_presentFamily.value())
     };
 
-    constexpr auto queuePriority = 1.0f;
+    constexpr auto queuePriority = 1.0f; /// 优先级 
     for (const auto queueFamily : uniqueQueueFamilies)
     {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily; /// 指定队列族
-        queueCreateInfo.queueCount = 1.0;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfo.queueCount = 1.0;               /// 创建的队列的数量
+        queueCreateInfo.pQueuePriorities = &queuePriority;   /// 队列的优先级 
         queueCreateInfos.emplace_back(queueCreateInfo);
     }
 
@@ -1186,7 +1186,7 @@ auto HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) const -
     /**
      * @brief 查找当前设备中满足要求的队列族
     */
-    const auto indices = findQueueFamily(device);
+    const auto indices = findQueueFamily(device);   /// 满足条件的队列族索引
     const auto extensionSupport = checkDeviceExtensionSupport(device);
 
     /**

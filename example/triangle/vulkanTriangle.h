@@ -154,7 +154,7 @@ private:
     /**
      * @brief 查找满足要求的队列族
      * @param device 传入的设备
-     * @return 队列族的索引
+     * @return 队列族的索引 (队列族索引是绑定到物理设备的从0开始的整数 可以在创建逻辑设备的时候引用它)
      */
     auto findQueueFamily(VkPhysicalDevice device) const -> QueueFamilyIndices;
 
