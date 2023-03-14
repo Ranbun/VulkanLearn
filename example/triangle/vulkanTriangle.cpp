@@ -347,6 +347,11 @@ auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const
     uint32_t glfwExtensionCount = 0;
     auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
+    for(auto i = 0;i < glfwExtensionCount;i++)
+    {
+        std::cout<<glfwExtensions[i] << std::endl;
+    }
+
 #if _DEBUG
     {
         //获取vulkan支持的扩展列表(名称和版本)

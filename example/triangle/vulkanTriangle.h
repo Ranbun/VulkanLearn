@@ -1,5 +1,6 @@
 #ifndef  VULKANTRIANGLE_H_
 #define  VULKANTRIANGLE_H_
+
 #include <vector>
 #include <vulkan/vulkan.h>
 
