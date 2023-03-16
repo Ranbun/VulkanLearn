@@ -262,7 +262,7 @@ auto HelloTriangleApplication::createInstance() -> void
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
     /**
-     * @brief创建VulKan实例
+     * @brief 创建VulKan实例
     */
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -366,7 +366,7 @@ auto HelloTriangleApplication::getRequireExtensions() const -> std::vector<const
             std::cout << "\t" << extension.extensionName << std::endl;
         }
     }
-#endif 
+#endif
 
     std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
@@ -396,7 +396,7 @@ auto HelloTriangleApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
         return p_func(instance, pCreateInfo, pAllocator, pCallback);   // call func
     }
 
-    /// load error 
+    /// load error
     return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
@@ -460,11 +460,11 @@ auto HelloTriangleApplication::pickPhysicalDevice() -> void
         candidates.insert(std::make_pair(score, device));
     }
 
-#endif 
+#endif
 
     /**
      * @brief 遍历所有物理设备 筛选合适的物理设备
-     * @return 
+     * @return
     */
     for (const auto& device : devices)
     {
@@ -499,8 +499,10 @@ auto HelloTriangleApplication::findQueueFamily(VkPhysicalDevice device) const ->
     auto i = 0;
     for (const auto& queueFamily : queueFamilies)
     {
+        /// 是否支持在给定表面做呈现操作
         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
 
+        /// 队列族支持的对列的类型 queueFlags
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) ///< 是否支持渲染命令
         {
             indices.m_graphicsFamily = i;
@@ -538,18 +540,22 @@ auto HelloTriangleApplication::createLogicDevice() -> void
      * @brief 队列族的创建队列的结构体
     */
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+
+    /// 队列族索引列表
     std::set<int> uniqueQueueFamilies = {
         static_cast<int>(indices.m_graphicsFamily.value()), static_cast<int>(indices.m_presentFamily.value())
     };
 
-    constexpr auto queuePriority = 1.0f; /// 优先级 
+    constexpr auto queuePriority = 1.0f; /// 优先级
+
+    /// 每个队列族索引都需要指定给创建的队列创建
     for (const auto queueFamily : uniqueQueueFamilies)
     {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily; /// 指定队列族
         queueCreateInfo.queueCount = 1.0;               /// 创建的队列的数量
-        queueCreateInfo.pQueuePriorities = &queuePriority;   /// 队列的优先级 
+        queueCreateInfo.pQueuePriorities = &queuePriority;   /// 队列的优先级
         queueCreateInfos.emplace_back(queueCreateInfo);
     }
 
@@ -578,7 +584,7 @@ auto HelloTriangleApplication::createLogicDevice() -> void
         createInfo.enabledLayerCount = 0;
     }
 
-    /// 启用交换链
+    /// 启用交换链 扩展
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
@@ -616,6 +622,7 @@ auto HelloTriangleApplication::createSurface() -> void
 
     const auto CreateWin32SurfaceKHR = reinterpret_cast<PFN_vkCreateWin32SurfaceKHR>(vkGetInstanceProcAddr(m_vkInstance, "vkCreateWin32SurfaceKHR"));
 
+    /// 创建一个窗口表面对象
     if (!CreateWin32SurfaceKHR || CreateWin32SurfaceKHR(m_vkInstance,&createInfo,nullptr,&m_surface) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create window surface");
@@ -649,7 +656,6 @@ auto HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice devi
 
 auto HelloTriangleApplication::querySwapChainSupport(VkPhysicalDevice device) const -> SwapChainSupportDetails
 {
-    assert(this);
     SwapChainSupportDetails details;
 
     ///获取表面属性
@@ -677,8 +683,7 @@ auto HelloTriangleApplication::querySwapChainSupport(VkPhysicalDevice device) co
     return details;
 }
 
-auto HelloTriangleApplication::chooseSwapSurfaceFormat(
-    const std::vector<VkSurfaceFormatKHR>& availableFormats) -> VkSurfaceFormatKHR
+auto HelloTriangleApplication::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) -> VkSurfaceFormatKHR
 {
     assert(this);
     if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED)
@@ -733,6 +738,7 @@ auto HelloTriangleApplication::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& 
     }
 
     VkExtent2D actualExtent = {WIDTH, HEIGHT};
+    /// 选择的交换范围需要在minImageExtent 与maxImageExtent 的范围内
     actualExtent.width = std::max(capabilities.minImageExtent.width,
                                   std::min(capabilities.maxImageExtent.width, actualExtent.width));
 
@@ -744,13 +750,13 @@ auto HelloTriangleApplication::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& 
 
 auto HelloTriangleApplication::createSwapChain() -> void
 {
-    assert(this);
     const auto swapChainSupport = querySwapChainSupport(m_physicalDevice);
 
     const auto surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.m_format);
     const auto presentMode = chooseSwapPresentMode(swapChainSupport.m_presentModes);
     const auto extent = chooseSwapExtent(swapChainSupport.m_capabilities);
 
+    /// 交换链图像的个数
     auto imageCount = swapChainSupport.m_capabilities.minImageCount + 1;
 
     if (swapChainSupport.m_capabilities.maxImageCount > 0 &&
@@ -777,6 +783,7 @@ auto HelloTriangleApplication::createSwapChain() -> void
         static_cast<uint32_t>(indices.m_presentFamily.value())
     };
 
+    /// 处理在多个队列族上使用交换链图像的方式
     if (indices.m_graphicsFamily.value() != indices.m_presentFamily.value())
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
@@ -785,16 +792,17 @@ auto HelloTriangleApplication::createSwapChain() -> void
     }
     else
     {
-        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; ///< 一张图只能被一个队列族使用
         createInfo.queueFamilyIndexCount = 0;
         createInfo.pQueueFamilyIndices = nullptr;
     }
 
+    /// 指定变换操作
     createInfo.preTransform = swapChainSupport.m_capabilities.currentTransform;
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; ///< 窗口混合 此设置为忽略
 
     createInfo.presentMode = presentMode;
-    createInfo.clipped = VK_TRUE;
+    createInfo.clipped = VK_TRUE;  /// TRUE不要回读窗口
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     if (vkCreateSwapchainKHR(m_logicDevice, &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)

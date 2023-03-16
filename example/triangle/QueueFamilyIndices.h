@@ -12,7 +12,10 @@
 
 struct QueueFamilyIndices
 {
+    /// 绘制队列
     std::optional<uint32_t> m_graphicsFamily = -1;
+
+    /// 呈现队列
     std::optional<uint32_t> m_presentFamily = -1;
 
 
@@ -24,4 +27,4 @@ struct QueueFamilyIndices
 
 
 
-#endif 
+#endif

@@ -175,7 +175,7 @@ private:
     auto createSurface() -> void;
 
     /**
-     * @brief 检查设备支持情况
+     * @brief 检查设备支持情况 是否支持交换链
      */
     auto checkDeviceExtensionSupport(VkPhysicalDevice device) const -> bool;
 
@@ -314,7 +314,7 @@ private:
     VkSwapchainKHR m_swapChain{};
 
     /**
-     * @brief 交换链图像
+     * @brief 交换链图像句柄 -- 用于渲染
      */
     std::vector<VkImage> m_swapChainImages;
 
