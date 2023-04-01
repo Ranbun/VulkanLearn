@@ -1,1 +1,468 @@
-{"root":{"data":{"id":"cqh9h3knetk0","created":1676273814771,"text":"Vulkan"},"children":[{"data":{"id":"cqh9hb4z94g0","created":1676273831237,"text":"创建实例VulkanInstance","priority":1,"layout_mind_offset":{"x":-28,"y":-94},"layout":null},"children":[{"data":{"id":"cqh9hmjfhbc0","created":1676273856056,"text":"VulkanApp","priority":null,"layout":null},"children":[]},{"data":{"id":"cqh9kjy1cw80","created":1676274085501,"text":"全局扩展","priority":null,"layout":null},"children":[{"data":{"id":"cr7sjukpx2w0","created":1678968190238,"text":"VK_KHR_surface必须可用，","layout":null},"children":[]}]},{"data":{"id":"cqh9ko7us800","created":1676274094802,"text":"检验层","priority":null,"layout":null},"children":[]},{"data":{"id":"cqh9liy05jc0","created":1676274161687,"text":"创建实例","layout":null},"children":[]}]},{"data":{"id":"cqh9ikbtmaw0","created":1676273929606,"text":"消息回调(输出调试信息)","layout_mind_offset":{"x":-24,"y":-80},"priority":2,"layout":null},"children":[]},{"data":{"id":"cqh9nml85sw0","created":1676274326349,"text":"选择物理设备","priority":4,"layout_mind_offset":{"x":-35,"y":-35},"layout_right_offset":{"x":-615,"y":6},"layout":null},"children":[{"data":{"id":"cqhajb37a740","created":1676276808968,"text":"获取所有物理设备","layout":null},"children":[]},{"data":{"id":"cqhajfzbhqo0","created":1676276819617,"text":"筛选物理设备","layout":null},"children":[{"data":{"id":"cqhal3gfc2o0","created":1676276949082,"text":"满足队列族要求(队列族作为筛选条件)","layout":null},"children":[{"data":{"id":"cr7smw3yup40","created":1678968428671,"text":"渲染命令支持","layout":null},"children":[]},{"data":{"id":"cr7smznyhmw0","created":1678968436410,"text":"呈现命令支持","layout":null},"children":[]}]},{"data":{"id":"cr7snuugz540","created":1678968504284,"text":"扩展支持","layout":null},"children":[{"data":{"id":"cr7some9f7s0","created":1678968564254,"text":"交换链支持","layout":null},"children":[]}]}]}]},{"data":{"id":"cqhwbqt94y80","created":1676338280700,"text":"创建逻辑设备","layout_mind_offset":{"x":160,"y":71},"priority":5,"layout":null},"children":[{"data":{"id":"cqzbdq1lmko0","created":1678107271668,"text":"1. 筛选队列族索引","layout":null},"children":[]},{"data":{"id":"cqhwqv4m25k0","created":1676339465556,"text":"2. 设置队列族创建的结构体","layout":null},"children":[{"data":{"id":"cqzbeavgr2g0","created":1678107317009,"text":"队列族索引","layout":null},"children":[]},{"data":{"id":"cqzbefe6viw0","created":1678107326849,"text":"创建的队列个数","layout":null},"children":[]},{"data":{"id":"cqzbek5dqe80","created":1678107337200,"text":"队列的优先级","layout":null},"children":[]}]},{"data":{"id":"cqzbes88ckg0","created":1678107354787,"text":"3.逻辑设备创建结构体","layout":null},"children":[{"data":{"id":"cqzbf63szcg0","created":1678107384994,"text":"1. 队列创建结构体","layout":null},"children":[]},{"data":{"id":"cqzbgrx1tyg0","created":1678107510839,"text":"2. 物理设备特性","layout":null},"children":[{"data":{"id":"cqzbhfk5yy00","created":1678107562303,"text":"开启或者禁用物理设备的某些特性，只需要将结构体对应的变量设置成false","layout":null},"children":[]}]}]},{"data":{"id":"cqzbj2htsqg0","created":1678107690591,"text":"4.vkCreateDevice","layout":null},"children":[{"data":{"id":"cqzbj8u2x3k0","created":1678107704393,"text":"创建逻辑设备","layout":null},"children":[]}]},{"data":{"id":"cqzbjjczlp40","created":1678107727304,"text":"可以通过逻辑设备获取创建的队列","layout_left_offset":{"x":10,"y":32},"font-style":"italic","progress":null,"layout":null},"children":[]}]},{"data":{"id":"cr7shf6f0ao0","created":1678967999993,"text":"创建窗口表面","layout_right_offset":{"x":12,"y":-654},"priority":3,"layout":null,"layout_mind_offset":{"x":-90,"y":146}},"children":[{"data":{"id":"cr7so1bfx400","created":1678968518371,"text":"使用glfw可以直接调用接口","layout":null},"children":[]}]},{"data":{"id":"cr7sp6weomg0","created":1678968608887,"text":"创建交换链","priority":6,"layout":null,"layout_mind_offset":{"x":-9,"y":197}},"children":[{"data":{"id":"cr7sr0r0m340","created":1678968752229,"text":"获取当前设备的交换链支持详细信息","layout":null},"children":[]},{"data":{"id":"cr7ssfb41940","created":1678968862283,"text":"为交换链选择合适的设置","layout":null},"children":[{"data":{"id":"cr7ssm2u68w0","created":1678968877020,"text":"表面格式","layout":null},"children":[]},{"data":{"id":"cr7sspg9lm80","created":1678968884362,"text":"呈现模式","layout":null},"children":[]},{"data":{"id":"cr7ssspzfyo0","created":1678968891480,"text":"交换范围，图像的分辨率","layout":null},"children":[]},{"data":{"id":"cr7t59kjjbs0","created":1678969868526,"text":"交换链图像的个数","layout":null},"children":[]}]},{"data":{"id":"cr7td7lj4zs0","created":1678970491146,"text":"创建交换链","layout":null},"children":[]},{"data":{"id":"cr7tdb1xizs0","created":1678970498668,"text":"存储图像句柄","layout":null},"children":[{"data":{"id":"cr7tdgtoz480","created":1678970511231,"text":"也可以通过逻辑设备和交换链直接获取","layout":null},"children":[]}]},{"data":{"id":"cr7ti7nndao0","created":1678970883095,"text":"记录交换链的格式和范围"},"children":[]}]}]},"template":"default","theme":"fresh-blue","version":"1.4.43"}
+{
+    "root": {
+        "data": {
+            "id": "cqh9h3knetk0",
+            "created": 1676273814771,
+            "text": "Vulkan"
+        },
+        "children": [
+            {
+                "data": {
+                    "id": "cqh9hb4z94g0",
+                    "created": 1676273831237,
+                    "text": "创建实例VulkanInstance",
+                    "priority": 1,
+                    "layout_mind_offset": {
+                        "x": -28,
+                        "y": -94
+                    },
+                    "layout": null
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cqh9hmjfhbc0",
+                            "created": 1676273856056,
+                            "text": "VulkanApp",
+                            "priority": null,
+                            "layout": null
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cqh9kjy1cw80",
+                            "created": 1676274085501,
+                            "text": "全局扩展",
+                            "priority": null,
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cr7sjukpx2w0",
+                                    "created": 1678968190238,
+                                    "text": "VK_KHR_surface必须可用，",
+                                    "layout": null
+                                },
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "data": {
+                            "id": "cqh9ko7us800",
+                            "created": 1676274094802,
+                            "text": "检验层",
+                            "priority": null,
+                            "layout": null
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cqh9liy05jc0",
+                            "created": 1676274161687,
+                            "text": "创建实例",
+                            "layout": null
+                        },
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "data": {
+                    "id": "cqh9ikbtmaw0",
+                    "created": 1676273929606,
+                    "text": "消息回调(输出调试信息)",
+                    "layout_mind_offset": {
+                        "x": -24,
+                        "y": -80
+                    },
+                    "priority": 2,
+                    "layout": null
+                },
+                "children": []
+            },
+            {
+                "data": {
+                    "id": "cqh9nml85sw0",
+                    "created": 1676274326349,
+                    "text": "选择物理设备",
+                    "priority": 4,
+                    "layout_mind_offset": {
+                        "x": -35,
+                        "y": -35
+                    },
+                    "layout_right_offset": {
+                        "x": -615,
+                        "y": 6
+                    },
+                    "layout": null
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cqhajb37a740",
+                            "created": 1676276808968,
+                            "text": "获取所有物理设备",
+                            "layout": null
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cqhajfzbhqo0",
+                            "created": 1676276819617,
+                            "text": "筛选物理设备",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cqhal3gfc2o0",
+                                    "created": 1676276949082,
+                                    "text": "满足队列族要求(队列族作为筛选条件)",
+                                    "layout": null
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "cr7smw3yup40",
+                                            "created": 1678968428671,
+                                            "text": "渲染命令支持",
+                                            "layout": null
+                                        },
+                                        "children": []
+                                    },
+                                    {
+                                        "data": {
+                                            "id": "cr7smznyhmw0",
+                                            "created": 1678968436410,
+                                            "text": "呈现命令支持",
+                                            "layout": null
+                                        },
+                                        "children": []
+                                    }
+                                ]
+                            },
+                            {
+                                "data": {
+                                    "id": "cr7snuugz540",
+                                    "created": 1678968504284,
+                                    "text": "扩展支持",
+                                    "layout": null
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "cr7some9f7s0",
+                                            "created": 1678968564254,
+                                            "text": "交换链支持",
+                                            "layout": null
+                                        },
+                                        "children": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "data": {
+                    "id": "cqhwbqt94y80",
+                    "created": 1676338280700,
+                    "text": "创建逻辑设备",
+                    "layout_mind_offset": {
+                        "x": 160,
+                        "y": 71
+                    },
+                    "priority": 5,
+                    "layout": null
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cqzbdq1lmko0",
+                            "created": 1678107271668,
+                            "text": "1. 筛选队列族索引",
+                            "layout": null
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cqhwqv4m25k0",
+                            "created": 1676339465556,
+                            "text": "2. 设置队列族创建的结构体",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cqzbeavgr2g0",
+                                    "created": 1678107317009,
+                                    "text": "队列族索引",
+                                    "layout": null
+                                },
+                                "children": []
+                            },
+                            {
+                                "data": {
+                                    "id": "cqzbefe6viw0",
+                                    "created": 1678107326849,
+                                    "text": "创建的队列个数",
+                                    "layout": null
+                                },
+                                "children": []
+                            },
+                            {
+                                "data": {
+                                    "id": "cqzbek5dqe80",
+                                    "created": 1678107337200,
+                                    "text": "队列的优先级",
+                                    "layout": null
+                                },
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "data": {
+                            "id": "cqzbes88ckg0",
+                            "created": 1678107354787,
+                            "text": "3.逻辑设备创建结构体",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cqzbf63szcg0",
+                                    "created": 1678107384994,
+                                    "text": "1. 队列创建结构体",
+                                    "layout": null
+                                },
+                                "children": []
+                            },
+                            {
+                                "data": {
+                                    "id": "cqzbgrx1tyg0",
+                                    "created": 1678107510839,
+                                    "text": "2. 物理设备特性",
+                                    "layout": null
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "cqzbhfk5yy00",
+                                            "created": 1678107562303,
+                                            "text": "开启或者禁用物理设备的某些特性，只需要将结构体对应的变量设置成false",
+                                            "layout": null
+                                        },
+                                        "children": []
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "data": {
+                            "id": "cqzbj2htsqg0",
+                            "created": 1678107690591,
+                            "text": "4.vkCreateDevice",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cqzbj8u2x3k0",
+                                    "created": 1678107704393,
+                                    "text": "创建逻辑设备",
+                                    "layout": null
+                                },
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "data": {
+                            "id": "cqzbjjczlp40",
+                            "created": 1678107727304,
+                            "text": "可以通过逻辑设备获取创建的队列",
+                            "layout_left_offset": {
+                                "x": 10,
+                                "y": 32
+                            },
+                            "font-style": "italic",
+                            "progress": null,
+                            "layout": null
+                        },
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "data": {
+                    "id": "cr7shf6f0ao0",
+                    "created": 1678967999993,
+                    "text": "创建窗口表面",
+                    "layout_right_offset": {
+                        "x": 12,
+                        "y": -654
+                    },
+                    "priority": 3,
+                    "layout": null,
+                    "layout_mind_offset": {
+                        "x": -90,
+                        "y": 146
+                    }
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cr7so1bfx400",
+                            "created": 1678968518371,
+                            "text": "使用glfw可以直接调用接口",
+                            "layout": null
+                        },
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "data": {
+                    "id": "cr7sp6weomg0",
+                    "created": 1678968608887,
+                    "text": "创建交换链",
+                    "priority": 6,
+                    "layout": null,
+                    "layout_mind_offset": {
+                        "x": -9,
+                        "y": 197
+                    }
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cr7sr0r0m340",
+                            "created": 1678968752229,
+                            "text": "获取当前设备的交换链支持详细信息",
+                            "layout": null
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cr7ssfb41940",
+                            "created": 1678968862283,
+                            "text": "为交换链选择合适的设置",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cr7ssm2u68w0",
+                                    "created": 1678968877020,
+                                    "text": "表面格式",
+                                    "layout": null
+                                },
+                                "children": []
+                            },
+                            {
+                                "data": {
+                                    "id": "cr7sspg9lm80",
+                                    "created": 1678968884362,
+                                    "text": "呈现模式",
+                                    "layout": null
+                                },
+                                "children": []
+                            },
+                            {
+                                "data": {
+                                    "id": "cr7ssspzfyo0",
+                                    "created": 1678968891480,
+                                    "text": "交换范围，图像的分辨率",
+                                    "layout": null
+                                },
+                                "children": []
+                            },
+                            {
+                                "data": {
+                                    "id": "cr7t59kjjbs0",
+                                    "created": 1678969868526,
+                                    "text": "交换链图像的个数",
+                                    "layout": null
+                                },
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "data": {
+                            "id": "cr7td7lj4zs0",
+                            "created": 1678970491146,
+                            "text": "创建交换链",
+                            "layout": null
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cr7tdb1xizs0",
+                            "created": 1678970498668,
+                            "text": "存储图像句柄",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cr7tdgtoz480",
+                                    "created": 1678970511231,
+                                    "text": "也可以通过逻辑设备和交换链直接获取",
+                                    "layout": null
+                                },
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "data": {
+                            "id": "cr7ti7nndao0",
+                            "created": 1678970883095,
+                            "text": "记录交换链的格式和范围"
+                        },
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "data": {
+                    "id": "crjk8k02cbc0",
+                    "created": 1680163455816,
+                    "text": "7.创建图像视图",
+                    "layout_mind_offset": {
+                        "x": -3.749999944120532,
+                        "y": 207.49999690800917
+                    }
+                },
+                "children": []
+            },
+            {
+                "data": {
+                    "id": "crjls5krd0g0",
+                    "created": 1680167812809,
+                    "text": "8.创建管线对象",
+                    "layout_mind_offset": {
+                        "x": -6.2499999068677425,
+                        "y": 274.9999959021809
+                    }
+                },
+                "children": []
+            }
+        ]
+    },
+    "template": "default",
+    "theme": "fresh-blue",
+    "version": "1.4.43"
+}
