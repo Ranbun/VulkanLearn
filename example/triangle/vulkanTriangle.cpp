@@ -900,13 +900,13 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     {
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         /**
-     * @brief 绑定
-     */
+         * @brief 绑定
+         */
         vertexInputInfo.vertexBindingDescriptionCount = 0;
         vertexInputInfo.pVertexBindingDescriptions = nullptr;
         /**
-     * @brief 属性
-     */
+         * @brief 属性
+         */
         vertexInputInfo.vertexAttributeDescriptionCount = 0;
         vertexInputInfo.pVertexAttributeDescriptions = nullptr;
     }
@@ -915,6 +915,8 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
     {
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+
+        /// 绘制的图元的类型
         inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;  /// 绘制三角形
         inputAssembly.primitiveRestartEnable = VK_FALSE;
     }
@@ -925,30 +927,32 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
         viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         viewportState.viewportCount = 1;
         viewportState.scissorCount = 1;
-    }
-    /// 视口和裁剪
-    VkViewport viewport = {};
-    {
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
-        viewport.width = static_cast<float>(m_swapChainExtent.width);
-        viewport.height = static_cast<float>(m_swapChainExtent.height);
 
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-    }
+        /// 视口和裁剪
+        VkViewport viewport = {};
+        {
+            viewport.x = 0.0f;
+            viewport.y = 0.0f;
+            viewport.width = static_cast<float>(m_swapChainExtent.width);
+            viewport.height = static_cast<float>(m_swapChainExtent.height);
 
-    viewportState.pViewports = &viewport;
+            viewport.minDepth = 0.0f;
+            viewport.maxDepth = 1.0f;
+        }
 
-    /**
+        viewportState.pViewports = &viewport;
+
+        /**
      * @brief 设置裁剪
      */
-    VkRect2D scissor = {};
-    {
-        scissor.offset = {0, 0};
-        scissor.extent = m_swapChainExtent;
+        VkRect2D scissor = {};
+        {
+            scissor.offset = {0, 0};
+            scissor.extent = m_swapChainExtent;
+        }
+        viewportState.pScissors = &scissor;
+
     }
-    viewportState.pScissors = &scissor;
 
     /// 光栅化
     VkPipelineRasterizationStateCreateInfo rasterizer = {};
@@ -958,12 +962,12 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
         rasterizer.rasterizerDiscardEnable = VK_FALSE;///< 禁止所有图元输出到帧缓冲
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE; /// 指定顶点的正面的顺序
 
         /**
-     * @brief 下面的值将作用在深度上
-     * @note 此处我们将之屏蔽
-     */
+         * @brief 下面的值将作用在深度上
+         * @note 此处我们将之屏蔽
+         */
         rasterizer.depthBiasEnable = VK_FALSE;
         rasterizer.depthBiasConstantFactor = 0.0f;
         rasterizer.depthBiasClamp = 0.0f;
@@ -971,15 +975,18 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     }
 
     /// 多重采样
-        /// 此处先禁用多重采样
+    /// 此处先禁用多重采样
     VkPipelineMultisampleStateCreateInfo multisampling = {};
-    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-    multisampling.minSampleShading = 1.0f;
-    multisampling.pSampleMask = nullptr;
-    multisampling.alphaToCoverageEnable = VK_FALSE;
-    multisampling.alphaToOneEnable = VK_FALSE;
+    {
+        multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        multisampling.sampleShadingEnable = VK_FALSE;
+        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        multisampling.minSampleShading = 1.0f;
+        multisampling.pSampleMask = nullptr;
+        multisampling.alphaToCoverageEnable = VK_FALSE;
+        multisampling.alphaToOneEnable = VK_FALSE;
+    }
+
 
     /// 深度与模板测试
     {
