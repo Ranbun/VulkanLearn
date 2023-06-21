@@ -1013,6 +1013,7 @@ auto HelloTriangleApplication::createGraphicsPipeline() -> void
     colorBlending.blendConstants[3] = 0.0f;
 
     ///动态修改的管线状态
+    /// 指定可以动态修改的管线状态
     std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH};
 
     VkPipelineDynamicStateCreateInfo dynamicState = {};
