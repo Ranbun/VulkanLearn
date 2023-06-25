@@ -786,15 +786,15 @@ auto HelloTriangleApplication::createSwapChain() -> void
     /// 处理在多个队列族上使用交换链图像的方式
     if (indices.m_graphicsFamily.value() != indices.m_presentFamily.value())
     {
-        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT; /// 一份图像可能同时使用一个图像，所以要并行
         createInfo.queueFamilyIndexCount = 2;
         createInfo.pQueueFamilyIndices = queueFamilyIndices;
     }
     else
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; ///< 一张图只能被一个队列族使用
-        createInfo.queueFamilyIndexCount = 0;
-        createInfo.pQueueFamilyIndices = nullptr;
+        createInfo.queueFamilyIndexCount = 1;
+        createInfo.pQueueFamilyIndices = &indices.m_graphicsFamily.value();
     }
 
     /// 指定变换操作
