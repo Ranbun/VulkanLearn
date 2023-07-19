@@ -1,0 +1,166 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Create BuildDir",
+            "type": "shell",
+            "command": "mkdir",
+            "args": [
+                "-p",
+                "build"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "powershell.exe"
+                    }
+                },
+                "args": [
+                    "-Force",
+                    "build"
+                ]
+            }
+        },
+        // CMake 生成
+        {
+            "label": "CMake::Generate",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                "../"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "windows": {
+                "args": [
+                    "-DCMAKE_BUILD_TYPE=Debug",
+                    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                    "-DCMAKE_C_COMPILER=D:/Program Files/MinGW_64/bin/gcc.exe",
+                    "-DCMAKE_CXX_COMPILER=D:/Program Files/MinGW_64/bin/g++.exe",
+                    "-G",
+                    "Ninja",
+                    "-S",
+                    "E:/Github/VulkanLearn/",
+                    //"${workspaceFolder}/",
+                    "-B",
+                    "E:/Github/VulkanLearn/build/",
+                    //"${workspaceFolder}/build",
+                ],
+                // 设置VC的环境
+                /*
+                "options": {
+                    "shell": {
+                        "executable": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+                        "args": [
+                            "amd64",
+                            "-vcvars_ver=14.3",
+                            "&&"
+                        ]
+                    }
+                }
+                */
+            },
+            "dependsOn": [
+                "Create BuildDir"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        //CMake 编译
+        {
+            "label": "CMake::Build_Debug",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "./",
+                "--target",
+                "all",
+                "--"
+            ],
+            "options": {
+                "cwd": "E:/Github/VulkanLearn/build/"
+            },
+            "problemMatcher": "$gcc",
+            /*
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat",
+                        "args": [
+                            "amd64",
+                            "-vcvars_ver=14.3",
+                            "&&"
+                        ]
+                    }
+                },
+                "problemMatcher": "$msCompile"
+            },
+            */
+            "dependsOrder": "sequence", // 按照顺序执行
+            "dependsOn": [
+                "CMake::Generate"
+            ]
+        }
+    ]
+    /*
+    "inputs": [
+        {
+            "id": "CMAKE_BUILD_TYPE",
+            "type": "pickString",
+            "description": "What CMAKE_BUILD_TYPE do you want to create?",
+            "options": [
+                "Debug",
+                "Release",
+                "RelWithDebInfo",
+                "MinSizeRel",
+            ],
+            "default": "Debug"
+        },
+        {
+            "id": "PLATFORM",
+            "type": "pickString",
+            "description": "What PLAPLATFORTFORM do you want to create?",
+            "options": [
+                "x86",
+                "amd64",
+                "arm",
+                "x86_arm",
+                "x86_amd64",
+                "amd64_x86",
+                "amd64_arm",
+            ],
+            "default": "amd64"
+        },
+        {
+            "id": "vcvars_ver",
+            "type": "pickString",
+            "description": "What vcvars_ver do you want to create?",
+            "options": [
+                "14.3", // 2022
+                "14.2", // 2019
+                "14.1", // 2017
+                "14.0", // 2015
+            ],
+            "default": "14.3"
+        }
+    ]*/
+}

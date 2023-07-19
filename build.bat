@@ -1,4 +1,18 @@
+@ECHO OFF
+
+SET args1=%1
 call "%VS2022INSTALLDIR%/VC/Auxiliary/Build/vcvars64.bat"
 
-cmake.exe -DCMAKE_BUILD_TYPE=Debug -G Ninja -DGLFW_INSTALL:BOOL=OFF -S ./ -B ./build
-cmake.exe --build ./build --target all -j 8
+if %args1% == generate (
+    @ECHO ON
+    cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja -DGLFW_INSTALL:BOOL=OFF -S ./ -B ./build
+    EXIT /B 0
+)
+
+if %args1% == build (
+    @ECHO ON
+    cmake --build ./build --target all -j 8
+    EXIT /B 0
+)
+
+EXIT /B -1

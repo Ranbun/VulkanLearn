@@ -5,19 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Triangle-VulKan", //名称
-            "type": "cppdbg", //调试类型，除使用msvc进行调试外，均为该类型
+            "name": "Debug: Triangle-VulKan",
+            "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/${workspaceFolderBasename}", //指定C/C++程序位置
-            "args": [], //指定运行参数
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}",
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/example/triangle/",
             "environment": [],
             "console": "externalTerminal",
-            "windows": //windows的特定配置
-            {
-                "type": "cppvsdbg", //指定使用msvc进行调试
-                "program": "${workspaceFolder}/build/example/triangle/triangle.exe", //指定C/C++程序位置
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build/example/triangle/triangle.exe"
             }
         }
     ]
