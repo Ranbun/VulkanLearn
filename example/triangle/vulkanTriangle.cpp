@@ -1149,7 +1149,7 @@ auto HelloTriangleApplication::createRenderPass() -> void
     colorAttachment.format = m_swapChainImageFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
-    /// 渲染前后的处理 - 颜色和深度处理
+    /// 渲染前后的处理 - 颜色和深度处理 - glclear 
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
@@ -1172,7 +1172,7 @@ auto HelloTriangleApplication::createRenderPass() -> void
      * @brief 子流程
      */
     VkSubpassDescription subpass = {};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;  /// 表示是一个图形渲染子流程
 
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
@@ -1326,7 +1326,7 @@ void HelloTriangleApplication::createCommandPool()
 
     /// TODO 此处未判断查找结果是否满足要求
     poolCreateInfo.queueFamilyIndex = queueFamilyIndices.m_graphicsFamily.value();
-    poolCreateInfo.flags = 0;
+    poolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
     if(vkCreateCommandPool(m_logicDevice,&poolCreateInfo,nullptr,&m_commandPool) != VK_SUCCESS)
     {
@@ -1501,7 +1501,7 @@ void HelloTriangleApplication::recordCommandBuffer(VkCommandBuffer commandBuffer
 }
 void HelloTriangleApplication::drawFrame()
 {
-    vkWaitForFences(m_logicDevice, 1,& m_inFlightFence[m_currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    auto res = vkWaitForFences(m_logicDevice, 1,& m_inFlightFence[m_currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
     vkResetFences(m_logicDevice, 1, &m_inFlightFence[m_currentFrame]);
 
     /// 从交换链获取一张图像
@@ -1509,8 +1509,8 @@ void HelloTriangleApplication::drawFrame()
     /// 返回渲染后的图像到交换链进行呈现操作
 
     // 栅栏 and 信号量： 使用栅栏(fence) 来对应用程序本身和渲
-    //染操作进行同步。使用信号量(semaphore) 来对一个指令队列内的操作或
-    //多个不同指令队列的操作进行同步。
+    // 染操作进行同步。使用信号量(semaphore) 来对一个指令队列内的操作或
+    // 多个不同指令队列的操作进行同步。
 
     /**
      * @brief 获取图像
