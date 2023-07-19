@@ -51,7 +51,7 @@ auto HelloTriangleApplication::initWindow() -> void
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); ///< make GLFW don't create it(OpenGL Context)
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); ///< no resizing
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);   ///< no resizing
 
     /**
      * @brief 创建一个窗口

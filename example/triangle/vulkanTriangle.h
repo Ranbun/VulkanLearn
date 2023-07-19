@@ -57,7 +57,6 @@ public:
 
     HelloTriangleApplication(const HelloTriangleApplication&) = delete;
     HelloTriangleApplication(const HelloTriangleApplication&&) = delete;
-
     auto operator=(const HelloTriangleApplication&) -> HelloTriangleApplication& = delete;
     auto operator=(const HelloTriangleApplication&&) -> HelloTriangleApplication& = delete;
 
