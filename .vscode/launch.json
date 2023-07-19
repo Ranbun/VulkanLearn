@@ -11,21 +11,14 @@
             "program": "${workspaceFolder}/build/${workspaceFolderBasename}", //指定C/C++程序位置
             "args": [], //指定运行参数
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}", //指定工作目录
-            "preLaunchTask": "CMake::Build_Debug", //在调试前会先调用CMake::Build_Debug这个task编译构建程序
+            "cwd": "${workspaceFolder}/build/example/triangle/",
             "environment": [],
-            // "console": "externalTerminal",
-            "externalConsole": false,
+            "console": "externalTerminal",
             "windows": //windows的特定配置
             {
-                "name": "Triangle-VulKan",
-                "request": "launch",
-                "type": "cppdbg", //指定使用msvc进行调试
+                "type": "cppvsdbg", //指定使用msvc进行调试
                 "program": "${workspaceFolder}/build/example/triangle/triangle.exe", //指定C/C++程序位置
-            },
-            // 指定使用GDB调试
-            "MIMode": "gdb",
-            "miDebuggerPath": "D:/Program Files/LLVM/bin/gdb.exe"
+            }
         }
     ]
 }
