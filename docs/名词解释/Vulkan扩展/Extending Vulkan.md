@@ -1,8 +1,9 @@
 # Extending Vulkan
 
 ### 1. 新功能扩展机制
-- 添加新的扩展
-- 更新新的核心版本
+
+- 添加新的扩展扩展功能
+- 更新新的核心版本(一般来自于扩展)
 
 ### 2. 功能分类
 - 实例级功能
@@ -37,19 +38,21 @@ VkResult vkEnumerateInstanceLayerProperties(
 #### 启用层
 ##### 显示启用
 - 创建实例时指定层的名称到实例创建的参数中
+
 ```C++
-    /**
-     * @brief 创建实例的结构体
-    */
-    VkInstanceCreateInfo createInfo{};
-    ......
-    /**
-     * @brief 设置校验层
-    */
-    createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-    createInfo.ppEnabledLayerNames = validationLayers.data();
+/**
+ * @brief 创建实例的结构体
+*/
+VkInstanceCreateInfo createInfo{};
+......
+/**
+ * @brief 设置校验层
+*/
+createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+createInfo.ppEnabledLayerNames = validationLayers.data();
 
 ```
+
 ##### 隐式启用 - 加载器
 - 隐式启用的层在显式启用的层之前加载，因此隐式启用的层更接近应用程序，而显式启用的层更接近驱动程序。除非另有规定，隐式启用和显式启用的层仅在启用方式和加载顺序上有所区别。显式启用一个已经隐式启用的层将导致该层作为隐式启用的层进行加载，没有额外的影响。
 - 在`Vulkan`中，`Loader`是一个关键的组件，它负责加载和管理`Vulkan`的实现（驱动程序）。`Loader`充当了应用程序与底层驱动程序之间的中间层。它提供了一个统一的接口，使得应用程序可以与不同的驱动程序进行交互，而不需要直接与特定的硬件或驱动程序进行耦合。
@@ -106,12 +109,6 @@ VkResult vkEnumerateDeviceExtensionProperties(
 &ensp;&ensp;如果一个扩展被支持（通过vkEnumerateInstanceExtensionProperties或vkEnumerateDeviceExtensionProperties查询），那么该扩展所需的其他扩展也必须在同一实例或物理设备上被支持。
 &ensp;&ensp;如果一个设备扩展具有依赖于实例扩展的依赖关系，并且该实例扩展没有在vkCreateInstance中启用，那么该设备扩展被视为不受支持，因此在该实例的任何VkPhysicalDevice子对象中不应返回该设备扩展。实例扩展不依赖于设备扩展。
 &ensp;&ensp;如果一个所需的扩展被提升为另一个扩展或核心API版本，那么通常情况下，依赖关系也会被提升的扩展或核心版本所满足。只要原始扩展所需的任何功能也被提升的扩展或核心版本所需或启用，这个规则就成立。然而，在某些情况下，一个扩展在提升为另一个扩展或核心版本时，可能会将其某些功能设为可选。在这种情况下，依赖关系可能无法满足。要确定依赖关系是否满足，唯一的方法是查看图层和扩展附录中原始依赖和提升版本的描述信息。
-
-
-
-
-
-
 
 
 [Vulkan-1.3]: https://registry.khronos.org/vulkan/specs/1.3/html/chap31.html#extendingvulkan-layers
