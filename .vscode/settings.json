@@ -53,5 +53,10 @@
         "stdio.h": "c",
         "ctime": "cpp",
         "iomanip": "cpp"
+    },
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#1F3219",
+        "titleBar.activeBackground": "#2B4723",
+        "titleBar.activeForeground": "#F7FBF6"
     }
 }
