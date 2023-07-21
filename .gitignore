@@ -49,3 +49,6 @@ cmake-build-debug-clang
 
 .vscode
 .vscode/
+
+docs/_book/
+docs/_book
