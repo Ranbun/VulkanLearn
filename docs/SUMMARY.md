@@ -15,3 +15,11 @@
 ## 31 Vulkan 扩展
 
 - [Vulkan 扩展](./31.VulkanExtending/ExtendingVulkan.md)
+
+
+## Others
+- [队列](./NounInterpretation/Queues.md)
+- [队列族](./NounInterpretation/QueuesFamily.md)
+- [物理设备](./NounInterpretation/PhysicalDevices.md)
+- [逻辑设备](./NounInterpretation/Devices.md)
+
