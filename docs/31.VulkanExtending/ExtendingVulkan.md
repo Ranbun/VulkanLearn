@@ -10,15 +10,15 @@
 - 设备级功能
 
 #### 实例级功能
-- 可获取实例的属性，或者接受一个Vulkan实例(VkInstance)对象作为参数的命令视作实例级功能
+- 可获取实例的属性，或者接受一个`Vulkan`实例(`VkInstance``)对象作为参数的命令视作实例级功能
 
 #### 设备级功能
-- 从VkDevice对象或VkDevice的子对象分派或将其中任何一个(VkDevice or VkDevice子对象)作为参数的命令被视为设备级功能。设备扩展定义的类型也被视作设备级功能。
+- 从`VkDevice`对象或`VkDevice`的子对象分派或将其中任何一个(`VkDevice or VkDevice`子对象)作为参数的命令被视为设备级功能。设备扩展定义的类型也被视作设备级功能。
 - 获取物理设备属性的命令也是设备级功能
 
 
 ### 3. Vulkan 层
-- 扩展Vulkan的行为到规范之外
+- 扩展`Vulkan`的行为到规范之外
 - 启用某个层后，它会将自身插入到该层关注的 `Vulkan` 命令的调用链中。层可用于各种任务，这些任务将 `Vulkan` 的基本行为扩展到规范要求之外 - 例如调用日志记录、跟踪、验证或提供附加扩展。
 
 ```C++
@@ -74,7 +74,7 @@ createInfo.ppEnabledLayerNames = validationLayers.data();
 - 指定 `VkDeviceCreateInfo`结构体的`ppEnabledExtensionNames`参数在创建`VkDevice`时候.
 
 #### 实例扩展
-- 在核心API范围之外向Vulkan添加新的实例级功能
+- 在核心`API`范围之外向`Vulkan`添加新的实例级功能
 - 查询可用的实例级扩展
 
 ```C++
@@ -89,7 +89,7 @@ VkResult vkEnumerateInstanceExtensionProperties(
 ```
 
 #### 设备扩展
-- 设备扩展向API添加了核心规范之外的新的设备级功能。这些扩展可以扩展Vulkan的功能，引入新的命令、结构体、枚举值或其他特定功能，以满足特定应用程序的需求。
+- 设备扩展向API添加了核心规范之外的新的设备级功能。这些扩展可以扩展`Vulkan`的功能，引入新的命令、结构体、枚举值或其他特定功能，以满足特定应用程序的需求。
 
 ```C++
 // Provided by VK_VERSION_1_0
@@ -105,10 +105,10 @@ VkResult vkEnumerateDeviceExtensionProperties(
 - 要使用设备级扩展的功能必须在创建逻辑设备的时候启用相应的扩展
 
 ### 5. 扩展的依赖
-- &ensp;&ensp;一些扩展的功能依赖于其他扩展或特定的核心API版本。要启用具有依赖关系的扩展，在使用vkCreateInstance创建实例或使用vkCreateDevice创建设备时，必须通过相同的API机制启用所需的扩展。具有这种依赖关系的每个扩展都在总结该扩展的附录中记录了这些依赖关系。
-&ensp;&ensp;如果一个扩展被支持（通过vkEnumerateInstanceExtensionProperties或vkEnumerateDeviceExtensionProperties查询），那么该扩展所需的其他扩展也必须在同一实例或物理设备上被支持。
-&ensp;&ensp;如果一个设备扩展具有依赖于实例扩展的依赖关系，并且该实例扩展没有在vkCreateInstance中启用，那么该设备扩展被视为不受支持，因此在该实例的任何VkPhysicalDevice子对象中不应返回该设备扩展。实例扩展不依赖于设备扩展。
-&ensp;&ensp;如果一个所需的扩展被提升为另一个扩展或核心API版本，那么通常情况下，依赖关系也会被提升的扩展或核心版本所满足。只要原始扩展所需的任何功能也被提升的扩展或核心版本所需或启用，这个规则就成立。然而，在某些情况下，一个扩展在提升为另一个扩展或核心版本时，可能会将其某些功能设为可选。在这种情况下，依赖关系可能无法满足。要确定依赖关系是否满足，唯一的方法是查看图层和扩展附录中原始依赖和提升版本的描述信息。
+- &ensp;&ensp;一些扩展的功能依赖于其他扩展或特定的核心`API`版本。要启用具有依赖关系的扩展，在使用`vkCreateInstance`创建实例或使用`vkCreateDevice`创建设备时，必须通过相同的API机制启用所需的扩展。具有这种依赖关系的每个扩展都在总结该扩展的附录中记录了这些依赖关系。
+&ensp;&ensp;如果一个扩展被支持（通过`vkEnumerateInstanceExtensionProperties`或`vkEnumerateDeviceExtensionProperties`查询），那么该扩展所需的其他扩展也必须在同一实例或物理设备上被支持。
+&ensp;&ensp;如果一个设备扩展具有依赖于实例扩展的依赖关系，并且该实例扩展没有在`vkCreateInstance`中启用，那么该设备扩展被视为不受支持，因此在该实例的任何`VkPhysicalDevice`子对象中不应返回该设备扩展。实例扩展不依赖于设备扩展。
+&ensp;&ensp;如果一个所需的扩展被提升为另一个扩展或核心`API`版本，那么通常情况下，依赖关系也会被提升的扩展或核心版本所满足。只要原始扩展所需的任何功能也被提升的扩展或核心版本所需或启用，这个规则就成立。然而，在某些情况下，一个扩展在提升为另一个扩展或核心版本时，可能会将其某些功能设为可选。在这种情况下，依赖关系可能无法满足。要确定依赖关系是否满足，唯一的方法是查看图层和扩展附录中原始依赖和提升版本的描述信息。
 
 
 [Vulkan-1.3]: https://registry.khronos.org/vulkan/specs/1.3/html/chap31.html#extendingvulkan-layers
