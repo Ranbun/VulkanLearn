@@ -13,9 +13,12 @@
 - [Queues](./5.DevicesAndQueues/Queues/5.3Queues.md)
 
 ## 31 Vulkan 扩展
-
 - [Vulkan 扩展](./31.VulkanExtending/ExtendingVulkan.md)
 
+## 34 WSI 窗口系统集成
+- [Introduce](./34.WindowSystemIntegration/README.md)
+- [WSI 平台](./34.WindowSystemIntegration/WSIPlatform.md)
+- [WSI 表面](./34.WindowSystemIntegration/WSISurface.md)
 
 ## Others
 - [队列](./NounInterpretation/Queues.md)
