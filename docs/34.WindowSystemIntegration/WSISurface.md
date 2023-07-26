@@ -61,3 +61,44 @@ VkResult vkCreateWin32SurfaceKHR(
 #### XCB Platform
 
 loading ......
+
+#### XCB Platform
+
+loading .....
+
+#### 与平台无关的信息 Platform-Independent Information
+
+&ensp;&ensp;一旦创建，`VkSurfaceKHR`对象可以在本扩展以及其他扩展中使用，尤其是在`VK_KHR_swapchain`扩展中。
+
+&ensp;&ensp;在`WSI`中，有几个函数会在`Surface`不再可用时返回`VK_ERROR_SURFACE_LOST_KHR`错误。在这种错误发生后，应该销毁`Surface`（以及任何子`Swapchain`，如果存在），因为没有办法将它们恢复到非丢失状态。应用程序可以尝试使用相同的本地平台窗口对象创建一个新的`VkSurfaceKHR`，但是否成功取决于平台，并可能取决于`Surface`不可用的原因。丢失的`Surface`不会导致设备丢失。
+
+&ensp;&ensp;销毁VkSurfaceKHR对象，调用以下函数：
+```C++
+// Provided by VK_KHR_surface
+void vkDestroySurfaceKHR(
+    VkInstance                                  instance,
+    VkSurfaceKHR                                surface,
+    const VkAllocationCallbacks*                pAllocator);
+
+```
+- `instance`是用于创建该表面的实例。
+- `surface`是要销毁的表面。
+- `pAllocator`是在没有更具体的分配器可用时用于为表面对象分配主机内存的分配器（请参阅内存分配）。
+
+&ensp;&ensp;销毁`VkSurfaceKHR`仅仅断开了`Vulkan`与本地表面之间的连接，并不意味着销毁本地表面、关闭窗口或产生类似的行为。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
