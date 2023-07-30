@@ -50,7 +50,7 @@ VkResult vkCreateWin32SurfaceKHR(
 
 
 &ensp;&ensp;在 `Win32` 平台上，`minImageExtent`、`maxImageExtent` 和 `currentExtent` 必须始终等于窗口的大小。
-&ensp;&ensp;`Win32`` 表面的 `currentExtent`` 必须同时满足宽度和高度大于 0，或者它们都为 0。
+&ensp;&ensp;`Win32` 表面的 `currentExtent` 必须同时满足宽度和高度大于 0，或者它们都为 0。
 
 <p style="color: #707070" Size=10>
     <font color=red Size=4>Notes</font>:<br>

@@ -19,6 +19,8 @@
 - [Introduce](./34.WindowSystemIntegration/README.md)
 - [WSI 平台](./34.WindowSystemIntegration/WSIPlatform.md)
 - [WSI 表面](./34.WindowSystemIntegration/WSISurface.md)
+- [直接显示到显示设备](./34.WindowSystemIntegration/PresentingDirectlytoDisplayDevices.md)
+
 
 ## Others
 - [队列](./NounInterpretation/Queues.md)
