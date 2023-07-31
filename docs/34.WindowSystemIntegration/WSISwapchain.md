@@ -28,7 +28,6 @@ VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSwapchainKHR)
 
 - 在`Vulkan`中，"presentation engine"（展示引擎）是指负责将渲染结果呈现到屏幕或显示设备上的部分。它是`Vulkan`与窗口系统或显示设备交互的中间层。展示引擎可以是平台的合成器或显示引擎，负责接收应用程序渲染的图像，并在适当的时机将其呈现到屏幕上。展示引擎可以是同步的或异步的，具体取决于实现和硬件。有些实现会使用设备的图形队列或专用的展示硬件来执行呈现操作。对于每个交换链，都会有一个相应的展示引擎与之关联，管理交换链中的可呈现图像。应用程序通过与展示引擎交互，使用`vkAcquireNextImageKHR`获取可呈现图像的使用权，并通过`vkQueuePresentKHR`将图像提交给展示引擎进行呈现。展示引擎负责处理图像的呈现，以确保在正确的时机显示渲染结果到屏幕上。
 
-
 <p style="color: #707070" Size=10>
     <font color=red Size=4>Notes</font>:<br>
     &ensp;&ensp;这使得平台可以处理需要在呈现后无序返回图像的情况。同时，它允许应用程序在初始化时生成引用交换链中所有图像的命令缓冲区，而不是在其主循环中生成。
@@ -44,12 +43,21 @@ VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSwapchainKHR)
 
 呈现引擎在共享可呈现图像首次呈现后随时可以访问它。为了避免撕裂现象，应用程序应该与呈现引擎协调访问。这需要通过特定于平台的机制获得呈现引擎的时序信息，并确保颜色附件的写入操作在呈现引擎刷新周期的适当时段可用。
 
+<p style="color: #707070" Size=10>
+    <font color=red Size=4>Notes</font>:<br>
+    &ensp;&ensp;VK_KHR_shared_presentable_image扩展不提供用于确定呈现引擎刷新周期时序的功能。
+ </p>
 
+为了在渲染到共享可呈现图像时查询交换链的状态，可以调用以下函数：
 
+```C++
 
+// Provided by VK_KHR_shared_presentable_image
+VkResult vkGetSwapchainStatusKHR(
+    VkDevice                                    device,
+    VkSwapchainKHR                              swapchain);
 
-
-
+```
 
 
 
