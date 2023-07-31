@@ -20,6 +20,9 @@
 - [WSI 平台](./34.WindowSystemIntegration/WSIPlatform.md)
 - [WSI 表面](./34.WindowSystemIntegration/WSISurface.md)
 - [直接显示到显示设备](./34.WindowSystemIntegration/PresentingDirectlytoDisplayDevices.md)
+- [WSI支持查询](./34.WindowSystemIntegration/QueryingforWSISupport.md)
+
+
 
 
 ## Others

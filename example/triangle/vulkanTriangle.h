@@ -19,6 +19,8 @@ constexpr int HEIGHT = 800;
 const std::vector validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
+typedef VkResult(VKAPI_PTR *PFN_vkGetPhysicalDeviceDisplayPropertiesKHR)(VkPhysicalDevice physicalDevice, uint32_t *pPropertyCount, VkDisplayPropertiesKHR *pProperties);
+
 /// use validation layers
 #ifdef NODEBUG
 constexpr bool enableValidationLayers = false;
@@ -49,16 +51,15 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 /**
  * @brief VulKan渲染三角形基类
  */
-class HelloTriangleApplication
-{
+class HelloTriangleApplication {
 public:
     HelloTriangleApplication();
     virtual ~HelloTriangleApplication() = default;
 
-    HelloTriangleApplication(const HelloTriangleApplication&) = delete;
-    HelloTriangleApplication(const HelloTriangleApplication&&) = delete;
-    auto operator=(const HelloTriangleApplication&) -> HelloTriangleApplication& = delete;
-    auto operator=(const HelloTriangleApplication&&) -> HelloTriangleApplication& = delete;
+    HelloTriangleApplication(const HelloTriangleApplication &) = delete;
+    HelloTriangleApplication(const HelloTriangleApplication &&) = delete;
+    auto operator=(const HelloTriangleApplication &) -> HelloTriangleApplication & = delete;
+    auto operator=(const HelloTriangleApplication &&) -> HelloTriangleApplication & = delete;
 
     /**
      * @brief 运行程序
@@ -118,9 +119,9 @@ private:
      * @note 由于是扩展函数 所以此函数并不会被加载，需要手动加载
      */
     auto CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                      const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                                      const VkAllocationCallbacks* pAllocator,
-                                      VkDebugUtilsMessengerEXT* pCallback) const -> VkResult;
+                                      const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                                      const VkAllocationCallbacks *pAllocator,
+                                      VkDebugUtilsMessengerEXT *pCallback) const -> VkResult;
 
     /**
      * @brief 删除 DebugUtilsMessenger 对象
@@ -130,7 +131,7 @@ private:
      */
     auto DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                        VkDebugUtilsMessengerEXT callback,
-                                       const VkAllocationCallbacks* pAllocator) const -> void;
+                                       const VkAllocationCallbacks *pAllocator) const -> void;
 
     /**
      * @brief 选择物理设备
@@ -167,7 +168,7 @@ private:
      * @brief 设置结构体的属性
      * @param createInfo 被设置的结构体
      */
-    static auto populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) -> void;
+    static auto populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) -> void;
 
     /**
      * @brief 创建显示的表面
@@ -191,7 +192,7 @@ private:
      * @param availableFormats 当前物理设备的所有的表面格式
      * @return 选中的表面格式
      */
-    auto chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) -> VkSurfaceFormatKHR;
+    auto chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) -> VkSurfaceFormatKHR;
 
 
     /**
@@ -199,14 +200,14 @@ private:
      * @param availablePresentModes 对应物理设备的呈现模式
      * @return 查找的最佳显示模式
      */
-    auto chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) -> VkPresentModeKHR;
+    auto chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) -> VkPresentModeKHR;
 
     /**
      * @brief 选择合适的交换范围  - 图像的分辨率
      * @param capabilities 表面的基础属性
      * @return 选择的结果
      */
-    auto chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) -> VkExtent2D;
+    auto chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) -> VkExtent2D;
 
     /**
      * @brief  创建交换链
@@ -216,7 +217,7 @@ private:
     /**
      * @brief 创建图像视图
      */
-    auto createImageViews() -> void ;
+    auto createImageViews() -> void;
 
     /**
      * @brief  创建管线
@@ -228,13 +229,13 @@ private:
      * @param code 着色器文件
      * @return 创建的module
      */
-    [[nodiscard]] auto createShaderModule(const std::vector<char>& code) const ->VkShaderModule;
+    [[nodiscard]] auto createShaderModule(const std::vector<char> &code) const -> VkShaderModule;
 
     /**
      * @brief 设置帧缓冲附着
      * @return none
      */
-    auto createRenderPass()->void;
+    auto createRenderPass() -> void;
 
     /**
      * @brief 创建帧缓冲对象
@@ -254,7 +255,7 @@ private:
     /**
      * @brief 记录指令到缓冲
      */
-    void recordCommandBuffer(VkCommandBuffer commandBuffer,uint32_t imageIndex);
+    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
     /**
      * @brief 渲染一帧
@@ -270,7 +271,7 @@ private:
     /**
      * @brief 当前的绘制的窗口
      */
-    GLFWwindow* m_window{nullptr};
+    GLFWwindow *m_window{nullptr};
 
     /**
      * @brief VulKan instance
@@ -383,6 +384,9 @@ private:
     */
     size_t m_currentFrame = 0;
 
+    /// check
+private:
+    void checkDisplays();
 };
 
 #endif

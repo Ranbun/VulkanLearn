@@ -178,7 +178,45 @@ VkResult vkGetDisplayPlaneCapabilities2KHR(
 `vkGetDisplayPlaneCapabilities2KHR`与`vkGetDisplayPlaneCapabilitiesKHR`的行为类似，可以通过链接的输入结构指定扩展输入，并通过链接的输出结构返回扩展信息。
 
 
-#### 30.3.2. Display Surfaces
+#### Display Surfaces 显示表面
+完整的显示配置包括一个模式（mode）、一个或多个显示平面（`display planes`），以及描述它们行为的任何参数，以及描述与这些平面相关联的图像的一些方面的参数。显示表面（`display surfaces`）描述完整显示配置中单个平面的配置。要为显示平面创建一个`VkSurfaceKHR`对象，调用`vkCreateDisplayPlaneSurfaceKHR`函数：
+
+```C++
+
+// Provided by VK_KHR_display
+VkResult vkCreateDisplayPlaneSurfaceKHR(
+    VkInstance                                  instance,
+    const VkDisplaySurfaceCreateInfoKHR*        pCreateInfo,
+    const VkAllocationCallbacks*                pAllocator,
+    VkSurfaceKHR*                               pSurface);
+
+```
+- `instance`是对应于目标显示所在物理设备的`VkInstance`实例。
+- `pCreateInfo`是一个指向`VkDisplaySurfaceCreateInfoKHR`结构的指针，用于指定要使用的模式、平面和其他参数.
+- `pSurface`是一个指向`VkSurfaceKHR`句柄的指针，用于返回创建的表面对象。
+
+<p> <font color=#707070>Notes:</font>
+创建显示表面不能修改其命名的显示器、平面或其他资源的状态。例如，它不能应用指定的模式在关联的显示器上。应用显示配置是通过向显示表面进行呈现的副作用发生的
+</p>
+
+
+##### `Display Planes` & `VkDisplayKHR`
+在 `Vulkan` 中，`Display Planes`（显示层面）和 `VkDisplayKHR` 是用于表示和控制显示设备的两个不同概念，它们之间有如下关系：
+
+`Display Planes`（显示层面）：
+显示层面是显示设备（显示器或屏幕）上的硬件组件，用于将来自多个源（图像）的内容合成到最终的显示输出中。每个显示设备通常有多个显示层面可供使用，它们可以独立地合成多个图像，并以特定的方式进行叠加显示。例如，一个显示层面可以用于合成2D界面元素，另一个用于视频播放，还可以有其他显示层面用于不同的图像组合。
+
+`VkDisplayKHR`：
+`VkDisplayKHR` 是 `Vulkan` 中表示显示设备的对象。它是一个由 `Vulkan` 提供的句柄类型，用于标识和访问物理设备上的显示设备。每个 `VkDisplayKHR` 对象表示一个显示设备，其中包含显示设备的属性信息，如名称、物理尺寸和支持的显示模式等。
+
+关于 `Display Planes` 与 `VkDisplayKHR` 之间的关系：
+`VkDisplayKHR` 表示单个显示设备：每个 `VkDisplayKHR` 对象代表物理设备上的一个显示设备，例如一个显示器或屏幕。
+显示设备可以有多个 `Display Planes`：每个显示设备通常都有多个硬件显示层面，用于将来自不同源的图像合成为最终的显示输出。
+`VkDisplayKHR` 通过 `VkDisplayPlanePropertiesKHR` 提供显示层面信息：使用 `vkGetPhysicalDeviceDisplayPropertiesKHR` 函数，你可以获取物理设备上支持的显示设备列表。对于每个显示设备，你可以使用 `vkGetDisplayPlanePropertiesKHR` 函数获取其支持的显示层面属性。
+
+与特定显示层面相关联的表面：通过 `vkCreateDisplayPlaneSurfaceKHR` 函数，你可以创建一个 `VkSurfaceKHR` 对象，该对象与指定的显示层面相关联。这个表面可以用于将渲染结果直接呈现到该层面上。
+
+总结来说，`Display Planes` 是显示设备上的硬件组件，用于将多个图像合成为最终显示输出的显示层面。而 `VkDisplayKHR` 是 `Vulkan` 中表示显示设备的对象，通过它可以获取显示设备的属性信息，并通过 `VkDisplayPlanePropertiesKHR` 获取特定显示设备上支持的显示层面信息。通过创建与特定显示层面相关联的表面，你可以在 `Vulkan `中实现将渲染结果直接呈现到指定显示层面的操作。
 
 
 
