@@ -21,6 +21,11 @@
 - [WSI 表面](./34.WindowSystemIntegration/WSISurface.md)
 - [直接显示到显示设备](./34.WindowSystemIntegration/PresentingDirectlytoDisplayDevices.md)
 - [WSI支持查询](./34.WindowSystemIntegration/QueryingforWSISupport.md)
+- [表面信息查询](./34.WindowSystemIntegration/SurfaceQueries.md)
+- [设备组查询](./34.WindowSystemIntegration/DeviceGroupQueries.md)
+- [呈现等待](./34.WindowSystemIntegration/PresentWait.md)
+- [交换链](./34.WindowSystemIntegration/WSISwapchain.md)
+
 
 
 
