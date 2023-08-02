@@ -26,19 +26,13 @@
 - [呈现等待](./34.WindowSystemIntegration/PresentWait.md)
 - [交换链](./34.WindowSystemIntegration/WSISwapchain.md)
 
-
-
-
-
 ## Others
 - [队列](./NounInterpretation/Queues.md)
 - [队列族](./NounInterpretation/QueuesFamily.md)
 - [物理设备](./NounInterpretation/PhysicalDevices.md)
 - [逻辑设备](./NounInterpretation/Devices.md)
 
-
 ## Shared
-
 * [选择物理设备](./shared/pickPhysicalDevice.md)
 * [创建逻辑设备](./shared/createLogicDevice.md)
 * [窗口表面](./shared/WSI/WSISurface.md)
