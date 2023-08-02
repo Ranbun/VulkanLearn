@@ -36,3 +36,12 @@
 - [物理设备](./NounInterpretation/PhysicalDevices.md)
 - [逻辑设备](./NounInterpretation/Devices.md)
 
+
+## Shared
+
+* [选择物理设备](./shared/pickPhysicalDevice.md)
+* [创建逻辑设备](./shared/createLogicDevice.md)
+* [窗口表面](./shared/WSI/WSISurface.md)
+    * [创建表面](./shared/WSI/CreateSurface.md)
+    * [呈现队列](./shared/WSI/QueuePresent.md)
+
