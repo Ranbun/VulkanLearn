@@ -6,7 +6,7 @@
         // CMake 生成
         {
             "label": "CMake::CMake",
-            "type": "shell",
+            "type": "process",
             "command": "cmd.exe",
             "args": [
                 "call",
@@ -39,7 +39,7 @@
         // CMake build
         {
             "label": "CMake::Build Debug",
-            "type": "shell",
+            "type": "process",
             "command": "cmd.exe",
             "args": [
                 "call",
