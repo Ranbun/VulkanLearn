@@ -1,4 +1,20 @@
 ## 选择物理设备
+列出所有物理设备： call `vkEnumeratePhysicalDevices`:
+
+
+```C++
+
+// Provided by VK_VERSION_1_0
+VkResult vkEnumeratePhysicalDevices(
+    VkInstance                                  instance,
+    uint32_t*                                   pPhysicalDeviceCount,
+    VkPhysicalDevice*                           pPhysicalDevices);
+
+
+```
+
+vkEnumeratePhysicalDevices
+
 
 ### 获取设备属性
 
