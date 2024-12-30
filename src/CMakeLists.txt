@@ -1,1 +1,1 @@
-add_subdirectory(vendor)
+# add_subdirectory(vendor)
