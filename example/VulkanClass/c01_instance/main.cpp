@@ -26,7 +26,17 @@ int main()
     std::cout << "Vulkan is initialize success!"<<std::endl;
 
 
-    /// shutdown 
+    /// check support extensions
+    uint32_t glfwExtCount = 0;
+    const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtCount);
+    std::cout << "GLFW initialized. It requires the following etensions." << std::endl;
+
+    for (auto i = 0; i < glfwExtCount; i++)
+    {
+        std::cout << glfwExtensions[i] << std::endl;
+    }
+
+    /// shutdown
     glfwTerminate();
 
     return 0;
