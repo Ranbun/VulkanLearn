@@ -1,6 +1,6 @@
-SET(target_ c01_instance)
+SET(target_ c02_devices)
 
-SET(SOURCES_FILES main.cpp)
+FILE(GLOB SOURCES_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 ADD_EXECUTABLE(${target_} ${SOURCES_FILES})
 
 TARGET_INCLUDE_DIRECTORIES(${target_} PRIVATE
@@ -11,4 +11,3 @@ TARGET_LINK_LIBRARIES(${target_}  PRIVATE
     ${Vulkan_LIBRARY}
     glfw
 )
-

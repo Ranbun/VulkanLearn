@@ -42,13 +42,7 @@ build_Release
 cmake-build-debug-clang/
 cmake-build-debug-clang
 
-
-
-
 /Clion_Build
-
-.vscode
-.vscode/
 
 docs/_book/
 docs/_book
