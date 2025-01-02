@@ -1,2 +1,5 @@
 add_subdirectory(glad)
-add_subdirectory(glfw)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    add_subdirectory(glfw)
+endif()
