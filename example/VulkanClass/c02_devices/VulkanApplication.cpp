@@ -46,19 +46,22 @@ bool VulkanApplication::createInstance(const char *appName)
     /// check support extensions
     uint32_t glfwExtCount = 0;
     const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtCount);
-    // std::cout << "GLFW initialized. It requires the following etensions." << std::endl;
+    std::cout << "GLFW initialized. It requires the following etensions." << std::endl;
 
-    VkInstanceCreateInfo vkInstanceCreateInfo
+    for (auto i = 0; i < glfwExtCount; i ++)
     {
-        VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        nullptr,
-        0,
-        &appinfo,
-        0,
-        nullptr,
-        glfwExtCount,
-        glfwExtensions
-    };
+        // std::cout << glfwExtensions[i] << std::endl;
+    }
+
+    const char *layersName[] = {"VK_LAYER_KHRONOS_validation"};
+
+    VkInstanceCreateInfo vkInstanceCreateInfo{
+            VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            nullptr,0,
+            &appinfo,
+            1, layersName,
+            glfwExtCount,
+            glfwExtensions};
 
     VkResult result = vkCreateInstance(&vkInstanceCreateInfo, nullptr, &_instance);
     if(result != VK_SUCCESS)

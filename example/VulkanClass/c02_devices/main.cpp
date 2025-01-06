@@ -15,6 +15,7 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    /// vulkan 的调试层
     uint32_t layerCount = 0;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -24,9 +25,8 @@ int main(int argc, char ** args)
     for(auto & layer: layers)
     {
         std::cout << "Layers Name: " << layer.layerName << std::endl;
-        std::cout << "Layers Des: " << layer.description << std::endl;
+        // std::cout << "Layers Des: " << layer.description << std::endl;
     }
-
 
     /// select physical deveice
     uint32_t deviceCount = 0;
@@ -81,22 +81,25 @@ int main(int argc, char ** args)
     std::cout << "Tessellation: " << bool(physicalDeviceFeatures.tessellationShader) << std::endl;
 
     ///  create logsical device
+    ///  创建操作队列
+    float proper = 1.0f;
     VkDeviceQueueCreateInfo queueCreateInfo
     {
         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         nullptr,0,
         0, 1, /// queueFamily, queueCount
-        nullptr
+        &proper
     };
 
     VkDeviceCreateInfo logicDeviceCreateInfo
     {
         VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         nullptr, 0,
-        1, &queueCreateInfo,
-        0, nullptr,
-        0, nullptr,
-        &physicalDeviceFeatures
+        1,
+        &queueCreateInfo,
+        0, nullptr,  ///< 开启的层
+        0, nullptr,  ///< 启用的扩展
+        &physicalDeviceFeatures  ///< 物理设备特性
     };
 
     VkDevice logicDevice = nullptr;
@@ -108,9 +111,15 @@ int main(int argc, char ** args)
     }
 
     std::cout<< logicDevice <<std::endl;
+
+
+
+    /// 删除逻辑设备
     vkDestroyDevice(logicDevice, nullptr);
 
     /// create swap chain
+
+
 
 
 
