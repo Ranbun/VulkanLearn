@@ -11,3 +11,7 @@ ij_any_space_before_else_keyword = true
 ij_any_space_before_if_parentheses = true
 ij_c_keep_nested_namespaces_in_one_line = false
 
+[*.cpp]
+max_line_length = 120
+# 让 .clang-format 文件处理 C++ 代码格式化
+clang_format_style = file
