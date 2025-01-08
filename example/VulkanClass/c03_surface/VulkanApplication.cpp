@@ -19,14 +19,14 @@ VulkanApplication::VulkanApplication(const char *appName)
     }
     _initiallized = createInstance(appName);
 
-    auto result = obtainPhysicalDevice();
-    if (result != VK_SUCCESS)
+    auto selectResult = obtainPhysicalDevice();
+    if (selectResult != VK_SUCCESS)
     {
         std::cout << "Can not select Physical device." << std::endl;
     }
 
-    result = createLogicDevice();
-    if (result != VK_SUCCESS)
+    auto createResult = createLogicDevice();
+    if (createResult != VK_SUCCESS)
     {
         std::cout << "Can not create logic device." << std::endl;
     }
@@ -34,10 +34,14 @@ VulkanApplication::VulkanApplication(const char *appName)
 
 VulkanApplication::~VulkanApplication()
 {
+    if(_logicDevice)
+    {
+        vkDestroyDevice(_logicDevice, nullptr);
+    }
+
     if (_initiallized && _instance)
     {
         vkDestroyInstance(_instance, nullptr);
-        vkDestroyDevice(_logicDevice, nullptr);
     }
 
     glfwTerminate();
@@ -65,13 +69,12 @@ bool VulkanApplication::createInstance(const char *appName)
         // std::cout << glfwExtensions[i] << std::endl;
     }
 
-    const char *layersName[] = {"VK_LAYER_KHRONOS_validation"};
+    // const char *layersName[] = {"VK_LAYER_KHRONOS_validation"};
 
     VkInstanceCreateInfo vkInstanceCreateInfo{
             VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             nullptr, 0,
             &appinfo,
-            // 1, layersName,
             0, nullptr,
             glfwExtCount,
             glfwExtensions};
@@ -95,7 +98,7 @@ bool VulkanApplication::obtainPhysicalDevice()
     if (reslut != VK_SUCCESS || !deviceCount)
     {
         std::cout << "Failed to find physical devices." << std::endl;
-        return false;
+        return reslut;
     }
     std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
     vkEnumeratePhysicalDevices(getInstance(), &deviceCount, physicalDevices.data());
@@ -118,7 +121,7 @@ bool VulkanApplication::obtainPhysicalDevice()
 
     _physicalDevice = physicalDevices[0];
 
-    return true;
+    return VK_SUCCESS;
 }
 
 bool VulkanApplication::createLogicDevice()
@@ -169,10 +172,8 @@ bool VulkanApplication::createLogicDevice()
     if (reslut != VK_SUCCESS)
     {
         std::cout << "Failed to create logic Device" << std::endl;
-        return false;
+        return reslut;
     }
 
-    std::cout << _logicDevice << std::endl;
-
-    return true;
+    return VK_SUCCESS;
 }
