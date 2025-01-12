@@ -12,6 +12,9 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
+const std::vector validationLayers = { "VK_LAYER_KHRONOS_validation" };    /// 验证层扩展
+const std::vector deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
 VulkanApplication::VulkanApplication(const char *appName, int width, int height)
     : _initialized(false)
 {
@@ -204,6 +207,12 @@ bool VulkanApplication::createLogicDevice()
             0, nullptr,            ///< 启用的扩展
             &physicalDeviceFeatures///< 物理设备特性
     };
+
+    logicDeviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    logicDeviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+    logicDeviceCreateInfo.enabledLayerCount = validationLayers.size();
+    logicDeviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
 
     auto result = vkCreateDevice(getPhysicalDevice(), &logicDeviceCreateInfo, nullptr, &_logicDevice);
     if (result != VK_SUCCESS)
