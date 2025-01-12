@@ -5,7 +5,7 @@
 
 int main(int argc, char **args)
 {
-    VulkanApplication app("c03_surface", 640, 480);
+    VulkanApplication app("c04_swapchain", 1000, 800);
 
     if (!app.getInitialized())
     {
@@ -46,10 +46,48 @@ int main(int argc, char **args)
     std::vector<VkPresentModeKHR> imagePresentMode(presentModeCount);
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(app.getPhysicalDevice(), app.getSurface(), &presentModeCount, imagePresentMode.data());
 
+    VkSwapchainCreateInfoKHR createInfo{
+            VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+            nullptr, 0,
+            app.getSurface(),
+            caps.minImageCount,
+            imageFormat[0].format, imageFormat[0].colorSpace,
+            caps.maxImageExtent,
+            1,
+            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+            VK_SHARING_MODE_EXCLUSIVE,
+            0, nullptr,
+            caps.currentTransform,
+            VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+            imagePresentMode[0],
+            VK_TRUE, nullptr
+    };
+
+    VkSwapchainKHR swapChain = nullptr;
+
+    std::cout<<app.getLogicDevice()<<std::endl;
+
+    result = vkCreateSwapchainKHR(app.getLogicDevice(), &createInfo, nullptr,&swapChain);
+    if(result != VK_SUCCESS)
+    {
+        std::cout<<"Failed  to create swapChain."<< std::endl;
+        return 1;
+    }
+
+    uint32_t imageCount = 0;
+    vkGetSwapchainImagesKHR(app.getLogicDevice(), swapChain, &imageCount, nullptr);
+
+    std::vector<VkImage> images(imageCount);
+    vkGetSwapchainImagesKHR(app.getLogicDevice(), swapChain, &imageCount, images.data());
+
     while (!app.shouldClose())
     {
         glfwPollEvents();
     }
+
+    vkDestroySwapchainKHR(app.getLogicDevice(), swapChain, nullptr);
+
+
 
     return 0;
 }

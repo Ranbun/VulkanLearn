@@ -3,6 +3,15 @@
 #include <iostream>
 #include <vector>
 
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageServerity,
+                                                    VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                    void* pUserData)
+{
+    std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+    return VK_FALSE;
+}
+
 VulkanApplication::VulkanApplication(const char *appName, int width, int height)
     : _initialized(false)
 {
@@ -79,18 +88,33 @@ bool VulkanApplication::createInstance(const char *appName)
 
     for (auto i = 0; i < glfwExtCount; i++)
     {
-        // std::cout << glfwExtensions[i] << std::endl;
+        std::cout << glfwExtensions[i] << std::endl;
     }
 
-    // const char *layersName[] = {"VK_LAYER_KHRONOS_validation"};
+    std::vector<char *> layersName{"VK_LAYER_KHRONOS_validation"};
 
     VkInstanceCreateInfo vkInstanceCreateInfo{
             VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             nullptr, 0,
             &appinfo,
             0, nullptr,
+            //1, layersName,
             glfwExtCount,
             glfwExtensions};
+
+    vkInstanceCreateInfo.enabledLayerCount = 1;
+    vkInstanceCreateInfo.ppEnabledLayerNames = layersName.data();
+
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+
+    debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    debugCreateInfo.pfnUserCallback = debugCallback;
+
+    vkInstanceCreateInfo.pNext = &debugCreateInfo;
 
     VkResult result = vkCreateInstance(&vkInstanceCreateInfo, nullptr, &_instance);
     if (result != VK_SUCCESS)
@@ -194,8 +218,9 @@ bool VulkanApplication::createWindowSurface(const char *name, int width, int hei
 {
     /// create surface
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    _window = glfwCreateWindow(width, height, "c03_surface", nullptr, nullptr);
+    _window = glfwCreateWindow(width, height, name, nullptr, nullptr);
 
+    _surface = nullptr;
     VkResult result = glfwCreateWindowSurface(getInstance(), _window, nullptr, &_surface);
     if(result != VK_SUCCESS)
     {

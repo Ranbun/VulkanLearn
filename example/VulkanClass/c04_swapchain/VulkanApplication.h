@@ -43,7 +43,10 @@ public:
      *
      * @return VkDevice
      */
-    VkDevice getLogicDevice() { return _logicDevice; }
+    VkDevice getLogicDevice()
+    {
+        return _logicDevice;
+    }
 
     /**
      * @brief Get the Vulkan Initialized result
