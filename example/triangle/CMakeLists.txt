@@ -1,6 +1,10 @@
 SET(target_ triangle)
+
 SET(includeDIR ${CMAKE_SOURCE_DIR}/include)
 FILE(GLOB sourcefile ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
+
+find_package(glm CONFIG REQUIRED)
+find_package(Vulkan REQUIRED)
 
 ADD_EXECUTABLE(${target_}
     ${sourcefile}
