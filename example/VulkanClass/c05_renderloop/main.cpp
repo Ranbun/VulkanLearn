@@ -5,7 +5,7 @@
 
 int main(int argc, char **args)
 {
-    VulkanApplication app("c05_renderloop", 1000, 800);
+    VulkanApplication app("c05_render loop", 1024, 768);
 
     if (!app.getInitialized())
     {

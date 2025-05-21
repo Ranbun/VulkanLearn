@@ -304,12 +304,25 @@ bool VulkanApplication::createSwapChain()
     std::vector<VkPresentModeKHR> imagePresentMode(presentModeCount);
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(getPhysicalDevice(), getSurface(), &presentModeCount, imagePresentMode.data());
 
+    /// TODO: 需要使用 Mail Box 作为呈现模式
+    _presentMode = imagePresentMode[0];
+    _imageFormat = imageFormat[0];
+
+    for (auto mode : imagePresentMode)
+    {
+        if (mode == VkPresentModeKHR::VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            _presentMode = mode;
+            break;
+        }
+    }
+
     VkSwapchainCreateInfoKHR createInfo{
             VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             nullptr, 0,
             getSurface(),
             caps.minImageCount,
-            imageFormat[0].format, imageFormat[0].colorSpace,
+            _imageFormat.format, imageFormat[0].colorSpace,
             caps.maxImageExtent,
             1,
             VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -317,7 +330,7 @@ bool VulkanApplication::createSwapChain()
             0, nullptr,
             caps.currentTransform,
             VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-            imagePresentMode[0],
+            _presentMode,
             VK_TRUE, nullptr};
 
     std::cout << getLogicDevice() << std::endl;
@@ -329,8 +342,7 @@ bool VulkanApplication::createSwapChain()
         return 1;
     }
 
-    _presentMode = imagePresentMode[0];
-    _imageFormat = imageFormat[0];
+
 
     uint32_t imageCount = 0;
     vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, nullptr);
