@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <vector>
 
 /**
  * @brief Vulkan Application
@@ -36,7 +37,7 @@ public:
      * @brief 获取surface
      * @return VkSurface
      */
-    VkSurfaceKHR  getSurface() const {return _surface;}
+    VkSurfaceKHR getSurface() const { return _surface; }
 
     /**
      * @brief Get the Logic Device object
@@ -60,26 +61,34 @@ public:
      * @brief 是否需要关闭窗口
      * @return
      */
-    [[nodiscard]] bool shouldClose() const {return glfwWindowShouldClose(_window);}
+    [[nodiscard]] bool shouldClose() const { return glfwWindowShouldClose(_window); }
 
-    void mouseButtonCallBack(GLFWwindow * window, int button, int action, int mods);
-    void keyPressCallBack(GLFWwindow * window, int key, int scancode, int action, int mods);
-    void resizeCallBack(GLFWwindow * window, int w, int h);
+    void mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods);
+    void keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods);
+    void resizeCallBack(GLFWwindow *window, int w, int h);
 
 private:
     bool createInstance(const char *appName);
     bool obtainPhysicalDevice();
+
     bool createLogicDevice();
 
-    bool createWindowSurface(const char * name, int width, int  height);
+    bool createWindowSurface(const char *name, int width, int height);
+    bool createSwapChain();
 
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};
     VkDevice _logicDevice{};
     VkSurfaceKHR _surface{};
-    GLFWwindow * _window{};
+    GLFWwindow *_window{};
+
+    /// swap chain
+    VkSwapchainKHR _swapChain{};
+    std::vector<VkImage> _images{};
+    VkPresentModeKHR _presentMode{};
+    VkSurfaceFormatKHR _imageFormat{};
 
     bool _initialized;
 };
 
-#endif // __VULKANAPPLICATION_H__
+#endif// __VULKANAPPLICATION_H__

@@ -45,10 +45,20 @@ VulkanApplication::VulkanApplication(const char *appName, int width, int height)
     {
         _initialized = createWindowSurface(appName, width, height);
     }
+
+    if (_initialized)
+    {
+        createSwapChain();
+    }
 }
 
 VulkanApplication::~VulkanApplication()
 {
+    if (_swapChain)
+    {
+        vkDestroySwapchainKHR(_logicDevice, _swapChain, nullptr);
+    }
+
     if(_surface)
     {
         vkDestroySurfaceKHR(_instance, _surface, nullptr);
@@ -80,7 +90,7 @@ bool VulkanApplication::createInstance(const char *appName)
             nullptr,
             appName,
             VK_MAKE_VERSION(1, 0, 0),
-            "VukanCalss",
+            "VulkanClass",
             VK_MAKE_VERSION(1, 0, 0),
             VK_API_VERSION_1_2};
 
@@ -94,7 +104,7 @@ bool VulkanApplication::createInstance(const char *appName)
         std::cout << glfwExtensions[i] << std::endl;
     }
 
-    std::vector<char *> layersName{"VK_LAYER_KHRONOS_validation"};
+    std::vector<const char *> layersName{"VK_LAYER_KHRONOS_validation"};
 
     VkInstanceCreateInfo vkInstanceCreateInfo{
             VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -257,6 +267,77 @@ bool VulkanApplication::createWindowSurface(const char *name, int width, int hei
     });
 
     return true;
+}
+
+bool VulkanApplication::createSwapChain()
+{
+    /// create swap chain
+    /// 获取物理设备熟悉
+    VkSurfaceCapabilitiesKHR caps;
+    VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(getPhysicalDevice(), getSurface(), &caps);
+
+    if (result != VK_SUCCESS)
+    {
+        std::cout << "Failed to get capabilities." << std::endl;
+        return 1;
+    }
+
+    /// 获取物理设备的图像格式 & 图像的呈现方式
+    uint32_t formatCount = 0, presentModeCount = 0;
+    result = vkGetPhysicalDeviceSurfaceFormatsKHR(getPhysicalDevice(), getSurface(), &formatCount, nullptr);
+
+    if (result != VK_SUCCESS || formatCount == 0)
+    {
+        std::cout << "Failed to get surface formats." << std::endl;
+        return 1;
+    }
+    std::vector<VkSurfaceFormatKHR> imageFormat(formatCount);
+    result = vkGetPhysicalDeviceSurfaceFormatsKHR(getPhysicalDevice(), getSurface(), &formatCount, imageFormat.data());
+
+    result = vkGetPhysicalDeviceSurfacePresentModesKHR(getPhysicalDevice(), getSurface(), &presentModeCount, nullptr);
+
+    if (result != VK_SUCCESS || presentModeCount == 0)
+    {
+        std::cout << "Failed to get surface present mode." << std::endl;
+        return 1;
+    }
+    std::vector<VkPresentModeKHR> imagePresentMode(presentModeCount);
+    result = vkGetPhysicalDeviceSurfacePresentModesKHR(getPhysicalDevice(), getSurface(), &presentModeCount, imagePresentMode.data());
+
+    VkSwapchainCreateInfoKHR createInfo{
+            VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+            nullptr, 0,
+            getSurface(),
+            caps.minImageCount,
+            imageFormat[0].format, imageFormat[0].colorSpace,
+            caps.maxImageExtent,
+            1,
+            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+            VK_SHARING_MODE_EXCLUSIVE,
+            0, nullptr,
+            caps.currentTransform,
+            VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+            imagePresentMode[0],
+            VK_TRUE, nullptr};
+
+    std::cout << getLogicDevice() << std::endl;
+
+    result = vkCreateSwapchainKHR(getLogicDevice(), &createInfo, nullptr, &_swapChain);
+    if (result != VK_SUCCESS)
+    {
+        std::cout << "Failed  to create swapChain." << std::endl;
+        return 1;
+    }
+
+    _presentMode = imagePresentMode[0];
+    _imageFormat = imageFormat[0];
+
+    uint32_t imageCount = 0;
+    vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, nullptr);
+
+    _images.resize(imageCount);
+    vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, _images.data());
+
 }
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)

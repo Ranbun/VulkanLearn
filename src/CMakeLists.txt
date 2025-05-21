@@ -5,5 +5,5 @@
 
 
 add_subdirectory(vendor)
-add_subdirectory(VKBase)
+# add_subdirectory(VKBase)
 
