@@ -8,4 +8,5 @@ ADD_SUBDIRECTORY(c01_instance)
 ADD_SUBDIRECTORY(c02_devices)
 ADD_SUBDIRECTORY(c03_surface)
 ADD_SUBDIRECTORY(c04_swapchain)
+ADD_SUBDIRECTORY(c05_renderloop)
 
