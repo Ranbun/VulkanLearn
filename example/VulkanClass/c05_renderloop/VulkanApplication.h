@@ -44,9 +44,19 @@ public:
      *
      * @return VkDevice
      */
-    VkDevice getLogicDevice()
+    VkDevice getLogicDevice() const
     {
         return _logicDevice;
+    }
+
+    VkFormat getSurfaceFormat() const
+    {
+        return _imageFormat.format;
+    }
+
+    std::vector<VkImage> getImage() const
+    {
+        return _images;
     }
 
     /**
@@ -80,7 +90,7 @@ private:
     VkPhysicalDevice _physicalDevice{};
     VkDevice _logicDevice{};
     VkSurfaceKHR _surface{};
-    GLFWwindow *_window{};
+    GLFWwindow * _window{};
 
     /// swap chain
     VkSwapchainKHR _swapChain{};
@@ -88,7 +98,7 @@ private:
     VkPresentModeKHR _presentMode{};
     VkSurfaceFormatKHR _imageFormat{};
 
-    bool _initialized;
+    bool _initialized{false};
 };
 
 #endif// __VULKANAPPLICATION_H__
