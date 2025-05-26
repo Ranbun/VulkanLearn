@@ -19,12 +19,11 @@
                 "program": "${workspaceFolder}/build/example/triangle/triangle.exe"
             }
         },
-
         {
             "name": "vulkanClass",
-            "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/example/VulkanClass/c02_devices/c02_devices",
+            "program": "${workspaceFolder}/out/build/example/VulkanClass/c02_devices/c02_devices",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/example/VulkanClass/c02_devices/",

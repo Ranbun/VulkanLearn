@@ -11,7 +11,7 @@
             "args": [
                 "call",
                 "/C",
-                "build.bat",
+                "${workspaceFolder}/.vscode/build.bat",
                 "generate"
             ],
             "options": {
@@ -44,14 +44,14 @@
             "args": [
                 "call",
                 "/C",
-                "build.bat",
+                "${workspaceFolder}/.vscode/build.bat",
                 "build"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/"
             },
             "dependsOn": [
-                "CMake::CMake"
+                // "CMake::CMake"
             ],
             "problemMatcher": [
                 "$msCompile"

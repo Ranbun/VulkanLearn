@@ -23,7 +23,7 @@
                     "${workspaceFolder}/example/triangle/*.*",
                     "${vcpkgRoot}/x64-windows/include/",
                     "${workspaceFolder}/src/vendor/glfw/include/*.*",
-                    "${workspaceFolder}/src/vendor/glad/include/*.*",
+                    "${workspaceFolder}/src/vendor/glad/include/*.*"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
