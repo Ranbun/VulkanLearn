@@ -347,8 +347,8 @@ bool VulkanApplication::createSwapChain()
     uint32_t imageCount = 0;
     vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, nullptr);
 
-    _images.resize(imageCount);
-    vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, _images.data());
+    _swapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, _swapChainImages.data());
 
 }
 

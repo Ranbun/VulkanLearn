@@ -49,11 +49,29 @@ VulkanApplication::VulkanApplication(const char *appName, int width, int height)
     if (_initialized)
     {
         createSwapChain();
+
+        createSwapChainImageView();
     }
+
 }
 
 VulkanApplication::~VulkanApplication()
 {
+    for (auto i = 0; i < _swapChainImages.size(); i++)
+    {
+        vkDestroyImageView(getLogicDevice(), _swapChainImageViews[i], nullptr);
+    }
+
+    for (auto &[name, fence]: _fences)
+    {
+        vkDestroyFence(getLogicDevice(), fence, nullptr);
+    }
+
+    for (auto &[name, semaphore]: _semaphores)
+    {
+        vkDestroySemaphore(getLogicDevice(), semaphore, nullptr);
+    }
+
     if (_swapChain)
     {
         vkDestroySwapchainKHR(_logicDevice, _swapChain, nullptr);
@@ -304,12 +322,25 @@ bool VulkanApplication::createSwapChain()
     std::vector<VkPresentModeKHR> imagePresentMode(presentModeCount);
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(getPhysicalDevice(), getSurface(), &presentModeCount, imagePresentMode.data());
 
+    /// TODO: 需要使用 Mail Box 作为呈现模式
+    _presentMode = imagePresentMode[0];
+    _imageFormat = imageFormat[0];
+
+    for (auto mode : imagePresentMode)
+    {
+        if (mode == VkPresentModeKHR::VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            _presentMode = mode;
+            break;
+        }
+    }
+
     VkSwapchainCreateInfoKHR createInfo{
             VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             nullptr, 0,
             getSurface(),
             caps.minImageCount,
-            imageFormat[0].format, imageFormat[0].colorSpace,
+            _imageFormat.format, imageFormat[0].colorSpace,
             caps.maxImageExtent,
             1,
             VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -317,7 +348,7 @@ bool VulkanApplication::createSwapChain()
             0, nullptr,
             caps.currentTransform,
             VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-            imagePresentMode[0],
+            _presentMode,
             VK_TRUE, nullptr};
 
     std::cout << getLogicDevice() << std::endl;
@@ -329,8 +360,7 @@ bool VulkanApplication::createSwapChain()
         return 1;
     }
 
-    _presentMode = imagePresentMode[0];
-    _imageFormat = imageFormat[0];
+
 
     uint32_t imageCount = 0;
     vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, nullptr);
@@ -339,6 +369,38 @@ bool VulkanApplication::createSwapChain()
     vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, _swapChainImages.data());
 
 }
+
+
+bool VulkanApplication::createSwapChainImageView()
+{
+    /// create swapchain image view
+    VkImageViewCreateInfo imageViewCreateInfo{
+            VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            nullptr,
+            0,
+            nullptr,
+            VK_IMAGE_VIEW_TYPE_2D,
+            getSurfaceFormat().format,
+            {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
+                VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
+            {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}};
+
+    const size_t imageSize = getSwapChainImage().size();
+    _swapChainImageViews.resize(imageSize);
+
+    for (size_t i = 0; i < imageSize; i++)
+    {
+        imageViewCreateInfo.image = getSwapChainImage()[i];
+        auto res = vkCreateImageView(getLogicDevice(), &imageViewCreateInfo, nullptr, &_swapChainImageViews[i]);
+        if (res != VK_SUCCESS)
+        {
+            throw std::runtime_error("vkCreateImageView Failed!");
+            return 1;
+        }
+    }
+}
+
+
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -357,6 +419,63 @@ void VulkanApplication::resizeCallBack(GLFWwindow *window, int w, int h)
 
     std::cout << "new resize: " << "w = " << w << "h = " << h << std::endl;
 }
+
+VkFence VulkanApplication::getOrCreateFence(const std::string &name)
+{
+    if (_fences.count(name))
+    {
+        return _fences.at(name);
+    }
+
+    VkFenceCreateInfo fenceCreateInfo = {
+            VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, nullptr,
+            VK_FENCE_CREATE_SIGNALED_BIT
+
+    };
+
+    VkFence fence = nullptr;
+
+    /// 栅栏 用于CPU & GPU之间的同步
+    auto res = vkCreateFence(getLogicDevice(), &fenceCreateInfo, nullptr, &fence);
+    if (res != VK_SUCCESS)
+    {
+        throw std::runtime_error("vkCreateFence Failed!");
+        return nullptr;
+    }
+
+    _fences[name] = fence;
+
+    return fence;
+}
+
+VkSemaphore VulkanApplication::getOrCreateSemaphore(const std::string &name)
+{
+    if (_semaphores.count(name))
+    {
+        return _semaphores.at(name);
+    }
+
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {
+            VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, nullptr, 0};
+
+    VkSemaphore semaphore = nullptr;
+
+    // 信号量用于GPU之间
+    auto res = vkCreateSemaphore(getLogicDevice(), &semaphoreCreateInfo, nullptr, &semaphore);
+    if (res != VK_SUCCESS)
+    {
+        throw std::runtime_error("vkCreateSemaphore Failed!");
+        return nullptr;
+    }
+
+    _semaphores[name] = semaphore;
+
+    return semaphore;
+}
+
+
+
+
 
 void VulkanApplication::mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods)
 {

@@ -1,10 +1,7 @@
 @ECHO OFF
 
 SET args1=%1
-
-if %args1% == generate (
-    call "%VS2022INSTALLDIR%/VC/Auxiliary/Build/vcvars64.bat"
-)
+call "%VS2022INSTALLDIR%/VC/Auxiliary/Build/vcvars64.bat"
 
 if %args1% == generate (
     @ECHO ON

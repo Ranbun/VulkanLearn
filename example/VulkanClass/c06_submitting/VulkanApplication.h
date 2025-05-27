@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 /**
  * @brief Vulkan Application
@@ -44,10 +45,22 @@ public:
      *
      * @return VkDevice
      */
-    VkDevice getLogicDevice()
+    VkDevice getLogicDevice() const
     {
         return _logicDevice;
     }
+
+    VkSurfaceFormatKHR getSurfaceFormat() const { return _imageFormat; }
+
+    std::vector<VkImage> getSwapChainImage() const {  return _swapChainImages; }
+
+    VkPresentModeKHR getPresentMode() { return _presentMode; }
+
+    VkSwapchainKHR getSwapChain() { return _swapChain; }
+
+
+    VkFence getOrCreateFence(const std::string &name) ;
+    VkSemaphore getOrCreateSemaphore(const std::string &name);
 
     /**
      * @brief Get the Vulkan Initialized result
@@ -62,6 +75,8 @@ public:
      * @return
      */
     [[nodiscard]] bool shouldClose() const { return glfwWindowShouldClose(_window); }
+    void setClose() { glfwSetWindowShouldClose(_window, 1); }
+
 
     void mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods);
     void keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -76,19 +91,25 @@ private:
     bool createWindowSurface(const char *name, int width, int height);
     bool createSwapChain();
 
+    bool createSwapChainImageView();
+
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};
     VkDevice _logicDevice{};
     VkSurfaceKHR _surface{};
-    GLFWwindow *_window{};
+    GLFWwindow * _window{};
 
     /// swap chain
     VkSwapchainKHR _swapChain{};
     std::vector<VkImage> _swapChainImages{};
+    std::vector<VkImageView> _swapChainImageViews{};
     VkPresentModeKHR _presentMode{};
     VkSurfaceFormatKHR _imageFormat{};
 
-    bool _initialized;
-};
+    std::map<std::string, VkFence> _fences;
+    std::map<std::string, VkSemaphore> _semaphores;
 
+
+    bool _initialized{false};
+};
 #endif// __VULKANAPPLICATION_H__

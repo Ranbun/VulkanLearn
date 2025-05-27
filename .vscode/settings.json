@@ -60,6 +60,8 @@
         "titleBar.activeForeground": "#F7FBF6"
     },
     "cSpell.words": [
-        "ENDLOCAL"
+        "ENDLOCAL",
+        "glfw",
+        "Wwindow"
     ]
 }

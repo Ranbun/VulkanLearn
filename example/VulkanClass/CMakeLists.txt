@@ -9,5 +9,6 @@ ADD_SUBDIRECTORY(c02_devices)
 ADD_SUBDIRECTORY(c03_surface)
 ADD_SUBDIRECTORY(c04_swapchain)
 ADD_SUBDIRECTORY(c05_renderloop)
+ADD_SUBDIRECTORY(c06_submitting)
 ADD_SUBDIRECTORY(c06_renderloop_new)
 

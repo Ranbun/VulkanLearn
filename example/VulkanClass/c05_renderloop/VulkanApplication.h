@@ -49,15 +49,13 @@ public:
         return _logicDevice;
     }
 
-    VkFormat getSurfaceFormat() const
-    {
-        return _imageFormat.format;
-    }
+    VkSurfaceFormatKHR getSurfaceFormat() const { return _imageFormat; }
 
-    std::vector<VkImage> getImage() const
-    {
-        return _images;
-    }
+    std::vector<VkImage> getSwapChainImage() const {  return _swapChainImages; }
+
+    VkPresentModeKHR getPresentMode() { return _presentMode; }
+
+    VkSwapchainKHR getSwapChain() { return _swapChain; }
 
     /**
      * @brief Get the Vulkan Initialized result
@@ -72,6 +70,8 @@ public:
      * @return
      */
     [[nodiscard]] bool shouldClose() const { return glfwWindowShouldClose(_window); }
+    void setClose() { glfwSetWindowShouldClose(_window, 1); }
+
 
     void mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods);
     void keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -94,7 +94,7 @@ private:
 
     /// swap chain
     VkSwapchainKHR _swapChain{};
-    std::vector<VkImage> _images{};
+    std::vector<VkImage> _swapChainImages{};
     VkPresentModeKHR _presentMode{};
     VkSurfaceFormatKHR _imageFormat{};
 
