@@ -37,6 +37,8 @@ int main(int argc, char **args)
         1 // 分配一个指令缓存
     };
 
+
+    // 从指令池中获取一个指令缓冲
     VkCommandBuffer commandBuffer = nullptr;
     res = vkAllocateCommandBuffers(app.getLogicDevice(), &allocInfo, &commandBuffer);
     if(res != VK_SUCCESS)
@@ -47,8 +49,10 @@ int main(int argc, char **args)
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
-    auto waitSubmission = app.getOrCreateFence("WaitSubmission");
+    auto waitSubmission = app.getOrCreateSemaphore("WaitSubmission");
 
+    VkQueue queue = nullptr;
+    vkGetDeviceQueue(app.getLogicDevice(), 0, 0, &queue);
 
     while (!app.shouldClose())
     {
@@ -74,23 +78,47 @@ int main(int argc, char **args)
             0, nullptr
         };
 
-        VkResetCommandBuffer(commandBuffer,0);
-        VkBenginCommandBuffer(commandBuffer, &beginInfo);
+        vkResetCommandBuffer(commandBuffer,0);
+        vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
         // TODO: 添加渲染指令
-        VkEndCommandBuffer(commandBuffer);
+
+        vkEndCommandBuffer(commandBuffer);
+
+
+        // 提交之前判断下一帧图像是否准备好？ 当前的渲染流水线什么时候等待
+        VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
         /// 提交指令到GPU - VULKAN
-
         VkSubmitInfo submitInfo {
             VK_STRUCTURE_TYPE_SUBMIT_INFO, nullptr,
-            1, &waitNextImage,    // 等待信号量  -- 照片是不是执行获取完成
-            0, nullptr,            // 不需要等待的信号量
-            1, &commandBuffer      // 提交的指令缓存
+            1,
+            &waitNextImage,     // 等待信号量  -- 照片是不是执行获取完成
+            &waitStageMask,
+            1, &commandBuffer,
+            1, &waitSubmission      // 提交的指令缓存  执行完成之后通知这个信号量  告诉等待这个信号量的地方开始执行
         };
+
+        vkQueueSubmit(queue, 1, &submitInfo, waitFence);
+
+        VkSwapchainKHR swapChains[] = {app.getSwapChain()};
+        VkPresentInfoKHR presentInfo{
+            VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            nullptr,
+            1, &waitSubmission,
+            1, swapChains,
+            &imageIndex,
+            nullptr
+        };
+
+        vkQueuePresentKHR(queue, &presentInfo);
+
 
 
         glfwPollEvents();
     }
+
+    vkDestroyCommandPool(app.getLogicDevice(), commandPool, nullptr);
 
     return 0;
 }
