@@ -21,7 +21,7 @@ int main(int argc, char **args)
     };
 
     /// 创建指令池
-    VkCommandPool commandPool = nullptr;
+    VkCommandPool commandPool = VK_NULL_HANDLE;
     auto res = vkCreateCommandPool(app.getLogicDevice(), &poolInfo, nullptr, &commandPool);
     if (res != VK_SUCCESS)
     {

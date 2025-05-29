@@ -53,10 +53,20 @@ VulkanApplication::VulkanApplication(const char *appName, int width, int height)
         createSwapChainImageView();
     }
 
+    if (_initialized)
+    {
+        createCommandBuffer();
+    }
+
 }
 
 VulkanApplication::~VulkanApplication()
 {
+    if (_commandPool)
+    {
+        vkDestroyCommandPool(getLogicDevice(), _commandPool, nullptr);
+    }
+
     for (auto i = 0; i < _swapChainImages.size(); i++)
     {
         vkDestroyImageView(getLogicDevice(), _swapChainImageViews[i], nullptr);
@@ -368,6 +378,7 @@ bool VulkanApplication::createSwapChain()
     _swapChainImages.resize(imageCount);
     vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, _swapChainImages.data());
 
+    return true;
 }
 
 
@@ -382,7 +393,7 @@ bool VulkanApplication::createSwapChainImageView()
             VK_IMAGE_VIEW_TYPE_2D,
             getSurfaceFormat().format,
             {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
-                VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
+             VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
             {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}};
 
     const size_t imageSize = getSwapChainImage().size();
@@ -395,11 +406,49 @@ bool VulkanApplication::createSwapChainImageView()
         if (res != VK_SUCCESS)
         {
             throw std::runtime_error("vkCreateImageView Failed!");
-            return 1;
+            return false;
         }
     }
+
+    return true;
 }
 
+bool VulkanApplication::createCommandBuffer()
+{
+    /// create command pool
+    VkCommandPoolCreateInfo poolInfo{
+            VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO, nullptr,
+            VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+            0// 队列族的号
+    };
+
+    /// 创建指令池
+    auto res = vkCreateCommandPool(getLogicDevice(), &poolInfo, nullptr, &_commandPool);
+    if (res != VK_SUCCESS)
+    {
+        std::cout << "Failed create command pool." << std::endl;
+        return false;
+    }
+
+    // 创建指令缓存  -- 缓存发送的指令
+    VkCommandBufferAllocateInfo allocInfo{
+            VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, nullptr,
+            _commandPool,
+            VK_COMMAND_BUFFER_LEVEL_PRIMARY,// 主指令缓存
+            1                               // 分配一个指令缓存
+    };
+
+
+    // 从指令池中获取一个指令缓冲
+    res = vkAllocateCommandBuffers(getLogicDevice(), &allocInfo, &_commandBuffer);
+    if (res != VK_SUCCESS)
+    {
+        std::cout << "Failed allocate command buffer." << std::endl;
+        return false;
+    }
+
+    return true;
+}
 
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -471,6 +520,39 @@ VkSemaphore VulkanApplication::getOrCreateSemaphore(const std::string &name)
     _semaphores[name] = semaphore;
 
     return semaphore;
+}
+void VulkanApplication::submitAndPresent(VkSemaphore waitImage, VkSemaphore waitSubmission, VkFence fenceSubmission, uint32_t imagIndex)
+{
+    // 提交之前判断下一帧图像是否准备好？ 当前的渲染流水线什么时候等待
+    VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkSwapchainKHR swapChains[] = {getSwapChain()};
+
+    /// TODO: move to create  device
+    VkQueue queue = nullptr;
+    vkGetDeviceQueue(getLogicDevice(), 0, 0, &queue);
+
+    /// 提交指令到GPU - VULKAN
+    VkSubmitInfo submitInfo {
+        VK_STRUCTURE_TYPE_SUBMIT_INFO, nullptr,
+        1,
+        &waitImage,     // 等待信号量  -- 照片是不是执行获取完成
+        &waitStageMask,
+        1, &_commandBuffer,
+        1, &waitSubmission      // 提交的指令缓存  执行完成之后通知这个信号量  告诉等待这个信号量的地方开始执行
+    };
+
+    vkQueueSubmit(queue, 1, &submitInfo, fenceSubmission);
+
+    VkPresentInfoKHR presentInfo{
+        VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        nullptr,
+        1, &waitSubmission,
+        1, swapChains,
+        &imagIndex,
+        nullptr
+    };
+
+    vkQueuePresentKHR(queue, &presentInfo);
 }
 
 
