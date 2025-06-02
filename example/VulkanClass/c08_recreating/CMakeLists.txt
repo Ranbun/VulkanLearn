@@ -1,0 +1,14 @@
+SET(target_ c08_recreating)
+
+FILE(GLOB SOURCES_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+
+ADD_EXECUTABLE(${target_} ${SOURCES_FILES})
+
+TARGET_INCLUDE_DIRECTORIES(${target_} PRIVATE
+    ${Vulkan_INCLUDE_DIR}
+    )
+
+TARGET_LINK_LIBRARIES(${target_}  PRIVATE
+    ${Vulkan_LIBRARY}
+    glfw
+)

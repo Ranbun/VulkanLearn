@@ -31,7 +31,8 @@ public:
     VkSwapchainKHR getSwapChain() const { return _swapChain; }
     VkCommandBuffer getCommandBuffer() const { return _commandBuffer;}
     std::vector<VkImageView> & getSwapChainImageView(){return _swapChainImageViews;}
-
+    VkRenderPass & getRenderPass(){return _renderPass;}
+    std::vector<VkFramebuffer> & getFramebuffer(){return _framebuffers;}
 
     VkFence getOrCreateFence(const std::string &name) ;
     VkSemaphore getOrCreateSemaphore(const std::string &name);
@@ -41,6 +42,8 @@ public:
     [[nodiscard]] bool getInitialized() const { return _initialized; }
     [[nodiscard]] bool shouldClose() const { return glfwWindowShouldClose(_window); }
     [[maybe_unused]] void setClose() const { glfwSetWindowShouldClose(_window, 1); }
+    uint32_t reCreateSwapChain(int &w, int &h, VkSemaphore &waitImage);
+
 
     void mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods);
     void keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -54,6 +57,9 @@ private:
     bool createSwapChain();
     bool createSwapChainImageView();
     bool createCommandBuffer();
+    bool createRenderPass();
+    bool createFramebuffer(int w, int h);
+    void cleanUpSwapChain();
 
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};
@@ -64,6 +70,9 @@ private:
     VkCommandPool _commandPool{};
     VkCommandBuffer _commandBuffer{};
 
+    std::vector<VkFramebuffer> _framebuffers;
+    VkRenderPass _renderPass{};
+
     /// swap chain
     VkSwapchainKHR _swapChain{};
     std::vector<VkImage> _swapChainImages{};
@@ -73,7 +82,6 @@ private:
 
     std::map<std::string, VkFence> _fences;
     std::map<std::string, VkSemaphore> _semaphores;
-
 
     bool _initialized{false};
 };

@@ -1,0 +1,16 @@
+SET(target_ c09_renderPipeLine)
+
+FILE(GLOB SOURCES_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+
+ADD_EXECUTABLE(${target_} ${SOURCES_FILES})
+
+TARGET_INCLUDE_DIRECTORIES(${target_} PRIVATE
+    ${Vulkan_INCLUDE_DIR}
+    )
+
+TARGET_LINK_LIBRARIES(${target_}  PRIVATE
+    ${Vulkan_LIBRARY}
+    glfw
+)
+
+FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_BINARY_DIR}/example/VulkanClass/c09_renderPipeline/)

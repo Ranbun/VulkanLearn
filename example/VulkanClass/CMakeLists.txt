@@ -11,5 +11,7 @@ ADD_SUBDIRECTORY(c04_swapchain)
 ADD_SUBDIRECTORY(c05_renderloop)
 ADD_SUBDIRECTORY(c06_submitting)
 ADD_SUBDIRECTORY(c07_renderpass)
+ADD_SUBDIRECTORY(c08_recreating)
+ADD_SUBDIRECTORY(c09_renderPipeline)
 ADD_SUBDIRECTORY(c06_renderloop_new)
 

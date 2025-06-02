@@ -49,28 +49,44 @@ VulkanApplication::VulkanApplication(const char *appName, int width, int height)
 
     if (_initialized)
     {
-        createSwapChain();
-        createSwapChainImageView();
+        _initialized = createSwapChain();
     }
 
     if (_initialized)
     {
-        createCommandBuffer();
+        _initialized = createSwapChainImageView();
+    }
+
+    if (_initialized)
+    {
+        _initialized = createCommandBuffer();
+    }
+
+    if (_initialized)
+    {
+        _initialized = createRenderPass();
+    }
+
+    if (_initialized)
+    {
+        _initialized = createFramebuffer(width, height);
     }
 
 }
 
 VulkanApplication::~VulkanApplication()
 {
+    if (_renderPass)
+    {
+        vkDestroyRenderPass(getLogicDevice(), _renderPass, nullptr);
+    }
+
     if (_commandPool)
     {
         vkDestroyCommandPool(getLogicDevice(), _commandPool, nullptr);
     }
 
-    for (auto i = 0; i < _swapChainImages.size(); i++)
-    {
-        vkDestroyImageView(getLogicDevice(), _swapChainImageViews[i], nullptr);
-    }
+    cleanUpSwapChain();
 
     for (auto &fence: _fences | std::views::values)
     {
@@ -447,6 +463,86 @@ bool VulkanApplication::createCommandBuffer()
     return true;
 }
 
+bool VulkanApplication::createRenderPass()
+{
+    // create render pass
+    VkAttachmentDescription colorAttachment{
+            0, getSurfaceFormat().format,
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
+
+    VkAttachmentReference colorAttachmentRef{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+
+    VkSubpassDescription subpass{
+            0, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            0, nullptr,
+            1, &colorAttachmentRef,
+            nullptr, nullptr,
+            0, nullptr};
+
+    VkRenderPassCreateInfo renderPassInfo{
+            VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+            nullptr, 0,
+            1, &colorAttachment,
+            1, &subpass,
+            0, nullptr};
+
+    const auto res = vkCreateRenderPass(getLogicDevice(), &renderPassInfo, nullptr, &_renderPass);
+    if (res != VK_SUCCESS)
+    {
+        std::cout << "Failed to create render pass!" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanApplication::createFramebuffer(int w, int h)
+{
+    _framebuffers.resize(getSwapChainImageView().size());
+    for (auto i = 0; i < _framebuffers.size(); i++)
+    {
+        VkImageView attachments[] = {getSwapChainImageView()[i]};
+        VkFramebufferCreateInfo info{
+                VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+                nullptr, 0,
+                getRenderPass(),
+                1, attachments,
+                static_cast<uint32_t>(w), static_cast<uint32_t>(h), 1
+
+        };
+        const auto res = vkCreateFramebuffer(getLogicDevice(), &info, nullptr, &_framebuffers[i]);
+        if (res != VK_SUCCESS)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void VulkanApplication::cleanUpSwapChain()
+{
+    for (auto i =0 ; i < _framebuffers.size(); i++)
+    {
+        vkDestroyFramebuffer(getLogicDevice(),_framebuffers[i],nullptr);
+    }
+
+    for (auto i =0; i < _swapChainImageViews.size();i++)
+    {
+        vkDestroyImageView(getLogicDevice(), _swapChainImageViews[i], nullptr);
+    }
+
+    if (_swapChain != VK_NULL_HANDLE)
+    {
+        vkDestroySwapchainKHR(getLogicDevice(), _swapChain,nullptr);
+    }
+}
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -529,29 +625,58 @@ void VulkanApplication::submitAndPresent(VkSemaphore waitImage, VkSemaphore wait
     vkGetDeviceQueue(getLogicDevice(), 0, 0, &queue);
 
     /// 提交指令到GPU - VULKAN
-    VkSubmitInfo submitInfo {
-        VK_STRUCTURE_TYPE_SUBMIT_INFO, nullptr,
-        1,
-        &waitImage,     // 等待信号量  -- 照片是不是执行获取完成
-        &waitStageMask,
-        1, &_commandBuffer,
-        1, &waitSubmission      // 提交的指令缓存  执行完成之后通知这个信号量  告诉等待这个信号量的地方开始执行
+    VkSubmitInfo submitInfo{
+            VK_STRUCTURE_TYPE_SUBMIT_INFO, nullptr,
+            1,
+            &waitImage,// 等待信号量  -- 照片是不是执行获取完成
+            &waitStageMask,
+            1, &_commandBuffer,
+            1, &waitSubmission// 提交的指令缓存  执行完成之后通知这个信号量  告诉等待这个信号量的地方开始执行
     };
 
     vkQueueSubmit(queue, 1, &submitInfo, fenceSubmission);
 
     VkPresentInfoKHR presentInfo{
-        VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-        nullptr,
-        1, &waitSubmission,
-        1, swapChains,
-        &imagIndex,
-        nullptr
-    };
+            VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            nullptr,
+            1, &waitSubmission,
+            1, swapChains,
+            &imagIndex,
+            nullptr};
 
     vkQueuePresentKHR(queue, &presentInfo);
 }
 
+
+uint32_t VulkanApplication::reCreateSwapChain(int &w, int &h, VkSemaphore &waitImage)
+{
+    cleanUpSwapChain();
+    // 等待设备空闲得时候重新创建交换链
+    auto  waitRes = vkDeviceWaitIdle(_logicDevice);
+    if (waitRes!=VK_SUCCESS)
+    {
+        return 0;
+    }
+
+    glfwGetWindowSize(_window, &w, &h);
+    auto created = createSwapChain();
+    if (created) created = createSwapChainImageView();
+    if (created) created = createFramebuffer(w,h);
+
+    uint32_t imageIndex = 0;
+    if (created)
+    {
+        /// 重新请求下一张图
+        waitRes = vkAcquireNextImageKHR(getLogicDevice(),_swapChain, UINT64_MAX,waitImage,VK_NULL_HANDLE, &imageIndex);
+        if (waitRes!=VK_SUCCESS)
+        {
+            std::cout<<"Failed recreating swapChain!"<<std::endl;
+            return 0;
+        }
+    }
+
+    return imageIndex;
+}
 
 void VulkanApplication::mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods)
 {
