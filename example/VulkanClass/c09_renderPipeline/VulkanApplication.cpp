@@ -1,5 +1,6 @@
 #include "VulkanApplication.h"
 
+#include <fstream>
 #include <iostream>
 #include <ranges>
 #include <vector>
@@ -88,6 +89,8 @@ VulkanApplication::~VulkanApplication()
 
     cleanUpSwapChain();
 
+
+#if 0
     for (auto &fence: _fences | std::views::values)
     {
         vkDestroyFence(getLogicDevice(), fence, nullptr);
@@ -97,6 +100,18 @@ VulkanApplication::~VulkanApplication()
     {
         vkDestroySemaphore(getLogicDevice(), semaphore, nullptr);
     }
+#else
+    for (auto & [name, fence]: _fences)
+    {
+        vkDestroyFence(getLogicDevice(), fence, nullptr);
+    }
+
+    for (auto & [name, semaphore]: _semaphores)
+    {
+        vkDestroySemaphore(getLogicDevice(), semaphore, nullptr);
+    }
+#endif
+
 
     if (_swapChain)
     {
@@ -528,20 +543,42 @@ bool VulkanApplication::createFramebuffer(int w, int h)
 
 void VulkanApplication::cleanUpSwapChain()
 {
-    for (auto i =0 ; i < _framebuffers.size(); i++)
+    for (auto i = 0; i < _framebuffers.size(); i++)
     {
-        vkDestroyFramebuffer(getLogicDevice(),_framebuffers[i],nullptr);
+        vkDestroyFramebuffer(getLogicDevice(), _framebuffers[i], nullptr);
     }
 
-    for (auto i =0; i < _swapChainImageViews.size();i++)
+    for (auto i = 0; i < _swapChainImageViews.size(); i++)
     {
         vkDestroyImageView(getLogicDevice(), _swapChainImageViews[i], nullptr);
     }
 
     if (_swapChain != VK_NULL_HANDLE)
     {
-        vkDestroySwapchainKHR(getLogicDevice(), _swapChain,nullptr);
+        vkDestroySwapchainKHR(getLogicDevice(), _swapChain, nullptr);
     }
+}
+
+VkShaderModule VulkanApplication::createShaderModule(VulkanApplication &app, const std::string &name)
+{
+    std::ifstream fin(name, std::ios::in | std::ios::binary);
+    std::string buffer((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+
+    VkShaderModuleCreateInfo createInfo {
+        VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+        nullptr, 0,
+        buffer.size(), reinterpret_cast<const uint32_t *>(buffer.data()),
+    };
+
+    VkShaderModule shaderModule = nullptr;
+    VkResult result = vkCreateShaderModule(app.getLogicDevice(), &createInfo, nullptr, &shaderModule);
+
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create shader module!");
+    }
+
+    return shaderModule;
 }
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)

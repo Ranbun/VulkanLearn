@@ -44,6 +44,7 @@ public:
     [[maybe_unused]] void setClose() const { glfwSetWindowShouldClose(_window, 1); }
     uint32_t reCreateSwapChain(int &w, int &h, VkSemaphore &waitImage);
 
+    VkShaderModule createShaderModule(VulkanApplication & app, const std::string & name);
 
     void mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods);
     void keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -60,6 +61,7 @@ private:
     bool createRenderPass();
     bool createFramebuffer(int w, int h);
     void cleanUpSwapChain();
+
 
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};

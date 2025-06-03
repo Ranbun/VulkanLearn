@@ -55,7 +55,14 @@
             ],
             "problemMatcher": [
                 "$msCompile"
-            ]
+            ],
+            "linux":{
+                "command": "bash",
+                "args": [
+                    "${workspaceFolder}/build_cmake_debug_linux.sh",
+                ],
+            }
+
         },
     ],
 }

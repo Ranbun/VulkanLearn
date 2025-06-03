@@ -5,7 +5,6 @@
 
 int main(int argc, char **args)
 {
-
     int width = 1024;
     int height = 768;
 
@@ -16,6 +15,25 @@ int main(int argc, char **args)
         std::cout << "Failed top initialized VulkanApplication!" << std::endl;
         return 1;
     }
+
+    auto vertexShaderModel = app.createShaderModule(app, "/home/rlh/coding/github/VulkanLearn/example/VulkanClass/c09_renderPipeline/shaders/sample.vert.glsl");
+    auto fragShaderModel = app.createShaderModule(app, "/home/rlh/coding/github/VulkanLearn/example/VulkanClass/c09_renderPipeline/shaders/sample.frag.glsl");
+
+    VkPipelineShaderStageCreateInfo shaderStages[] = {
+        {
+            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            nullptr, 0,
+            VK_SHADER_STAGE_VERTEX_BIT, vertexShaderModel,
+            "main", nullptr
+        },
+    {
+        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        nullptr, 0,
+        VK_SHADER_STAGE_FRAGMENT_BIT, fragShaderModel,
+        "main", nullptr
+        }
+    };
+
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
