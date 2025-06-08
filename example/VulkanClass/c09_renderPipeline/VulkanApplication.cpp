@@ -158,12 +158,17 @@ bool VulkanApplication::createInstance(const char *appName)
     const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtCount);
     std::cout << "GLFW initialized. It requires the following extensions." << std::endl;
 
-    for (auto i = 0; i < glfwExtCount; i++)
+    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtCount);
+
+    /// 启用debug支持必须显示指定使用此扩展
+    extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    for (const auto &extension: extensions)
     {
-        std::cout << glfwExtensions[i] << std::endl;
+        std::cout << extension << std::endl;
     }
 
-    std::vector<const char *> layersName{"VK_LAYER_KHRONOS_validation"};
+    const std::vector<const char *> layersName{"VK_LAYER_KHRONOS_validation"};
 
     VkInstanceCreateInfo vkInstanceCreateInfo{
             VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -171,8 +176,8 @@ bool VulkanApplication::createInstance(const char *appName)
             &appinfo,
             0, nullptr,
             //1, layersName,
-            glfwExtCount,
-            glfwExtensions};
+            static_cast<uint32_t>(extensions.size()),
+            extensions.data()};
 
     vkInstanceCreateInfo.enabledLayerCount = 1;
     vkInstanceCreateInfo.ppEnabledLayerNames = layersName.data();
@@ -541,7 +546,7 @@ bool VulkanApplication::createFramebuffer(int w, int h)
     return true;
 }
 
-void VulkanApplication::cleanUpSwapChain() const
+void VulkanApplication::cleanUpSwapChain()
 {
     for (auto i = 0; i < _framebuffers.size(); i++)
     {
@@ -558,24 +563,8 @@ void VulkanApplication::cleanUpSwapChain() const
         vkDestroySwapchainKHR(getLogicDevice(), _swapChain, nullptr);
     }
 }
-void VulkanApplication::createPipeline()
-{
-    /// create shader mode
-    const auto vertShaderMode = createShaderModule("./shader/sample_vert.spv");
-    const auto fragShaderMode = createShaderModule("./shader/sample_frag.spv");
-    /// pre make
 
-    /// static stage
-
-    /// create pipline
-
-    /// clean shader mode
-    vkDestroyShaderModule(getLogicDevice(), vertShaderMode, nullptr);
-    vkDestroyShaderModule(getLogicDevice(), fragShaderMode, nullptr);
-
-}
-
-VkShaderModule VulkanApplication::createShaderModule(const std::string &name) const
+VkShaderModule VulkanApplication::createShaderModule(VulkanApplication &app, const std::string &name)
 {
     std::ifstream fin(name, std::ios::in | std::ios::binary);
     std::string buffer((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
@@ -585,14 +574,16 @@ VkShaderModule VulkanApplication::createShaderModule(const std::string &name) co
         nullptr, 0,
         buffer.size(), reinterpret_cast<const uint32_t *>(buffer.data()),
     };
-    VkShaderModule shader_module;
-    auto result = vkCreateShaderModule(getLogicDevice(), &createInfo,nullptr, &shader_module);
+
+    VkShaderModule shaderModule = nullptr;
+    VkResult result = vkCreateShaderModule(app.getLogicDevice(), &createInfo, nullptr, &shaderModule);
+
     if (result != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create shader module!");
     }
 
-    return shader_module;
+    return shaderModule;
 }
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)

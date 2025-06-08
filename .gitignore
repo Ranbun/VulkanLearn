@@ -10,7 +10,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-
 # IDE - VS
 out/
 out
@@ -46,8 +45,6 @@ cmake-build-debug-clang
 
 docs/_book/
 docs/_book
-
-
 
 .vscode/launch.json
 .vscode/settings.json

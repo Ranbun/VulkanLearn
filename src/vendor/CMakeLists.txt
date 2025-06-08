@@ -1,5 +1,4 @@
 add_subdirectory(glad)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    add_subdirectory(glfw)
-endif()
+# if build in Linux, please install some libs to build glfw3
+add_subdirectory(glfw)
