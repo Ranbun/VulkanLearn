@@ -61,7 +61,7 @@ private:
     bool createRenderPass();
     bool createFramebuffer(int w, int h);
     void cleanUpSwapChain() const;
-    void createPipeline();
+    void createPipeline() const;
 
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};
@@ -84,6 +84,8 @@ private:
 
     std::map<std::string, VkFence> _fences;
     std::map<std::string, VkSemaphore> _semaphores;
+
+    VkExtent2D _extent{};
 
     bool _initialized{false};
 };

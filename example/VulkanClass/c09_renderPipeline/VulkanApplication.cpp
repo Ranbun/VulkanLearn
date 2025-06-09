@@ -288,7 +288,7 @@ bool VulkanApplication::createLogicDevice()
     logicDeviceCreateInfo.enabledLayerCount = validationLayers.size();
     logicDeviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
 
-    auto result = vkCreateDevice(getPhysicalDevice(), &logicDeviceCreateInfo, nullptr, &_logicDevice);
+    const auto result = vkCreateDevice(getPhysicalDevice(), &logicDeviceCreateInfo, nullptr, &_logicDevice);
     if (result != VK_SUCCESS)
     {
         std::cout << "Failed to create logic Device" << std::endl;
@@ -405,6 +405,9 @@ bool VulkanApplication::createSwapChain()
         std::cout << "Failed  to create swapChain." << std::endl;
         return false;
     }
+
+    /// 记录当前窗口的大小
+    _extent = caps.maxImageExtent;
 
     uint32_t imageCount = 0;
     vkGetSwapchainImagesKHR(getLogicDevice(), _swapChain, &imageCount, nullptr);
@@ -546,16 +549,16 @@ bool VulkanApplication::createFramebuffer(int w, int h)
     return true;
 }
 
-void VulkanApplication::cleanUpSwapChain()
+void VulkanApplication::cleanUpSwapChain() const
 {
-    for (auto i = 0; i < _framebuffers.size(); i++)
+    for (auto &_framebuffer: _framebuffers)
     {
-        vkDestroyFramebuffer(getLogicDevice(), _framebuffers[i], nullptr);
+        vkDestroyFramebuffer(getLogicDevice(), _framebuffer, nullptr);
     }
 
-    for (auto i = 0; i < _swapChainImageViews.size(); i++)
+    for (const auto _swapChainImageView: _swapChainImageViews)
     {
-        vkDestroyImageView(getLogicDevice(), _swapChainImageViews[i], nullptr);
+        vkDestroyImageView(getLogicDevice(), _swapChainImageView, nullptr);
     }
 
     if (_swapChain != VK_NULL_HANDLE)
@@ -564,19 +567,143 @@ void VulkanApplication::cleanUpSwapChain()
     }
 }
 
-VkShaderModule VulkanApplication::createShaderModule(VulkanApplication &app, const std::string &name)
+void VulkanApplication::createPipeline() const
+{
+    auto vertexShaderModel = createShaderModule("./shaders/sample_vert.spv");
+    auto fragShaderModel = createShaderModule("./shaders/sample_frag.spv");
+
+    /// 可编成阶段配置
+    /// 创建着色器阶段
+    VkPipelineShaderStageCreateInfo shaderStages[] = {
+        {
+            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            nullptr, 0,
+            VK_SHADER_STAGE_VERTEX_BIT, vertexShaderModel,
+            "main", nullptr  // 通过指定常量优化效率
+        },
+    {
+        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        nullptr, 0,
+        VK_SHADER_STAGE_FRAGMENT_BIT, fragShaderModel,
+        "main", nullptr
+        }
+    };
+
+    /// 固定功能阶段
+    /// 1. 顶点输入
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 0;
+    vertexInputInfo.pVertexBindingDescriptions = nullptr;
+    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+    vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+
+    /// 输入装配
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+    /// 视口&裁减
+    // _swapChainImageViews[0]
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = _extent.width;
+    viewport.height = _extent.height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    /// 裁减矩形
+    VkRect2D scissor = {};
+    scissor.offset = {0,0};
+    scissor.extent = _extent;
+
+    /// bind viewport & scissor 需要组合在一起
+    std::vector<VkViewport> viewportStates;
+    viewportStates.emplace_back(std::move(viewport));
+
+    std::vector<VkRect2D> scissorStates;
+    scissorStates.emplace_back(std::move(scissor));
+
+    VkPipelineViewportStateCreateInfo viewportState = {};
+    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewportState.viewportCount = 1;
+    viewportState.pViewports = viewportStates.data();
+    viewportState.scissorCount = 1;
+    viewportState.pScissors = scissorStates.data();
+
+    /// 光栅化
+    VkPipelineRasterizationStateCreateInfo rasterizer = {};
+    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer.depthClampEnable = VK_FALSE;
+    rasterizer.rasterizerDiscardEnable = VK_FALSE;  // true 表示都不能通过光栅化
+    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.lineWidth = 1.0f;
+    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; ///背面剔除
+    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;    /// 指定顶点顺序 -> 顺时针 or 逆时针
+    rasterizer.depthBiasEnable = VK_FALSE;             /// 有点类似于深度偏移
+    rasterizer.depthBiasConstantFactor  = 0.0f;
+    rasterizer.depthBiasClamp = 0.0f;
+    rasterizer.depthBiasSlopeFactor = 0.0f;
+
+    /// 多重采样 -- 当前的实例中禁用多重采样
+    VkPipelineMultisampleStateCreateInfo multisampleState{};
+    multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisampleState.sampleShadingEnable = VK_FALSE;
+    multisampleState.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampleState.minSampleShading = 1.0f;
+    multisampleState.pSampleMask = nullptr;
+    multisampleState.alphaToCoverageEnable = VK_FALSE;
+    multisampleState.alphaToOneEnable = VK_FALSE;
+
+    /// 深度和模板测试
+    VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+        VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    colorBlendAttachment.blendEnable = VK_FALSE;
+    colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+    colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+    colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+    colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+    std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachmentStates;
+    colorBlendAttachmentStates.emplace_back(std::move(colorBlendAttachment));
+
+    VkPipelineColorBlendStateCreateInfo colorBlendingCreateInfo{};
+    colorBlendingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    colorBlendingCreateInfo.logicOpEnable = VK_FALSE;
+    colorBlendingCreateInfo.logicOp = VK_LOGIC_OP_COPY;
+    colorBlendingCreateInfo.attachmentCount = 1;
+    colorBlendingCreateInfo.pAttachments = colorBlendAttachmentStates.data();
+    colorBlendingCreateInfo.blendConstants[0] = 0.0f;
+    colorBlendingCreateInfo.blendConstants[1] = 0.0f;
+    colorBlendingCreateInfo.blendConstants[2] = 0.0f;
+    colorBlendingCreateInfo.blendConstants[3] = 0.0f;
+    /// 不设置会覆盖原有颜色
+
+    /// dynamic bind
+
+
+
+    /// remove shadermodule
+    vkDestroyShaderModule(getLogicDevice(), vertexShaderModel, nullptr);
+    vkDestroyShaderModule(getLogicDevice(), fragShaderModel, nullptr);
+}
+
+VkShaderModule VulkanApplication::createShaderModule(const std::string &name) const
 {
     std::ifstream fin(name, std::ios::in | std::ios::binary);
     std::string buffer((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
 
-    VkShaderModuleCreateInfo createInfo {
+    const VkShaderModuleCreateInfo createInfo {
         VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
         nullptr, 0,
         buffer.size(), reinterpret_cast<const uint32_t *>(buffer.data()),
     };
 
     VkShaderModule shaderModule = nullptr;
-    VkResult result = vkCreateShaderModule(app.getLogicDevice(), &createInfo, nullptr, &shaderModule);
+    VkResult result = vkCreateShaderModule(getLogicDevice(), &createInfo, nullptr, &shaderModule);
 
     if (result != VK_SUCCESS)
     {
@@ -716,6 +843,10 @@ uint32_t VulkanApplication::reCreateSwapChain(int &w, int &h, VkSemaphore &waitI
             return 0;
         }
     }
+
+
+    _extent.width = w;
+    _extent.height = h;
 
     return imageIndex;
 }

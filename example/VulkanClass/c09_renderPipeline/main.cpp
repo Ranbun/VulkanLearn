@@ -16,25 +16,6 @@ int main(int argc, char **args)
         return 1;
     }
 
-    auto vertexShaderModel = app.createShaderModule("./shaders/sample_vert.spv");
-    auto fragShaderModel = app.createShaderModule("./shaders/sample_frag.spv");
-
-    VkPipelineShaderStageCreateInfo shaderStages[] = {
-        {
-            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-            nullptr, 0,
-            VK_SHADER_STAGE_VERTEX_BIT, vertexShaderModel,
-            "main", nullptr
-        },
-    {
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        nullptr, 0,
-        VK_SHADER_STAGE_FRAGMENT_BIT, fragShaderModel,
-        "main", nullptr
-        }
-    };
-
-
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
     auto waitSubmission = app.getOrCreateSemaphore("WaitSubmission");
