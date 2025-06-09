@@ -541,7 +541,7 @@ bool VulkanApplication::createFramebuffer(int w, int h)
     return true;
 }
 
-void VulkanApplication::cleanUpSwapChain()
+void VulkanApplication::cleanUpSwapChain() const
 {
     for (auto i = 0; i < _framebuffers.size(); i++)
     {
@@ -558,8 +558,24 @@ void VulkanApplication::cleanUpSwapChain()
         vkDestroySwapchainKHR(getLogicDevice(), _swapChain, nullptr);
     }
 }
+void VulkanApplication::createPipeline()
+{
+    /// create shader mode
+    const auto vertShaderMode = createShaderModule("./shader/sample_vert.spv");
+    const auto fragShaderMode = createShaderModule("./shader/sample_frag.spv");
+    /// pre make
 
-VkShaderModule VulkanApplication::createShaderModule(VulkanApplication &app, const std::string &name)
+    /// static stage
+
+    /// create pipline
+
+    /// clean shader mode
+    vkDestroyShaderModule(getLogicDevice(), vertShaderMode, nullptr);
+    vkDestroyShaderModule(getLogicDevice(), fragShaderMode, nullptr);
+
+}
+
+VkShaderModule VulkanApplication::createShaderModule(const std::string &name) const
 {
     std::ifstream fin(name, std::ios::in | std::ios::binary);
     std::string buffer((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
@@ -569,16 +585,14 @@ VkShaderModule VulkanApplication::createShaderModule(VulkanApplication &app, con
         nullptr, 0,
         buffer.size(), reinterpret_cast<const uint32_t *>(buffer.data()),
     };
-
-    VkShaderModule shaderModule = nullptr;
-    VkResult result = vkCreateShaderModule(app.getLogicDevice(), &createInfo, nullptr, &shaderModule);
-
+    VkShaderModule shader_module;
+    auto result = vkCreateShaderModule(getLogicDevice(), &createInfo,nullptr, &shader_module);
     if (result != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create shader module!");
     }
 
-    return shaderModule;
+    return shader_module;
 }
 
 void VulkanApplication::keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods)

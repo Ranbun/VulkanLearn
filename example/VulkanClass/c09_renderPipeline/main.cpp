@@ -16,8 +16,8 @@ int main(int argc, char **args)
         return 1;
     }
 
-    auto vertexShaderModel = app.createShaderModule(app, "/home/rlh/coding/github/VulkanLearn/example/VulkanClass/c09_renderPipeline/shaders/sample.vert.glsl");
-    auto fragShaderModel = app.createShaderModule(app, "/home/rlh/coding/github/VulkanLearn/example/VulkanClass/c09_renderPipeline/shaders/sample.frag.glsl");
+    auto vertexShaderModel = app.createShaderModule("./shaders/sample_vert.spv");
+    auto fragShaderModel = app.createShaderModule("./shaders/sample_frag.spv");
 
     VkPipelineShaderStageCreateInfo shaderStages[] = {
         {
