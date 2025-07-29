@@ -67,16 +67,15 @@ VulkanApplication::VulkanApplication(const char *appName, const int width, const
         _initialized = createRenderPass();
     }
 
-    if (_initialized)
-    {
-        _initialized = setUpGraphicsPipeline(std::string(), std::string(), <#initializer#>, <#initializer#>);
-    }
+//    if (_initialized)
+//    {
+//        _initialized = setUpGraphicsPipeline(std::string(), std::string(), <#initializer#>, <#initializer#>);
+//    }
 
     if (_initialized)
     {
         _initialized = createFramebuffer(width, height);
     }
-
 }
 
 VulkanApplication::~VulkanApplication()
@@ -592,9 +591,10 @@ void VulkanApplication::cleanUpSwapChain() const
 }
 
 bool VulkanApplication::setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path,
-                                              VkPipelineVertexInputStateCreateInfo &vertexInput,
-                                              VkPipelineInputAssemblyStateCreateInfo &vertexInputAssembly)
+                                            VkPipelineVertexInputStateCreateInfo &vertexInput,
+                                            VkPipelineInputAssemblyStateCreateInfo &vertexInputAssembly)
 {
+#if 0
     auto vertexShaderModel = createShaderModule("./shaders/sample_vert.spv");
     auto fragShaderModel = createShaderModule("./shaders/sample_frag.spv");
 
@@ -614,7 +614,31 @@ bool VulkanApplication::setUpGraphicsPipeline(std::string vertexShader_path, std
         "main", nullptr
         }
     };
+#endif
 
+    auto vertexShaderModel = createShaderModule(vertexShader_path);
+    auto fragShaderModel = createShaderModule(fragmentShader_path);
+
+    /// 可编成阶段配置
+    /// 创建着色器阶段
+    VkPipelineShaderStageCreateInfo shaderStages[] = {
+            {
+                    VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                    nullptr, 0,
+                    VK_SHADER_STAGE_VERTEX_BIT, vertexShaderModel,
+                    "main", nullptr  // 通过指定常量优化效率
+            },
+            {
+                    VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                    nullptr, 0,
+                    VK_SHADER_STAGE_FRAGMENT_BIT, fragShaderModel,
+                    "main", nullptr
+            }
+    };
+
+
+
+#if 0
     /// 固定功能阶段
     /// 1. 顶点输入
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -629,6 +653,7 @@ bool VulkanApplication::setUpGraphicsPipeline(std::string vertexShader_path, std
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
+#endif
 
     /// 视口&裁减
     // _swapChainImageViews[0]
@@ -737,8 +762,8 @@ bool VulkanApplication::setUpGraphicsPipeline(std::string vertexShader_path, std
     pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_create_info.stageCount = 2;
     pipeline_create_info.pStages = shaderStages;
-    pipeline_create_info.pVertexInputState = &vertexInputInfo;
-    pipeline_create_info.pInputAssemblyState = &inputAssembly;
+    pipeline_create_info.pVertexInputState = &vertexInput;
+    pipeline_create_info.pInputAssemblyState = &vertexInputAssembly;
     pipeline_create_info.pViewportState = &viewportState;
     pipeline_create_info.pRasterizationState = &rasterizer;
     pipeline_create_info.pMultisampleState = &multisampleState;

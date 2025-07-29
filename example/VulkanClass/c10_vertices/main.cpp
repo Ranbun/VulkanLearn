@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "Vertex.h"
 
 #include "VulkanApplication.h"
 
@@ -8,12 +9,42 @@ int main(int argc, char **args)
     int width = 1024;
     int height = 768;
 
-    VulkanApplication app("c09_pipeLine", 1024, 768);
+    VulkanApplication app("c10_vertices", 1024, 768);
 
     if (!app.getInitialized())
     {
         std::cout << "Failed top initialized VulkanApplication!" << std::endl;
         return 1;
+    }
+
+    /// 输入顶点的绑定信息
+    VkVertexInputBindingDescription binding{
+            0, sizeof(VKL::Vertex), VK_VERTEX_INPUT_RATE_VERTEX
+    };
+
+    /// 输入信息的属性信息
+    std::vector<VkVertexInputAttributeDescription> attr_attr_list;
+    attr_attr_list.emplace_back(0,0, VK_FORMAT_R32G32B32_SFLOAT,0);
+    attr_attr_list.emplace_back(1,0, VK_FORMAT_R32G32B32_SFLOAT,sizeof(float) * 3);
+
+    /// 固定功能阶段
+    /// 1. 顶点输入
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 0;
+    vertexInputInfo.pVertexBindingDescriptions = nullptr;
+    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+    vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+
+    /// 输入装配
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+    if(!app.setUpGraphicsPipeline("./shaders/sample_vert.spv","./shaders/sample_frag.spv",vertexInputInfo,inputAssembly))
+    {
+        throw std::runtime_error("Create graphics pipeline error!");
     }
 
     auto waitFence = app.getOrCreateFence("WaitFence");

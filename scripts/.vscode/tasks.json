@@ -1,0 +1,68 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        // CMake 生成
+        {
+            "label": "CMake::CMake",
+            "type": "process",
+            "command": "cmd.exe",
+            "args": [
+                "call",
+                "/C",
+                "${workspaceFolder}/.vscode/build.bat",
+                "generate"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/",
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "powershell.exe"
+                    }
+                },
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        // CMake build
+        {
+            "label": "CMake::Build Debug",
+            "type": "process",
+            "command": "cmd.exe",
+            "args": [
+                "call",
+                "/C",
+                "${workspaceFolder}/.vscode/build.bat",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "dependsOn": [
+                // "CMake::CMake"
+            ],
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "linux":{
+                "command": "bash",
+                "args": [
+                    "${workspaceFolder}/build_cmake_debug_linux.sh",
+                ],
+            }
+
+        },
+    ],
+}

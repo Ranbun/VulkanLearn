@@ -8,3 +8,7 @@ ADD_COMPILE_OPTIONS("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 ADD_SUBDIRECTORY(example)
 ADD_SUBDIRECTORY(src)
+
+# unit test
+#enable_testing()
+#ADD_SUBDIRECTORY(test)

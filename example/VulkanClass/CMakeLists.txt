@@ -13,5 +13,6 @@ ADD_SUBDIRECTORY(c06_submitting)
 ADD_SUBDIRECTORY(c07_renderpass)
 ADD_SUBDIRECTORY(c08_recreating)
 ADD_SUBDIRECTORY(c09_renderPipeline)
+ADD_SUBDIRECTORY(c10_vertices)
 ADD_SUBDIRECTORY(c06_renderloop_new)
 

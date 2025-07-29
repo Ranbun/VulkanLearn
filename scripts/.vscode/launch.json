@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Triangle-VulKan",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/example/triangle/",
+            "environment": [],
+            "console": "externalTerminal",
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build/example/triangle/triangle.exe"
+            }
+        },
+        {
+            "name": "vulkanClass",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/example/VulkanClass/c02_devices/c02_devices",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/example/VulkanClass/c02_devices/",
+            "environment": [],
+            "console": "externalTerminal",
+        },
+    ]
+}

@@ -47,6 +47,10 @@ public:
 
     VkShaderModule createShaderModule(const std::string &name) const;
 
+    bool setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path,
+                               VkPipelineVertexInputStateCreateInfo &vertexInput,
+                               VkPipelineInputAssemblyStateCreateInfo &vertexInputAssembly);
+
     void mouseButtonCallBack(GLFWwindow *window, int button, int action, int mods);
     void keyPressCallBack(GLFWwindow *window, int key, int scancode, int action, int mods);
     void resizeCallBack(GLFWwindow *window, int w, int h);
@@ -62,9 +66,7 @@ private:
     bool createRenderPass();
     bool createFramebuffer(int w, int h);
     void cleanUpSwapChain() const;
-    bool setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path,
-                               VkPipelineVertexInputStateCreateInfo &vertexInput,
-                               VkPipelineInputAssemblyStateCreateInfo &vertexInputAssembly);
+
 
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};

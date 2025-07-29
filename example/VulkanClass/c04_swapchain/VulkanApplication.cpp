@@ -266,6 +266,10 @@ bool VulkanApplication::createWindowSurface(const char *name, int width, int hei
           app->resizeCallBack(window, w,h);
     });
 
+    glfwSetWindowCloseCallback(_window, [](GLFWwindow * windows){
+        std::cout<<"Close Window"<<std::endl;
+    });
+
     return true;
 }
 
