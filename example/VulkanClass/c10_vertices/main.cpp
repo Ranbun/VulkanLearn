@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Vertex.h"
+#include "Buffer.h"
 
 #include "VulkanApplication.h"
 
@@ -19,22 +20,22 @@ int main(int argc, char **args)
 
     /// 输入顶点的绑定信息
     VkVertexInputBindingDescription binding{
-            0, sizeof(VKL::Vertex), VK_VERTEX_INPUT_RATE_VERTEX
-    };
+        0, sizeof(VKL::Vertex), VK_VERTEX_INPUT_RATE_VERTEX
+};
 
     /// 输入信息的属性信息
     std::vector<VkVertexInputAttributeDescription> attr_attr_list;
-    attr_attr_list.emplace_back(0,0, VK_FORMAT_R32G32B32_SFLOAT,0);
-    attr_attr_list.emplace_back(1,0, VK_FORMAT_R32G32B32_SFLOAT,sizeof(float) * 3);
+    attr_attr_list.emplace_back(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);
+    attr_attr_list.emplace_back(1, 0, VK_FORMAT_R32G32B32_SFLOAT,sizeof(float) * 3);
 
     /// 固定功能阶段
     /// 1. 顶点输入
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = &binding;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attr_attr_list.size());
+    vertexInputInfo.pVertexAttributeDescriptions = attr_attr_list.data();
 
     /// 输入装配
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
@@ -46,6 +47,20 @@ int main(int argc, char **args)
     {
         throw std::runtime_error("Create graphics pipeline error!");
     }
+
+    /// create data
+    std::vector<VKL::Vertex> vertices;
+    /// triangle 1
+    vertices.emplace_back(0.0f, 0.5f,0.0f, 1.0f,0.0f, 0.0f);
+    vertices.emplace_back(-0.5f, -0.5f,0.0f, 0.0f,1.0f, 0.0f);
+    vertices.emplace_back(0.5f, -0.5f,0.0f, 0.0f,0.0f, 1.0f);
+    /// triangle 2
+    vertices.emplace_back(1.0f, 0.5f,0.0f, 1.0f,0.0f, 0.0f);
+    vertices.emplace_back(0.5f, -0.5f,0.0f, 0.0f,1.0f, 0.0f);
+    vertices.emplace_back(1.5f, -0.5f,0.0f, 0.0f,0.0f, 1.0f);
+
+    /// 创建顶点缓存
+    auto vk_buffer = VKL::BufferTool::createVertexBuffer(app, vertices);
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
@@ -110,8 +125,14 @@ int main(int argc, char **args)
                 vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, app.getGraphicsPipeline());
                 vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
                 vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+                /// bind buffer
+                VkBuffer vertex_buffers[] = {vk_buffer};
+                VkDeviceSize offsets[] = {0};
+                vkCmdBindVertexBuffers(commandBuffer, 0,1, vertex_buffers, offsets);
+                vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+                // vkCmdDraw(commandBuffer, 3, 1, 0, 0);
             }
-            vkCmdDraw(commandBuffer, 3, 1, 0, 0);
             vkCmdEndRenderPass(commandBuffer);
         }
         const auto command_res = vkEndCommandBuffer(commandBuffer);
