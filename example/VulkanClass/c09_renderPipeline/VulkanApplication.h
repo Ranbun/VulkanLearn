@@ -62,9 +62,7 @@ private:
     bool createRenderPass();
     bool createFramebuffer(int w, int h);
     void cleanUpSwapChain() const;
-    bool setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path,
-                               VkPipelineVertexInputStateCreateInfo &vertexInput,
-                               VkPipelineInputAssemblyStateCreateInfo &vertexInputAssembly);
+    bool setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path);
 
     VkInstance _instance{};
     VkPhysicalDevice _physicalDevice{};

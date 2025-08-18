@@ -69,14 +69,13 @@ VulkanApplication::VulkanApplication(const char *appName, const int width, const
 
     if (_initialized)
     {
-        _initialized = setUpGraphicsPipeline(std::string(), std::string(), <#initializer#>, <#initializer#>);
+        _initialized = setUpGraphicsPipeline(std::string(), std::string());
     }
 
     if (_initialized)
     {
         _initialized = createFramebuffer(width, height);
     }
-
 }
 
 VulkanApplication::~VulkanApplication()
@@ -591,9 +590,7 @@ void VulkanApplication::cleanUpSwapChain() const
     }
 }
 
-bool VulkanApplication::setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path,
-                                              VkPipelineVertexInputStateCreateInfo &vertexInput,
-                                              VkPipelineInputAssemblyStateCreateInfo &vertexInputAssembly)
+bool VulkanApplication::setUpGraphicsPipeline(std::string vertexShader_path, std::string fragmentShader_path)
 {
     auto vertexShaderModel = createShaderModule("./shaders/sample_vert.spv");
     auto fragShaderModel = createShaderModule("./shaders/sample_frag.spv");
