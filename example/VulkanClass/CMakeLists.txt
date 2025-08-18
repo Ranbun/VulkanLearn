@@ -3,6 +3,8 @@ PROJECT(VulkanClass)
 
 FIND_PACKAGE(Vulkan REQUIRED)
 
+# ADD_SUBDIRECTORY(c06_renderloop_new)
+
 ADD_SUBDIRECTORY(c00_framework)
 ADD_SUBDIRECTORY(c01_instance)
 ADD_SUBDIRECTORY(c02_devices)
@@ -14,5 +16,5 @@ ADD_SUBDIRECTORY(c07_renderpass)
 ADD_SUBDIRECTORY(c08_recreating)
 ADD_SUBDIRECTORY(c09_renderPipeline)
 ADD_SUBDIRECTORY(c10_vertices)
-ADD_SUBDIRECTORY(c06_renderloop_new)
+ADD_SUBDIRECTORY(c11_indices)
 
