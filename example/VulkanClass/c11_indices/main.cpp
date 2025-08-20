@@ -50,17 +50,22 @@ int main(int argc, char **args)
 
     /// create data
     std::vector<VKL::Vertex> vertices;
-    /// triangle 1
     vertices.emplace_back(0.0f, 0.5f,0.0f, 1.0f,0.0f, 0.0f);
     vertices.emplace_back(-0.5f, -0.5f,0.0f, 0.0f,1.0f, 0.0f);
     vertices.emplace_back(0.5f, -0.5f,0.0f, 0.0f,0.0f, 1.0f);
-    /// triangle 2
     vertices.emplace_back(1.0f, 0.5f,0.0f, 1.0f,0.0f, 0.0f);
-    vertices.emplace_back(0.5f, -0.5f,0.0f, 0.0f,1.0f, 0.0f);
-    vertices.emplace_back(1.5f, -0.5f,0.0f, 0.0f,0.0f, 1.0f);
+
+    std::vector<uint32_t> indices;
+    indices.emplace_back(0);
+    indices.emplace_back(1);
+    indices.emplace_back(2);
+    indices.emplace_back(0);
+    indices.emplace_back(2);
+    indices.emplace_back(3);
 
     /// 创建顶点缓存
-    auto vk_buffer = VKL::BufferTool::createVertexBuffer(app, vertices);
+    auto vk_vertex_buffer = VKL::BufferTool::createVertexBufferNew(app, vertices);
+    auto vk_index_buffer = VKL::BufferTool::createIndexBuffer(app, indices);
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
@@ -127,11 +132,11 @@ int main(int argc, char **args)
                 vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
                 /// bind buffer
-                VkBuffer vertex_buffers[] = {vk_buffer};
+                VkBuffer vertex_buffers[] = {vk_vertex_buffer};
                 VkDeviceSize offsets[] = {0};
                 vkCmdBindVertexBuffers(commandBuffer, 0,1, vertex_buffers, offsets);
-                vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-                // vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+                vkCmdBindIndexBuffer(commandBuffer, vk_index_buffer, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdDrawIndexed(commandBuffer, indices.size(),1,0,0,0);
             }
             vkCmdEndRenderPass(commandBuffer);
         }
