@@ -17,4 +17,5 @@ ADD_SUBDIRECTORY(c08_recreating)
 ADD_SUBDIRECTORY(c09_renderPipeline)
 ADD_SUBDIRECTORY(c10_vertices)
 ADD_SUBDIRECTORY(c11_indices)
+ADD_SUBDIRECTORY(c12_uniform_buffer)
 
