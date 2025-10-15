@@ -3,16 +3,11 @@
 
 namespace VKL   /// vulkan learn
 {
-#if 0
-    namespace Vertex1
+    struct Vertex
     {
-        struct Vertex
-        {
-            float x, y, z;/// position
-            float r, g, b;/// color
-        };
-    }
-#endif 
+        float x, y, z;/// position
+        float r, g, b;/// color
+    };
 }
 
 #endif

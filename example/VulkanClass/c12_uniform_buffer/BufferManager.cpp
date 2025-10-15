@@ -2,13 +2,15 @@
 
 #include <ranges>
 #include <utility>
+#include <cmath>
+#include <cstring>
 
 namespace VKL
 {
     BufferManager::BufferManager(VulkanApplication *app)
         : application(app)
     {
-        
+
     }
 
     BufferManager::~BufferManager() = default;
@@ -158,8 +160,6 @@ namespace VKL
             throw std::runtime_error("Failed to Create buffer memory.");
             // return false;
         }
-
-
         return true;
     }
 

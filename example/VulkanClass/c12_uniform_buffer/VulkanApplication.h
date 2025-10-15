@@ -22,24 +22,23 @@ public:
     VulkanApplication(VulkanApplication &&) = delete;
     VulkanApplication& operator=(const VulkanApplication &) = delete;
     VulkanApplication &operator=(VulkanApplication &&) = delete;
-
-
     ~VulkanApplication();
 
-    VkInstance GetInstance() const { return instance; }
-    VkPhysicalDevice getPhysicalDevice() const { return physicalDevice; }
-    VkSurfaceKHR getSurface() const { return surface; }
-    VkDevice getLogicDevice() const { return logicDevice; }
+    [[nodiscard]] VkInstance GetInstance() const { return instance; }
+    [[nodiscard]] VkPhysicalDevice getPhysicalDevice() const { return physicalDevice; }
+    [[nodiscard]] VkSurfaceKHR getSurface() const { return surface; }
+    [[nodiscard]] VkDevice getLogicDevice() const { return logicDevice; }
 
-    VkSurfaceFormatKHR getSurfaceFormat() const { return surfaceImageFormat; }
-    std::vector<VkImage> getSwapChainImage() const { return swapChainImages; }
-    VkPresentModeKHR getPresentMode() const { return presentMode; }
-    VkSwapchainKHR getSwapChain() const { return swapChain; }
-    VkCommandBuffer getCommandBuffer() const { return commandBuffer; }
+    [[nodiscard]] VkSurfaceFormatKHR getSurfaceFormat() const { return surfaceImageFormat; }
+    [[nodiscard]] std::vector<VkImage> getSwapChainImage() const { return swapChainImages; }
+    [[nodiscard]] VkPresentModeKHR getPresentMode() const { return presentMode; }
+    [[nodiscard]] VkSwapchainKHR getSwapChain() const { return swapChain; }
+    [[nodiscard]] VkCommandBuffer getCommandBuffer() const { return commandBuffer; }
     std::vector<VkImageView> &getSwapChainImageView() { return swapChainImageViews; }
     VkRenderPass &getRenderPass() { return renderPass; }
     std::vector<VkFramebuffer> &getFrameBuffer() { return frameBuffers; }
     VkPipeline &getGraphicsPipeline() { return graphicsPipeline; }
+    VkPipelineLayout & GetPipelineLayout() {return pipelineLayout;}
 
     VkFence getOrCreateFence(const std::string &name);
     VkSemaphore getOrCreateSemaphore(const std::string &name);
@@ -51,7 +50,7 @@ public:
     [[maybe_unused]] void setClose() const { glfwSetWindowShouldClose(window, 1); }
     uint32_t reCreateSwapChain(int &w, int &h, VkSemaphore &wait_image);
 
-    VkShaderModule createShaderModule(const std::string &name) const;
+    [[nodiscard]] VkShaderModule createShaderModule(const std::string &name) const;
 
     bool setUpGraphicsPipeline(const std::string &vertex_shader_path, const std::string &fragment_shader_path,
                                VkPipelineVertexInputStateCreateInfo &vertex_input,

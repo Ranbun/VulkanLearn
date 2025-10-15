@@ -695,7 +695,7 @@ bool VulkanApplication::setUpGraphicsPipeline(const std::string& vertex_shader_p
     /// set uniform varianle
     VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
     pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutCreateInfo.setLayoutCount = 0;
+    pipelineLayoutCreateInfo.setLayoutCount = 1;
     pipelineLayoutCreateInfo.pSetLayouts = &desc_set;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
     // pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;

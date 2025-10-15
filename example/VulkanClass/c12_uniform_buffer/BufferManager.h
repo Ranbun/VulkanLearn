@@ -2,21 +2,15 @@
 #define VULKANLEARN_BUFFERMANAGER_H
 
 #include "VulkanApplication.h"
-
 #include <vulkan/vulkan.h>
+#include "Vertex.h"
 
 namespace VKL
 {
-    struct Vertex
-    {
-        float x, y, z;/// position
-        float r, g, b;/// color
-    };
-
     class BufferManager
     {
     public:
-        BufferManager(VulkanApplication *app);
+        explicit BufferManager(VulkanApplication *app);
         ~BufferManager();
 
         bool prepare(const std::string &vert_file, const std::string &frag_file, VkDescriptorSetLayout desc_set) const;
@@ -34,7 +28,6 @@ namespace VKL
         std::map<std::string, VkBuffer> buffer_maps;
         std::map<std::string, VkDeviceMemory> buffer_memory_map;
         VulkanApplication * application;
-
     };
 } // VKL
 

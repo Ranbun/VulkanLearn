@@ -1,50 +1,80 @@
+#include "BufferManager.h"
+#include "Matrix.hpp"
+#include "VulkanApplication.h"
+
 #include <iostream>
 #include <vector>
-#include "Buffer.h"
-#include "BufferManager.h"
-
-#include "VulkanApplication.h"
+#include <cstring>
 
 int main(int argc, char **args)
 {
     int width = 1024;
     int height = 768;
-
     VulkanApplication app("c12_uniform_buffer", 1024, 768);
-
     if (!app.getInitialized())
     {
         std::cout << "Failed top initialized VulkanApplication!" << std::endl;
         return 1;
     }
 
-    /// 输入顶点的绑定信息
-    VkVertexInputBindingDescription binding{
-        0, sizeof(VKL::Vertex), VK_VERTEX_INPUT_RATE_VERTEX };
-
-    /// 输入信息的属性信息
-    std::vector<VkVertexInputAttributeDescription> attr_attr_list;
-    attr_attr_list.emplace_back(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);
-    attr_attr_list.emplace_back(1, 0, VK_FORMAT_R32G32B32_SFLOAT,sizeof(float) * 3);
-
-    /// 固定功能阶段
-    /// 1. 顶点输入
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.pVertexBindingDescriptions = &binding;
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attr_attr_list.size());
-    vertexInputInfo.pVertexAttributeDescriptions = attr_attr_list.data();
-
-    /// 输入装配
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
-
-    if(!app.setUpGraphicsPipeline("./shaders/sample_vert.spv", "./shaders/sample_frag.spv", vertexInputInfo, inputAssembly, nullptr))
+    // create uniform description layout
+    VkDescriptorSetLayoutBinding descriptor_set_layout_binding
     {
-        throw std::runtime_error("Create graphics pipeline error!");
+        0, ///binding point
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        1,  ///  可以是多个 -- 看shader里面资源的个数 如果资源是个数组 则是数组的大小
+        VK_SHADER_STAGE_VERTEX_BIT,   /// 哪个阶段可用
+        nullptr
+    };
+
+    VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info
+    {
+        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        nullptr, 0,
+        1, &descriptor_set_layout_binding
+    };
+
+    VkDescriptorSetLayout descriptor_set_layout = nullptr;
+    if (auto res = vkCreateDescriptorSetLayout(app.getLogicDevice(), &descriptor_set_layout_create_info, nullptr, &descriptor_set_layout);
+        res != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed: Create VkDescriptorSetLayout");
+    }
+
+    VkDescriptorPoolSize pool_size{
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1
+    };
+
+    VkDescriptorPoolCreateInfo descriptor_pool_create_info{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        nullptr, 0,
+        1, 1, &pool_size
+    };
+
+    VkDescriptorPool descriptor_pool = nullptr;
+    if (auto res= vkCreateDescriptorPool(app.getLogicDevice(), &descriptor_pool_create_info, nullptr, &descriptor_pool);
+        res != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed: Create DescriptorPool");
+    }
+
+    /// create uniform descriptor set
+    VkDescriptorSetAllocateInfo descriptor_set_allocate_info{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        nullptr, descriptor_pool, 1, &descriptor_set_layout
+    };
+
+    VkDescriptorSet descriptor_set  = nullptr;
+    if (auto res = vkAllocateDescriptorSets(app.getLogicDevice(), &descriptor_set_allocate_info, &descriptor_set);
+        res != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed: Allocate DescriptorSets");
+    }
+
+    VKL::BufferManager manager(&app);
+    if (!manager.prepare("./shaders/sample_vert.spv", "./shaders/sample_frag.spv", descriptor_set_layout))
+    {
+        throw std::runtime_error("Failed to Create pipeline");
     }
 
     /// create data
@@ -63,8 +93,57 @@ int main(int argc, char **args)
     indices.emplace_back(3);
 
     /// 创建顶点缓存
-    auto vk_vertex_buffer = VKL::BufferTool::createVertexBufferNew(app, vertices);
-    auto vk_index_buffer = VKL::BufferTool::createIndexBuffer(app, indices);
+    auto vk_vertex_buffer = manager.CreateVertexBuffer("test_vertex_buffer",vertices);
+    auto vk_index_buffer = manager.CreateIndexBuffer("test_index_buffer", indices);
+
+    // create uniform buffer object
+    struct UniformBufferObject
+    {
+        VKL::Matrix model_view;
+        VKL::Matrix project;
+    };
+
+    UniformBufferObject ubo;
+    ubo.model_view.makeIdentify();
+    ubo.model_view.makeRotate(30.0f, 0.0,0.0, 1.0);
+    ubo.project.makeIdentify();
+    ubo.project.makeOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
+
+    auto ubo_data_size = sizeof(UniformBufferObject);
+    VkBuffer ubo_buffer = nullptr;
+    VkDeviceMemory ubo_buffer_memory = nullptr;
+    if (!manager.CreateBuffer(ubo_buffer, ubo_data_size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT))
+    {
+        throw std::runtime_error("Failed to Create Uniform buffer object");
+    }
+
+    VkMemoryRequirements ubo_buffer_requirements;
+    vkGetBufferMemoryRequirements(app.getLogicDevice(), ubo_buffer, &ubo_buffer_requirements);
+    manager.CreateBufferMemory(ubo_buffer_memory, ubo_buffer_requirements, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    void * ubo_data = nullptr;
+    vkBindBufferMemory(app.getLogicDevice(), ubo_buffer, ubo_buffer_memory, 0);
+    vkMapMemory(app.getLogicDevice(), ubo_buffer_memory, 0, ubo_data_size, 0, &ubo_data);
+    memcpy(ubo_data, &ubo, ubo_data_size);
+    vkUnmapMemory(app.getLogicDevice(), ubo_buffer_memory);
+
+    /// update 描述符集的数据
+    VkDescriptorBufferInfo descriptor_buffer_info
+    {
+        ubo_buffer, 0, ubo_data_size
+    };
+
+    VkWriteDescriptorSet write_descriptor_set{
+        VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        nullptr,
+        descriptor_set, 0,
+        0,1,
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        nullptr, &descriptor_buffer_info, nullptr
+    };
+
+    vkUpdateDescriptorSets(app.getLogicDevice(), 1, &write_descriptor_set, 0, nullptr);
+
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
@@ -129,6 +208,9 @@ int main(int argc, char **args)
                 vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
                 vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
+                /// bind uniform
+                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, app.GetPipelineLayout(), 0, 1, &descriptor_set, 0, nullptr);
+
                 /// bind buffer
                 VkBuffer vertex_buffers[] = {vk_vertex_buffer};
                 VkDeviceSize offsets[] = {0};
@@ -151,6 +233,10 @@ int main(int argc, char **args)
     }
 
     vkWaitForFences(app.getLogicDevice(), 1, &waitFence, VK_TRUE, UINT64_MAX);
-
+    vkDeviceWaitIdle(app.getLogicDevice());
+    vkDestroyDescriptorPool(app.getLogicDevice(), descriptor_pool, nullptr);
+    vkDestroyDescriptorSetLayout(app.getLogicDevice(), descriptor_set_layout, nullptr);
+    vkDestroyBuffer(app.getLogicDevice(), ubo_buffer, nullptr);
+    vkFreeMemory(app.getLogicDevice(), ubo_buffer_memory, nullptr);
     return 0;
 }
