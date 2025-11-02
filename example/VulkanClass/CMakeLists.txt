@@ -19,4 +19,5 @@ ADD_SUBDIRECTORY(c10_vertices)
 ADD_SUBDIRECTORY(c11_indices)
 ADD_SUBDIRECTORY(c12_uniform_buffer)
 add_subdirectory(c13_texture)
+add_subdirectory(c14_animation)
 
