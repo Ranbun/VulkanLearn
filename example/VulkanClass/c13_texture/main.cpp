@@ -11,7 +11,7 @@ int main(int argc, char **args)
     int width = 1024;
     int height = 768;
 
-    VulkanApplication app("c14 animation", width, height);
+    VulkanApplication app("c13 texture", width, height);
     if (!app.getInitialized())
     {
         std::cout << "Failed top initialized VulkanApplication!" << std::endl;
