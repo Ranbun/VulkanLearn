@@ -18,4 +18,5 @@ ADD_SUBDIRECTORY(c09_renderPipeline)
 ADD_SUBDIRECTORY(c10_vertices)
 ADD_SUBDIRECTORY(c11_indices)
 ADD_SUBDIRECTORY(c12_uniform_buffer)
+add_subdirectory(c13_texture)
 
