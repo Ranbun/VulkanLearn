@@ -1,0 +1,31 @@
+{
+    "configurations": [
+        {
+            "name": "c13 texture",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/VulkanClass/c13_texture/c13_texture",
+            "cwd": "${workspaceRoot}/out/build/example/VulkanClass/c13_texture/"
+        },
+        {
+            "name": "c14 animation",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/VulkanClass/c14_animation/c14_animation",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/VulkanClass/c14_animation/",
+            "stopAtEntry": false,
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

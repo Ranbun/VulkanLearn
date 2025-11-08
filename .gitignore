@@ -45,6 +45,3 @@ cmake-build-debug-clang
 
 docs/_book/
 docs/_book
-
-.vscode/launch.json
-.vscode/settings.json

@@ -1,0 +1,27 @@
+{
+    "files.eol": "\n",
+    "cSpell.words": [
+        "buildsystems",
+        "glfw",
+        "glslang",
+        "ranlh",
+        "vcpkg"
+    ],
+    "editor.formatOnSave": true,
+    "C_cpp.codeAnalysis.runAutomatically": false,
+    "editor.codeLens": false,
+    "editor.inlayHints.enabled": "off",
+    "clangd.arguments": [
+        "--log=error",
+        "--header-insertion=never",
+        "--clang-tidy=false",
+        "--compile-commands-dir=out/build"
+    ],
+    "clangd.fallbackFlags": [
+        "-std=c++20"
+    ],
+    "clangd.onConfigChanged": "restart",
+    "[cpp]": {
+        "editor.links": false,
+    },
+}
