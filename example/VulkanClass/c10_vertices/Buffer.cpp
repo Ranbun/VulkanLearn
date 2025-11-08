@@ -1,5 +1,6 @@
 #include "Buffer.h"
 #include "VulkanApplication.h"
+#include <cstring>
 
 namespace VKL
 {

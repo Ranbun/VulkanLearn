@@ -1,6 +1,7 @@
 #include "BufferManager.h"
 
 #include <cstring>
+#include <filesystem>
 #include <ranges>
 #include <stb_image.h>
 #include <utility>
@@ -308,6 +309,7 @@ namespace VKL
         int w = 0, h = 0, ch = 4;
         /// STBI_rgb_alpha 使用这个flag, 强制把图像加载成RGBA格式
         stbi_uc *pixels = stbi_load(file.c_str(), &w, &h, &ch, STBI_rgb_alpha);
+        std::cout << std::filesystem::current_path() << std::endl;
         if (pixels == nullptr)
         {
             throw std::runtime_error("Failed to load image file!");

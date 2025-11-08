@@ -2,6 +2,7 @@
 #include "VulkanApplication.h"
 
 #include <cstring>
+#include <filesystem>
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 #include <vector>
@@ -67,7 +68,7 @@ int main(int argc, char **args)
     manager.unmapBufferMemory("ubo_1");
 
     /// create texture object
-    VkImage texture_image = manager.createTextureImage("mouten", "./sources/mouten.jpg");
+    VkImage texture_image = manager.createTextureImage("mountain", "./sources/mountain.JPG");
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
