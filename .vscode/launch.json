@@ -26,6 +26,70 @@
                     "ignoreFailures": true
                 }
             ]
-        }
+        },
+        {
+            "name": "triangle",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/triangle/triangle",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/triangle/",
+            "stopAtEntry": false,
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "0-vk_env",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/0_vk_env/0_vk_env",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/0_vk_env/",
+            "stopAtEntry": false,
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "0-vk_env_lldb",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/0_vk_env/0_vk_env",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/0_vk_env/",
+        },
+        {
+            "name": "base",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/base/base",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/base/",
+        },
+        {
+            "name": "VkInstance",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/VkInstance/VkInstance",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/VkInstance/",
+        },
     ]
 }
