@@ -1,9 +1,11 @@
 #include "BufferManager.h"
+#include <stb_image.h>
 
 #include <cstring>
+#include <map>
 #include <ranges>
-#include <stb_image.h>
 #include <utility>
+
 
 namespace VKL
 {
@@ -19,7 +21,8 @@ namespace VKL
                                                                   .pImmutableSamplers = nullptr};
 
         constexpr VkDescriptorSetLayoutBinding sampler_layout_binding{.binding = 1,
-                                                                      .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                      .descriptorType =
+                                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                       .descriptorCount = 1,
                                                                       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
                                                                       .pImmutableSamplers = nullptr};
@@ -111,6 +114,13 @@ namespace VKL
         {
             vkDestroyBuffer(_application->getLogicDevice(), buffer, nullptr);
         }
+
+        // _image_map
+        for (auto &image: _image_map | std::views::values)
+        {
+            vkDestroyImage(_application->getLogicDevice(), image, nullptr);
+        }
+
 
         for (const auto &buffer_memory: _buffer_memory_map | std::views::values)
         {
@@ -324,7 +334,7 @@ namespace VKL
         VkBuffer image_buffer = nullptr;
         VkDeviceMemory image_buffer_memory = nullptr;
         if (!CreateBuffer(image_buffer, image_size,
-                          VK_BUFFER_USAGE_TRANSFER_SRC_BIT)) /// 创建这个bufer,作为传输源使用
+                          VK_BUFFER_USAGE_TRANSFER_SRC_BIT)) /// 创建这个buffer,作为传输源使用
         {
             return VK_NULL_HANDLE;
         }

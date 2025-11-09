@@ -112,24 +112,27 @@ int main(int argc, char **args)
     // manager.unmapBufferMemory("ubo_1");
 
     /// create texture object
-    VkImage texture_image = manager.createTextureImage("mouten", "./sources/mouten.jpg");
+    VkImage texture_image = manager.createTextureImage("mountain", "./sources/mountain.JPG");
     [[maybe_unused]] VkImageView texture_image_view = createTextureImageView(app, texture_image);
     /// 为了使用imageView, 需要创建一个采样器
     [[maybe_unused]] auto texture_sampler = createTextureSampler(app);
 
-    VkDescriptorImageInfo image_info{
-            .sampler = texture_sampler,
-            .imageView = texture_image_view,
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    VkDescriptorImageInfo image_info{.sampler = texture_sampler,
+                                     .imageView = texture_image_view,
+                                     .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
 
-    VkWriteDescriptorSet write_descriptor_set{
-            VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, manager.getDescriptorSet(), 1, 0, 1,
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            &image_info,
-            nullptr,
-            nullptr};
+    VkWriteDescriptorSet write_descriptor_set{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                                              nullptr,
+                                              manager.getDescriptorSet(),
+                                              1,
+                                              0,
+                                              1,
+                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                              &image_info,
+                                              nullptr,
+                                              nullptr};
 
-            vkUpdateDescriptorSets(app.getLogicDevice(), 1, &write_descriptor_set, 0, nullptr);
+    vkUpdateDescriptorSets(app.getLogicDevice(), 1, &write_descriptor_set, 0, nullptr);
 
     auto waitFence = app.getOrCreateFence("WaitFence");
     auto waitNextImage = app.getOrCreateSemaphore("WaitNextImage");
@@ -178,7 +181,7 @@ int main(int argc, char **args)
         auto ubo_data = manager.mapBufferMemory("ubo_1", sizeof(UniformBufferObject));
         memcpy(ubo_data, &ubo, sizeof(UniformBufferObject));
 
-        angleZ += 0.1f;
+        angleZ += 0.5f;
 
         /// 每一帧 往buffer添加指令
         VkCommandBufferBeginInfo beginInfo{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, nullptr,

@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
 PROJECT(VulkanClass)
-
 FIND_PACKAGE(Vulkan REQUIRED)
 
 # ADD_SUBDIRECTORY(c06_renderloop_new)
