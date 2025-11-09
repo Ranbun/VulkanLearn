@@ -1,7 +1,7 @@
 SET(target_ triangle)
 
-SET(includeDIR ${CMAKE_SOURCE_DIR}/include)
-FILE(GLOB sourcefile ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
+FILE(GLOB sourcefile ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+                     ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 find_package(glm CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
@@ -12,7 +12,6 @@ ADD_EXECUTABLE(${target_}
 
 target_include_directories(${target_}
     PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/vendor/glfw/include
 )
 
 TARGET_LINK_DIRECTORIES(${target_}

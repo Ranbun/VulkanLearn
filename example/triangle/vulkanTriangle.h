@@ -1,10 +1,8 @@
-#ifndef  VULKANTRIANGLE_H_
-#define  VULKANTRIANGLE_H_
+#ifndef VULKANTRIANGLE_H_
+#define VULKANTRIANGLE_H_
 
 #include <vector>
-// #include <vulkan/vulkan.h>
-#include <vulkan/vulkan.hpp>
-
+#include <vulkan/vulkan_core.h>
 
 /**
  * @brief 窗口的 size
@@ -19,7 +17,9 @@ constexpr int HEIGHT = 800;
 const std::vector validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-typedef VkResult(VKAPI_PTR *PFN_vkGetPhysicalDeviceDisplayPropertiesKHR)(VkPhysicalDevice physicalDevice, uint32_t *pPropertyCount, VkDisplayPropertiesKHR *pProperties);
+typedef VkResult(VKAPI_PTR *PFN_vkGetPhysicalDeviceDisplayPropertiesKHR)(VkPhysicalDevice physicalDevice,
+                                                                         uint32_t *pPropertyCount,
+                                                                         VkDisplayPropertiesKHR *pProperties);
 
 /// use validation layers
 #ifdef NODEBUG
@@ -51,7 +51,8 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 /**
  * @brief VulKan渲染三角形基类
  */
-class HelloTriangleApplication {
+class HelloTriangleApplication
+{
 public:
     HelloTriangleApplication();
     virtual ~HelloTriangleApplication() = default;
@@ -105,8 +106,8 @@ private:
     static auto checkValidationLayerSupport() -> bool;
 
     /**
-    * @brief message callback
-    */
+     * @brief message callback
+     */
     [[nodiscard]] auto getRequireExtensions() const -> std::vector<const char *>;
 
     /**
@@ -118,8 +119,7 @@ private:
      * @return 结果
      * @note 由于是扩展函数 所以此函数并不会被加载，需要手动加载
      */
-    auto CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                      const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+    auto CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                       const VkAllocationCallbacks *pAllocator,
                                       VkDebugUtilsMessengerEXT *pCallback) const -> VkResult;
 
@@ -129,8 +129,7 @@ private:
      * @param callback 被创建的调试对象
      * @param pAllocator 分配器
      */
-    auto DestroyDebugUtilsMessengerEXT(VkInstance instance,
-                                       VkDebugUtilsMessengerEXT callback,
+    auto DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback,
                                        const VkAllocationCallbacks *pAllocator) const -> void;
 
     /**
@@ -371,17 +370,17 @@ private:
 
     /**
      * @brief 信号量
-    */
+     */
     std::vector<VkSemaphore> m_renderFinishedSemaphore;
 
     /**
      * @brief 栅栏 同步CPU & GPU
-    */
+     */
     std::vector<VkFence> m_inFlightFence;
 
     /**
      * @brief 当前帧ID
-    */
+     */
     size_t m_currentFrame = 0;
 
     /// check
