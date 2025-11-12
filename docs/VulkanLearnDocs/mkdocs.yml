@@ -7,7 +7,7 @@ nav:
     - 首页: index.md
     - Vulkan 入门:
         - Vulkan简介: 0.Vulkan/vulkan_intro.md
-        - 初始化: 1.Instance/init.md
+        - 初始化: 1.Instance/Init.md
         - 渲染循环: render_loop.md
     - 调试与性能:
         - Validation Layers: validation.md

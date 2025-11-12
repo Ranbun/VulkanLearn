@@ -1,4 +1,0 @@
-# VkInstance
-
-[VkInstance](./VKInstance.md)
-
