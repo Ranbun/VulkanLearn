@@ -1,6 +1,7 @@
 PROJECT(VulkanTutorial)
 FIND_PACKAGE(Vulkan REQUIRED)
 
-add_subdirectory(0_vk_env)
-add_subdirectory(base)
-add_subdirectory(VkInstance)
+add_subdirectory(00_vk_env)
+add_subdirectory(00_base)
+add_subdirectory(01_VkInstance)
+add_subdirectory(02_Validation_layers)

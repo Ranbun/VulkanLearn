@@ -47,7 +47,7 @@ void Application::cleanup()
     glfwTerminate();
 }
 
-void Application::RequirementsCheck(std::vector<const char *> &requiredExtensions)
+void Application::checkRequirementsExtensionSupport(std::vector<const char *> &requiredExtensions)
 {
     /// Vulkan Instance Extensions
     uint32_t extensionCount = 0;
@@ -103,7 +103,7 @@ void Application::createInstance()
     std::vector<const char *> glfwRequirementExtensions{glfwExtensions, glfwExtensions + glfwExtensionCount};
 
     /// 检测glfw 请求的扩展是否支持
-    RequirementsCheck(glfwRequirementExtensions);
+    checkRequirementsExtensionSupport(glfwRequirementExtensions);
 
     createInfo.enabledExtensionCount = glfwRequirementExtensions.size();
     createInfo.ppEnabledExtensionNames = glfwRequirementExtensions.data();

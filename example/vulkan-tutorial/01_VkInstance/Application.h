@@ -43,7 +43,7 @@ private:
      * @brief Check system requirements
      *
      */
-    void RequirementsCheck(std::vector<const char *> &requiredExtensions);
+    void checkRequirementsExtensionSupport(std::vector<const char *> &requiredExtensions);
 
     void createInstance();
 
