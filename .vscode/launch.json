@@ -87,9 +87,17 @@
             "name": "VkInstance",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/VkInstance/VkInstance",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/01_VkInstance/VkInstance",
             "args": [],
-            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/VkInstance/",
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/01_VkInstance/",
+        },
+        {
+            "name": "Validation_layers",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/02_Validation_layers/Validation_layers",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/02_Validation_layers/",
         },
     ]
 }
