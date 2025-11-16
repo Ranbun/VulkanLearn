@@ -4,3 +4,5 @@
 
 [Vulkan1.3]: https://registry.khronos.org/vulkan/specs/1.3-khr-extensions/html/
 
+- [Execution Model](./ExecutionModel/ExecutionModel.md)
+- [Object Model](./ObjectModel/ObjectModel.md)

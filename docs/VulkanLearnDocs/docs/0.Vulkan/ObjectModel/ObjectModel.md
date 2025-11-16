@@ -1,0 +1,65 @@
+# 3.3 Object Model
+&ensp;&ensp;在`Vulkan`中，设备、队列和其他实体都由`Vulkan`对象来表示。在API级别上，所有对象都由句柄（`handles`）引用。句柄有两类，即可分派句柄（`dispatchable`）和不可分派句柄（`non-dispatchable`）。可分派句柄类型是指向不透明类型的指针。这些指针可用于层拦截API命令的一部分，因此每个API命令的第一个参数都是可分派类型。每个可分派类型的对象在其生命周期内必须具有唯一的句柄值。<br>
+例如`VkInstance、VkDevice、VkQueue`等。这些句柄用于执行操作、创建其他对象以及管理资源。可分派句柄是对底层对象的引用，它们可以用于调用相关的`Vulkan`函数来执行操作。例如，用于创建对象的函数通常使用可分派句柄。
+
+&ensp;&ensp;不可分派句柄类型是一个64位整数类型，其含义取决于实现。如果对于`VkDevice`启用了`privateData`特性，那么在该设备上创建的每个不可分派类型的对象在其生命周期内必须具有在该设备上创建的所有对象中唯一的句柄值。否则，不可分派句柄可能会直接编码对象信息而不是充当底层对象的引用，因此可能没有唯一的句柄值。如果句柄值不是唯一的，则销毁其中一个句柄不得导致其他类型的相同句柄变为无效，也不得导致相同类型的句柄变为无效，如果该句柄值已经创建的次数多于它被销毁的次数。<br>
+
+不可分派句柄用于表示`Vulkan`的一些对象，例如`VkBuffer、VkImage、VkSampler`等。这些句柄用于引用底层的资源，但不能直接用于调用函数。相反，它们在函数中用作参数。不可分派句柄主要用于管理内存和资源的生命周期。
+
+&ensp;从VkDevice创建或分配的所有对象（即第一个参数为`VkDevice`）都是为这个设备所私有的，不能在其他设备上使用.
+
+
+## 3.3.1. Object Lifetime
+
+&ensp;&ensp;`Vulkan`中的对象通过`vkCreate`和`vkAllocate`命令进行创建或分配。一旦对象被创建或分配，其“结构”被视为不可更改，尽管某些对象类型的内容仍然可以自由更改。对象通过`vkDestroy`和`vkFree`命令进行销毁或释放。<br>
+
+&ensp;&ensp;被分配的对象（而不是创建的对象）从现有的池对象或内存堆中获取资源，在释放时将资源返回给该池或堆。虽然对象的创建和销毁通常在运行时预期是低频发生的事件，但分配和释放对象可能会频繁发生。池对象有助于提高分配和释放操作的性能。<br>
+
+&ensp;&ensp;`Vulkan`对象的生命周期由应用程序负责跟踪，在使用中的对象不能被销毁。<br>
+
+&ensp;&ensp;应用程序拥有的内存所有权会在传递给任何Vulkan命令时被命令立即获取。这些内存的所有权必须在命令执行的持续时间结束时返回给应用程序，以便应用程序可以在所有获取该内存的命令返回后立即更改或释放这些内存。<br>
+
+&ensp;&ensp;以下对象类型在传递给`Vulkan`命令后并且不再被用于创建其他对象时被消耗。在它们被传递给任何API命令期间，它们不能被销毁：
+
+- `VkShaderModule`
+- `VkPipelineCache`
+
+&ensp;&ensp;当将`VkRenderPass`或`VkPipelineLayout`对象作为参数传递给另一个对象创建命令时，在该命令的执行期间，该对象不再被访问。在命令缓冲中使用的`VkRenderPass`遵循下面所述的规则。<br>
+
+&ensp;&ensp;`VkDescriptorSetLayout`对象可能被操作使用该布局分配的描述符集的命令所访问，而在`VkDescriptorSetLayout`被销毁后，这些描述符集不得通过`vkUpdateDescriptorSets`进行更新。否则，将`VkDescriptorSetLayout`对象作为参数传递给创建另一个对象的命令后，在命令的执行期间，该对象不再被进一步访问。<br>
+
+&ensp;&ensp;应用程序在设备（例如通过命令缓冲执行）对任何其他类型的`Vulkan`对象的所有使用都完成之前，不能销毁该对象。<br>
+
+&ensp;&ensp;在任何命令缓冲处于挂起状态时，以下`Vulkan`对象不能被销毁：<br>
+
+- `VkEvent`
+- `VkQueryPool`
+- `VkBuffer`
+- `VkBufferView`
+- `VkImage`
+- `VkImageView`
+- `VkPipeline`
+- `VkSampler`
+- `VkSamplerYcbcrConversion`
+- `VkDescriptorPool`
+- `VkFramebuffer`
+- `VkRenderPass`
+- `VkCommandBuffer`
+- `VkCommandPool`
+- `VkDeviceMemory`
+- `VkDescriptorSet`
+
+
+<br>
+
+<font size=10 color=red>loading......</font>
+
+
+
+
+
+
+
+
+
+
