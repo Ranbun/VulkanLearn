@@ -100,12 +100,30 @@
             "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/02_Validation_layers/",
         },
         {
-            "name": "03_physicalDevice",
+            "name": "physicalDevice",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/03_physicalDevice/physicalDevice",
             "args": [],
             "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/03_physicalDevice/",
+        },
+        {
+            "name": "logicDevice",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/04_logicDevice/logicDevice",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/04_logicDevice/",
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "windowSurface",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/05_windowSurface/windowSurface",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/05_windowSurface/",
+            "preLaunchTask": "build"
         },
     ]
 }

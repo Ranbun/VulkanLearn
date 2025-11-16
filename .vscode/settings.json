@@ -4,6 +4,9 @@
         "buildsystems",
         "glfw",
         "glslang",
+        "KHRONOS",
+        "LUNARG",
+        "Nsight",
         "ranlh",
         "vcpkg"
     ],
