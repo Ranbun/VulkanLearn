@@ -1,9 +1,7 @@
-#ifndef FAACF494_8D3B_40FA_8454_DA5157F68393
-#define FAACF494_8D3B_40FA_8454_DA5157F68393
-#include <functional>
 #ifndef VULKANCONTEXT_H
 #define VULKANCONTEXT_H
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -94,7 +92,3 @@ private:
 };
 
 #endif
-
-
-#endif /* FAACF494_8D3B_40FA_8454_DA5157F68393 */
-  

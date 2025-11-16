@@ -1,5 +1,3 @@
-#ifndef B1CB949F_58D9_4CA0_A9E6_E7CBE02669EC
-#define B1CB949F_58D9_4CA0_A9E6_E7CBE02669EC
 #ifndef WINDOW_PRO_H_
 #define WINDOW_PRO_H_
 
@@ -19,6 +17,3 @@ static WindowPro WP = {
 };
 
 #endif
-
-
-#endif /* B1CB949F_58D9_4CA0_A9E6_E7CBE02669EC */
