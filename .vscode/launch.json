@@ -99,5 +99,13 @@
             "args": [],
             "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/02_Validation_layers/",
         },
+        {
+            "name": "03_physicalDevice",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/03_physicalDevice/physicalDevice",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/03_physicalDevice/",
+        },
     ]
 }
