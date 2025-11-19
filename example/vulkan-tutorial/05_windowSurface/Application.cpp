@@ -8,24 +8,12 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 
-Application::Application()
-{
-    try
-    {
-        init();
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Application initialization failed: " << e.what() << std::endl;
-        cleanup();
-        throw;
-    }
-}
+Application::Application() {}
 Application::~Application() { cleanup(); }
 
 void Application::init()
 {
-    m_window = std::make_unique<Window>(WP.width, WP.height, WP.title);
+    m_window = std::make_unique<AppWindow>(WP.width, WP.height, WP.title);
     const auto &windowRequirementExtensions = m_window->getRequirementVulkanExtensions();
     m_vkContext = std::make_unique<VulkanContext>(windowRequirementExtensions);
 
@@ -49,3 +37,22 @@ void Application::cleanup()
 
     std::cout << "Application cleanup complete." << std::endl;
 }
+Application &Application::Instance()
+{
+    static Application app;
+    return app;
+}
+AppWindow *Application::RenderWindow() { return m_window.get(); }
+void Application::Init()
+{
+    try
+    {
+        init();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Application initialization failed: " << e.what() << std::endl;
+        cleanup();
+        throw;
+    }
+};

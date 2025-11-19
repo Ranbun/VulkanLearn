@@ -4,11 +4,13 @@
         "buildsystems",
         "glfw",
         "glslang",
+        "hinstance",
         "KHRONOS",
         "LUNARG",
         "Nsight",
         "ranlh",
-        "vcpkg"
+        "vcpkg",
+        "xlib"
     ],
     "editor.formatOnSave": true,
     "C_cpp.codeAnalysis.runAutomatically": false,

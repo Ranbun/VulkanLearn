@@ -5,6 +5,57 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "Application.h"
+
+#define USE_LINUX 0
+#define USE_WINDOW 0
+#define USE_GLFW 1
+
+#define ENABLE_X11 0
+#define ENABLE_XCB 0
+
+#ifdef _WIN32
+#if USE_WINDOW
+#define WIN32_LEAN_AND_MEAN
+#include <vulkan/vulkan_win32.h>
+#include <windows.h>
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#endif
+#endif
+
+
+#ifdef __linux__
+
+#if USE_LINUX
+
+#if ENABLE_X11
+#define GLFW_EXPOSE_NATIVE_X11
+#include <GLFW/glfw3native.h>
+#include <X11/Xlib.h>
+#include <vulkan/vulkan_xlib.h>
+#endif // ENABLE_X11
+
+#if ENABLE_XCB
+
+#define GLFW_EXPOSE_NATIVE_X11
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <X11/Xlib-xcb.h>
+#include <X11/Xlib.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_xcb.h>
+#include <xcb/xcb.h>
+#endif // ENABLE_XCB
+
+#endif
+
+#endif
+
+
 VulkanContext::VulkanContext(const std::vector<const char *> &requiredExtensions) : m_instance(VK_NULL_HANDLE)
 {
     init(requiredExtensions);
@@ -39,10 +90,9 @@ void VulkanContext::init(const std::vector<const char *> &requiredExtensions)
     {
         setupDebugMessenger();
     }
-
+    createSurface();
     pickPhysicalDevice();
     createLogicDevice();
-    createSurface();
 };
 
 void VulkanContext::createInstance(const std::vector<const char *> &requiredExtensions)
@@ -274,4 +324,78 @@ void VulkanContext::createLogicDevice()
 
     /// 之前的Vulkan分为实例扩展和设备扩展，如果在版本更老Vulkan版本开发，请在创建Device的时候指定验证层和消息传递的扩展
 };
-void VulkanContext::createSurface() {}
+void VulkanContext::createSurface()
+{
+    auto &app = Application::Instance();
+    auto *window = static_cast<GLFWwindow *>(app.RenderWindow()->getNativeWindow());
+
+#if USE_WINDOW
+    VkWin32SurfaceCreateInfoKHR win32SurfaceCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+            .pNext = nullptr,
+            .flags = 0,
+            .hinstance = GetModuleHandle(nullptr),
+            .hwnd = glfwGetWin32Window(window),
+    };
+
+    if (vkCreateWin32SurfaceKHR(m_instance, &win32SurfaceCreateInfo, nullptr, &m_surface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create window surface!");
+    }
+
+#elif USE_LINUX
+
+#if ENABLE_X11
+    /// default use xlib create window
+    Display *xlib_display = glfwGetX11Display();
+    Window xlib_window = glfwGetX11Window(window);
+    VkXlibSurfaceCreateInfoKHR create_info = {.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
+                                              .pNext = nullptr,
+                                              .flags = 0,
+                                              .dpy = xlib_display,
+                                              .window = xlib_window};
+
+    if (auto res = vkCreateXlibSurfaceKHR(m_instance, &create_info, nullptr, &m_surface); res != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create xlib window surface!");
+    }
+#endif // ENABLE_X11
+
+#if ENABLE_XCB
+
+    Display *x_display = glfwGetX11Display();
+    xcb_connection_t *xcb_connection = XGetXCBConnection(x_display);
+    if (!xcb_connection || xcb_connection_has_error(xcb_connection))
+    {
+        throw std::runtime_error("Failed to get XCB connection from X11 display");
+    }
+    xcb_window_t xcb_window = static_cast<xcb_window_t>(glfwGetX11Window(window));
+
+    VkXcbSurfaceCreateInfoKHR create_info = {.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,
+                                             .pNext = nullptr,
+                                             .flags = 0,
+                                             .connection = xcb_connection,
+                                             .window = xcb_window};
+
+    if (auto res = vkCreateXcbSurfaceKHR(m_instance, &create_info, nullptr, &m_surface); res != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create xcb window surface!");
+    }
+
+#endif // ENABLE_XCB
+
+
+#elif USE_GLFW
+
+    if (auto res = glfwCreateWindowSurface(m_instance, window, nullptr, &m_surface); res != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create window surface!");
+    }
+
+#endif
+
+    if (m_surface == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("must create VkSurface!");
+    }
+}

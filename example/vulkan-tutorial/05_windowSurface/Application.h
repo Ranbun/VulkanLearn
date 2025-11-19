@@ -10,15 +10,21 @@
 class Application
 {
 public:
-    Application();
-    ~Application();
+    static Application &Instance();
 
     /**
      * @brief Run the application main loop
      */
     void run();
 
+    void Init();
+
+    AppWindow *RenderWindow();
+
 private:
+    Application();
+    ~Application();
+
     void init();
     /**
      * @brief Main application loop
@@ -31,7 +37,7 @@ private:
     void cleanup();
 
 private:
-    std::unique_ptr<Window> m_window;
+    std::unique_ptr<AppWindow> m_window;
     std::unique_ptr<VulkanContext> m_vkContext;
 };
 

@@ -1,17 +1,20 @@
 #include "Window.h"
 #include <stdexcept>
 
-Window::Window(int width, int height, std::string &title) : m_window(nullptr) { initWindow(width, height, title); };
+AppWindow::AppWindow(int width, int height, std::string &title) : m_window(nullptr)
+{
+    initWindow(width, height, title);
+};
 
-Window::~Window() { cleanup(); };
+AppWindow::~AppWindow() { cleanup(); };
 
-void *Window::getNativeWindow() { return reinterpret_cast<void *>(m_window); };
+void *AppWindow::getNativeWindow() { return reinterpret_cast<void *>(m_window); };
 
-bool Window::shouldClose() { return glfwWindowShouldClose(m_window); };
+bool AppWindow::shouldClose() { return glfwWindowShouldClose(m_window); };
 
-void Window::pollEvent() { glfwPollEvents(); }
+void AppWindow::pollEvent() { glfwPollEvents(); }
 
-void Window::initWindow(int width, int height, std::string &title)
+void AppWindow::initWindow(int width, int height, std::string &title)
 {
     if (!glfwInit())
     {
@@ -28,7 +31,7 @@ void Window::initWindow(int width, int height, std::string &title)
     }
 };
 
-void Window::cleanup()
+void AppWindow::cleanup()
 {
     if (m_window)
     {
@@ -37,7 +40,7 @@ void Window::cleanup()
 
     glfwTerminate();
 };
-std::vector<const char *> Window::getRequirementVulkanExtensions()
+std::vector<const char *> AppWindow::getRequirementVulkanExtensions()
 {
     /// 查询 glfw 需要依赖的实例扩展
     uint32_t glfwExtensionCount = 0;
