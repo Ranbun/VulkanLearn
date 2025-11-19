@@ -8,14 +8,14 @@
 
 #include <string>
 
-class Window
+class AppWindow
 {
 public:
-    Window(int width, int height, std::string &title);
-    ~Window();
+    AppWindow(int width, int height, std::string &title);
+    ~AppWindow();
 
-    Window(Window &) = delete;
-    Window &operator=(const Window &) = delete;
+    AppWindow(AppWindow &) = delete;
+    AppWindow &operator=(const AppWindow &) = delete;
 
     bool shouldClose();
     void *getNativeWindow();

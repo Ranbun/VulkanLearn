@@ -83,17 +83,18 @@ private:
 
 private:
     VkInstance m_instance{VK_NULL_HANDLE};
-    std::unique_ptr<VulkanDebugger> m_vulkanDebugger;
+    std::unique_ptr<VulkanDebugger> m_vulkanDebugger{nullptr};
     VkPhysicalDevice m_physicalDevice{VK_NULL_HANDLE};
     VkDevice m_logicDevice{VK_NULL_HANDLE};
-    VkQueue m_graphicsQueue{VK_NULL_HANDLE};
-
     VkSurfaceKHR m_surface{VK_NULL_HANDLE};
+
+    VkQueue m_presentQueue{VK_NULL_HANDLE};
 
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphicsFamily;
-        bool isComplete() { return graphicsFamily.has_value(); }
+        std::optional<uint32_t> presentFamily;
+        bool isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
     };
 
     std::function<QueueFamilyIndices(VkPhysicalDevice &)> findQueueFamiliesFunc;

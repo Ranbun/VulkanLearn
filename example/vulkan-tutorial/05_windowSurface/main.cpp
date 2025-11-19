@@ -8,7 +8,10 @@ int main(int argc, char *argv[])
 {
     WP.title = "physical Device and queue families";
 
-    Application app;
+    auto &app = Application::Instance();
+
+    app.Init();
+
     try
     {
         app.run();

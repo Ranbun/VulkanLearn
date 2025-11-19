@@ -3,7 +3,17 @@
 #include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <set>
 #include <stdexcept>
+
+#include "Application.h"
+
+#define USE_LINUX 0
+#define USE_WINDOW 0
+#define USE_GLFW 1
+
+#define ENABLE_X11 0
+#define ENABLE_XCB 0
 
 VulkanContext::VulkanContext(const std::vector<const char *> &requiredExtensions) : m_instance(VK_NULL_HANDLE)
 {
@@ -39,10 +49,10 @@ void VulkanContext::init(const std::vector<const char *> &requiredExtensions)
     {
         setupDebugMessenger();
     }
+    createSurface();
 
     pickPhysicalDevice();
     createLogicDevice();
-    createSurface();
 };
 
 void VulkanContext::createInstance(const std::vector<const char *> &requiredExtensions)
@@ -161,7 +171,7 @@ void VulkanContext::pickPhysicalDevice()
     std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
     vkEnumeratePhysicalDevices(m_instance, &deviceCount, physicalDevices.data());
 
-    auto findQueueFamilies = [](VkPhysicalDevice &device) -> QueueFamilyIndices
+    auto findQueueFamilies = [&](VkPhysicalDevice &device) -> QueueFamilyIndices
     {
         QueueFamilyIndices indices;
 
@@ -179,12 +189,21 @@ void VulkanContext::pickPhysicalDevice()
         for (auto i = 0; i < queueFamilyCount; i++)
         {
             auto &queueFamily = queueFamilies.at(i);
+            VkBool32 presentSupport = false;
+
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
 
             /// 如果支持图形队列
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
             {
                 indices.graphicsFamily = i;
             }
+
+            if (presentSupport)
+            {
+                indices.presentFamily = i;
+            }
+
             /// others check.....
             if (indices.isComplete())
             {
@@ -232,7 +251,6 @@ void VulkanContext::pickPhysicalDevice()
 
 void VulkanContext::createLogicDevice()
 {
-    auto queueFamily = findQueueFamiliesFunc(m_physicalDevice);
 
     VkDeviceCreateInfo deviceCreateInfo{.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
                                         .pNext = nullptr,
@@ -246,20 +264,27 @@ void VulkanContext::createLogicDevice()
                                         .pEnabledFeatures = nullptr};
 
     /// create queue
-    VkDeviceQueueCreateInfo queueCreateInfo{.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                                            .pNext = nullptr,
-                                            .flags = 0,
-                                            .queueFamilyIndex = queueFamily.graphicsFamily.value(),
-                                            .queueCount = 1,
-                                            .pQueuePriorities = nullptr
+    auto queueFamily = findQueueFamiliesFunc(m_physicalDevice);
 
-    };
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> queueFamilies{queueFamily.graphicsFamily.value(), queueFamily.presentFamily.value()};
 
     float queuePriorities = 1.0f; /// 设置队列的优先级 [0.0f - 1.0f]
-    queueCreateInfo.pQueuePriorities = &queuePriorities;
+    for (auto queueFamily: queueFamilies)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                                                .pNext = nullptr,
+                                                .flags = 0,
+                                                .queueFamilyIndex = queueFamily,
+                                                .queueCount = 1,
+                                                .pQueuePriorities = &queuePriorities};
+        queueCreateInfos.emplace_back(queueCreateInfo);
+    }
 
-    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    deviceCreateInfo.queueCreateInfoCount = 1;
+
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.queueCreateInfoCount = queueCreateInfos.size();
+
 
     /// 指定设备启用的特性
     VkPhysicalDeviceFeatures deviceFeatures{};
@@ -270,8 +295,22 @@ void VulkanContext::createLogicDevice()
         throw std::runtime_error("Failed to create logic device.");
     }
 
-    vkGetDeviceQueue(m_logicDevice, queueFamily.graphicsFamily.value(), 0, &m_graphicsQueue);
+    vkGetDeviceQueue(m_logicDevice, queueFamily.presentFamily.value(), 0, &m_presentQueue);
 
     /// 之前的Vulkan分为实例扩展和设备扩展，如果在版本更老Vulkan版本开发，请在创建Device的时候指定验证层和消息传递的扩展
 };
-void VulkanContext::createSurface() {}
+void VulkanContext::createSurface()
+{
+    auto &app = Application::Instance();
+    auto *window = static_cast<GLFWwindow *>(app.RenderWindow()->getNativeWindow());
+
+    if (auto res = glfwCreateWindowSurface(m_instance, window, nullptr, &m_surface); res != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create window surface!");
+    }
+
+    if (m_surface == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("must create VkSurface!");
+    }
+}
