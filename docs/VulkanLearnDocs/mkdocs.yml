@@ -6,10 +6,11 @@ theme:
 nav:
     - 首页: index.md
     - Vulkan 入门:
-        - Vulkan简介: 0.Vulkan/vulkan_intro.md
-        - 初始化: "Setup Vulkan/Setup.md"
-        - Presentation: Presentation.md
-        - 渲染循环: render_loop.md
+        - Vulkan: Vulkan/vulkan.md
+        - Setup: "Setup Vulkan/Setup.md"
+        - Presentation: Presentation/Presentation.md
+        - Pipeline: Pipeline/Pipeline.md
+        - RenderLoop: render_loop.md
     - 调试与性能:
         - Validation Layers: validation.md
         - 性能优化: performance.md

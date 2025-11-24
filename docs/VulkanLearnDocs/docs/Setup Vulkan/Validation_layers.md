@@ -47,3 +47,18 @@ Vulkan 中的层是一个可选的中间件，它们“插入”到应用程序�
 
 - 一个用于在桌面上显示帧率 (FPS) 的简单层
 
+### 显式层与隐式层
+
+Vulkan 的层根据其加载方式被分为两类，这种区分对于排查“为何我的程序崩溃但代码没问题”这类问题至关重要。
+
+- 显式层（Explicit Layers）： 这些层必须由应用程序在 VkInstanceCreateInfo 中显式请求。验证层就属于这一类。如果应用程序不请求，它们就不会加载。
+
+- 隐式层（Implicit Layers）： 这些层如果存在于系统中，通常会被加载器自动加载，无需应用程序干预 。
+典型例子： Steam 覆盖层（VK_LAYER_VALVE_steam_overlay）、FPS 计数器（如 FRAPS 或 NVIDIA Nsight）、以及某些捕捉工具（如 RenderDoc 的注入层）。
+
+    - 发现机制： 隐式层通过特定的操作系统位置注册。在 Windows 上，它们位于注册表中；在 Linux 上，它们位于特定的 /etc/vulkan/implicit_layer.d 或用户目录中 。
+
+    - 风险与管理： 隐式层是造成 Vulkan 应用程序不稳定的常见原因。一个有 bug 的隐式层可能会导致完美的应用程序崩溃。开发者在调试难以复现的崩溃时，通常需要通过设置环境变量（如 VK_LOADER_LAYERS_DISABLE=~implicit~）来禁用所有隐式层以隔离问题 。
+
+
+
