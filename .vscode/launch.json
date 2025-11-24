@@ -125,5 +125,23 @@
             "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/05_windowSurface/",
             "preLaunchTask": "build"
         },
+        {
+            "name": "swapschin",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/06_swapchain/swapchain",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/06_swapchain/",
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "imageView",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/07_imageView/imageView",
+            "args": [],
+            "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/07_imageView/",
+            "preLaunchTask": "build"
+        },
     ]
 }
