@@ -6,7 +6,6 @@
 
 #include "VulkanContext.h"
 
-
 class Application
 {
 public:

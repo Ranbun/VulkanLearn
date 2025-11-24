@@ -3,28 +3,24 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
 #include <vulkan/vulkan.h>
+
 #include "VulkanDebugger.h"
 #include "VulkanFeatureManager.h"
 
-struct QueueFamilyIndices
-{
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-    bool isComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
-};
+struct QueueFamilyIndices;
+struct SwapChainSupportDetails;
 
 class VulkanContext
 {
 public:
-    VulkanContext(const VulkanFeatureManager &feature);
+    explicit VulkanContext(const VulkanFeatureManager &feature);
     ~VulkanContext();
     VulkanContext(const VulkanContext &) = delete;
     VulkanContext &operator=(const VulkanContext &) = delete;
 
-    VkInstance getInstance() { return m_instance; }
-    VkDevice getDevice() { return m_logicDevice; }
+    VkInstance getInstance() const { return m_instance; }
+    VkDevice getDevice() const { return m_logicDevice; }
 
 private:
     /**
@@ -40,7 +36,7 @@ private:
     void cleanup();
 
     /**
-     * @brief Create a Instance object
+     * @brief Create an Instance object
      *
      */
     void createInstance();
@@ -64,6 +60,9 @@ private:
      */
     void createSurface();
 
+    void createSwapChain();
+
+
     /**
      * @brief setup messenger
      *
@@ -78,10 +77,15 @@ private:
     VkPhysicalDevice m_physicalDevice{VK_NULL_HANDLE};
     VkDevice m_logicDevice{VK_NULL_HANDLE};
     VkSurfaceKHR m_surface{VK_NULL_HANDLE};
-
     VkQueue m_presentQueue{VK_NULL_HANDLE};
 
+    VkSwapchainKHR m_swapChain{VK_NULL_HANDLE};
+    std::vector<VkImage> m_swapChainImages{VK_NULL_HANDLE};
+    VkFormat m_swapChainImageFormat{VK_FORMAT_UNDEFINED};
+    VkExtent2D m_swapChainExtent{0, 0};
+
     std::function<QueueFamilyIndices(VkPhysicalDevice &)> findQueueFamiliesFunc;
+    std::function<SwapChainSupportDetails(VkPhysicalDevice &)> querySwapChainSupportDetailsFunc;
 };
 
 #endif

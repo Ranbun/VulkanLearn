@@ -36,6 +36,11 @@ public:
 
     void enableValidationLayers(bool enable);
 
+    /**
+     * @brief check device
+     * @param device
+     * @return bool
+     */
     bool validateDeviceSupport(VkPhysicalDevice device) const;
     bool checkInstanceExtensionSupport() const;
     bool checkValidationLayerSupport() const;
