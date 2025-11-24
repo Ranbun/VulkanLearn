@@ -43,7 +43,7 @@ void VulkanContext::cleanup()
 
     if (m_swapChain != VK_NULL_HANDLE)
     {
-        vkDestroySwapchainKHR(m_logicDevice,m_swapChain, nullptr);
+        vkDestroySwapchainKHR(m_logicDevice, m_swapChain, nullptr);
     }
 
     if (m_surface != VK_NULL_HANDLE)
@@ -132,7 +132,7 @@ void VulkanContext::createInstance()
         throw std::runtime_error("failed to create instance!");
     }
 
-    std::cout<< "Create VkInstance Success!" <<std::endl;
+    std::cout << "Create VkInstance Success!" << std::endl;
 }
 
 void VulkanContext::setupDebugMessenger()
@@ -199,11 +199,11 @@ void VulkanContext::pickPhysicalDevice()
         return indices;
     };
 
-    auto querySwapChainSupportDetails = [&](const VkPhysicalDevice & device)->SwapChainSupportDetails
+    auto querySwapChainSupportDetails = [&](const VkPhysicalDevice &device) -> SwapChainSupportDetails
     {
         SwapChainSupportDetails details;
 
-        ///查询 某个设备对于特定suface的能力
+        /// 查询 某个设备对于特定surface的能力
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.capabilities);
 
         uint32_t formatCount = 0;
@@ -214,12 +214,13 @@ void VulkanContext::pickPhysicalDevice()
             vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.formats.data());
         }
 
-        uint32_t presentModeCount = 0 ;
+        uint32_t presentModeCount = 0;
         vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
         if (presentModeCount != 0)
         {
             details.presentModes.resize(presentModeCount);
-            vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.presentModes.data());
+            vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount,
+                                                      details.presentModes.data());
         }
 
         return details;
@@ -234,7 +235,7 @@ void VulkanContext::pickPhysicalDevice()
 
         const auto queueFamily = findQueueFamilies(device);
 
-        const auto extensionSupported = m_featureManager.validateDeviceSupport(device);;   ///< 是否支持请求的那些扩展
+        const auto extensionSupported = m_featureManager.validateDeviceSupport(device); ///< 是否支持请求的那些扩展
 
         bool swapChainAdequate = false;
         if (extensionSupported)
@@ -248,7 +249,7 @@ void VulkanContext::pickPhysicalDevice()
 
     for (auto &device: physicalDevices)
     {
-        if (isDeviceSuitable(device))  /// select the first avaliable device
+        if (isDeviceSuitable(device)) /// select the first avaliable device
         {
             m_physicalDevice = device;
             break;
@@ -318,8 +319,9 @@ void VulkanContext::createLogicDevice()
 
     /// 之前的Vulkan分为实例扩展和设备扩展，如果在版本更老Vulkan版本开发，请在创建Device的时候指定验证层和消息传递的扩展
 
-    std::cout<< "Create VkDevice Success!" <<std::endl;
+    std::cout << "Create VkDevice Success!" << std::endl;
 };
+
 void VulkanContext::createSurface()
 {
     auto &app = Application::Instance();
@@ -335,7 +337,7 @@ void VulkanContext::createSurface()
         throw std::runtime_error("must create VkSurface!");
     }
 
-    std::cout<< "Create VkSurface Success!" <<std::endl;
+    std::cout << "Create VkSurface Success!" << std::endl;
 }
 void VulkanContext::createSwapChain()
 {
@@ -355,27 +357,24 @@ void VulkanContext::createSwapChain()
         imageCount = details.capabilities.maxImageCount;
     }
 
-    VkSwapchainCreateInfoKHR swapChainCreateInfo
-    {
-        .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-        .pNext = nullptr,
-        .flags = 0,
-        .surface = m_surface,
-        .minImageCount = imageCount,
-        .imageFormat = surfaceFormat.format,
-        .imageColorSpace = surfaceFormat.colorSpace,
-        .imageExtent = extent,
-        .imageArrayLayers = 1,
-        .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-        .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,   /// 不在队列之间共享
-        .queueFamilyIndexCount = 0,
-        .pQueueFamilyIndices = nullptr,
-        .preTransform = details.capabilities.currentTransform,
-        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-        .presentMode = presentMode,
-        .clipped = VK_TRUE,
-        .oldSwapchain = VK_NULL_HANDLE
-    };
+    VkSwapchainCreateInfoKHR swapChainCreateInfo{.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+                                                 .pNext = nullptr,
+                                                 .flags = 0,
+                                                 .surface = m_surface,
+                                                 .minImageCount = imageCount,
+                                                 .imageFormat = surfaceFormat.format,
+                                                 .imageColorSpace = surfaceFormat.colorSpace,
+                                                 .imageExtent = extent,
+                                                 .imageArrayLayers = 1,
+                                                 .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                                                 .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE, /// 不在队列之间共享
+                                                 .queueFamilyIndexCount = 0,
+                                                 .pQueueFamilyIndices = nullptr,
+                                                 .preTransform = details.capabilities.currentTransform,
+                                                 .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+                                                 .presentMode = presentMode,
+                                                 .clipped = VK_TRUE,
+                                                 .oldSwapchain = VK_NULL_HANDLE};
 
     auto queueFamily = findQueueFamiliesFunc(m_physicalDevice);
     std::vector<uint32_t> queueFamilyIndices{queueFamily.graphicsFamily.value(), queueFamily.presentFamily.value()};
@@ -388,7 +387,7 @@ void VulkanContext::createSwapChain()
         swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices.data();
     }
 
-    if (queueFamilyIndices[0] != queueFamilyIndices[1])   /// 渲染队列和显示队列不是同一个
+    if (queueFamilyIndices[0] != queueFamilyIndices[1]) /// 渲染队列和显示队列不是同一个
     {
         swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         swapChainCreateInfo.queueFamilyIndexCount = queueFamilyIndices.size();
@@ -402,13 +401,12 @@ void VulkanContext::createSwapChain()
         swapChainCreateInfo.pQueueFamilyIndices = nullptr;
     }
 
-    if (auto res = vkCreateSwapchainKHR(m_logicDevice, &swapChainCreateInfo, nullptr, &m_swapChain);
-        res != VK_SUCCESS)
+    if (auto res = vkCreateSwapchainKHR(m_logicDevice, &swapChainCreateInfo, nullptr, &m_swapChain); res != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create swapChain!");
     }
 
-    std::cout<< "Create SwapChain Success!" <<std::endl;
+    std::cout << "Create SwapChain Success!" << std::endl;
 
     /// get swapchain image
     uint32_t swapChainImageCount;
