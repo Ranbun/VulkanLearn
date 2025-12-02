@@ -1,3 +1,4 @@
 add_subdirectory(08_shderModule)
 add_subdirectory(09_FixedFunctions)
 add_subdirectory(10_renderPass)
+add_subdirectory(11_pipeline)
