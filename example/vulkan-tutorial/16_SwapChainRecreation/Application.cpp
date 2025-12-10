@@ -1,22 +1,21 @@
 #include "Application.h"
-#include <iostream>
 
-#include "window_pro.h"
+#include <iostream>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 
-Application::Application() = default;
+Application::Application()
+{ Init(); }
 
 Application::~Application() { cleanup(); }
 
 void Application::init()
 {
-    m_window = std::make_unique<AppWindow>(WP.width, WP.height, WP.title);
+    m_window = std::make_unique<AppWindow>(800, 640, std::string("SwapChainRecreation"));
     const auto & requirementExtensions = m_window->getRequirementVulkanExtensions();
-
     featureManager.enableValidationLayers(true);
     featureManager.requestFeature(EngineFeature::SwapChain);
     featureManager.requestFeature(EngineFeature::DebugUtils);
@@ -24,9 +23,15 @@ void Application::init()
     {
         featureManager.requestInstanceExtension(extension);
     }
-    m_vkContext = std::make_unique<VulkanContext>(featureManager);
 
-    m_window->setDate(m_vkContext.get());
+    m_window->setEventCallBack([this](auto & event) {
+        OnEvent(event);
+    });
+
+    m_vulkanLayer = std::make_unique<VulkanLayer>("Vulkan Layer", featureManager,[this]()
+    {
+        return m_window->getNativeWindow();
+    });
 
     std::cout << "Application initialized successfully." << std::endl;
 }
@@ -38,32 +43,23 @@ void Application::mainLoop() const
     while (!m_window->shouldClose())
     {
         m_window->pollEvent();
-        drawFrame();
+        m_vulkanLayer->OnUpdate(0.0);
     };
-
-    m_vkContext->waitIdle();
 }
 
 void Application::cleanup()
 {
-    m_vkContext.reset();
+    m_vulkanLayer.reset();
     m_window.reset();
 
     std::cout << "Application cleanup complete." << std::endl;
 }
 
-void Application::drawFrame() const
-{
-    m_vkContext->drawFrame();
-}
-
-Application &Application::Instance()
-{
-    static Application app;
-    return app;
-}
-
 AppWindow *Application::RenderWindow() const { return m_window.get(); }
+
+void Application::OnEvent(Event &event) const {
+    m_vulkanLayer->OnEvent(event);
+}
 
 void Application::Init()
 {

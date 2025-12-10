@@ -1,9 +1,11 @@
 #include "Window.h"
+
 #include <stdexcept>
 
+#include "Event.h"
 #include "VulkanContext.h"
 
-AppWindow::AppWindow(int width, int height, std::string &title) : m_window(nullptr)
+AppWindow::AppWindow(int width, int height, const std::string &title) : m_window(nullptr)
 {
     initWindow(width, height, title);
 };
@@ -16,11 +18,7 @@ bool AppWindow::shouldClose() const { return glfwWindowShouldClose(m_window); };
 
 void AppWindow::pollEvent() { glfwPollEvents(); }
 
-void AppWindow::setDate(void *data) const {
-    glfwSetWindowUserPointer(m_window, data);
-}
-
-void AppWindow::initWindow(int width, int height, std::string &title)
+void AppWindow::initWindow(int width, int height, const std::string &title)
 {
     if (!glfwInit())
     {
@@ -36,9 +34,12 @@ void AppWindow::initWindow(int width, int height, std::string &title)
         throw std::runtime_error("Failed to create GLFW window!");
     }
 
+    glfwSetWindowUserPointer(m_window, &m_Data);
+
     glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-        auto * vkcontext = static_cast<VulkanContext*>(glfwGetWindowUserPointer(window));
-        vkcontext->resize(width, height);
+        auto data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        WindowResizeEvent event(width, height);
+        data->EventCallback(event);
     });
 
 };

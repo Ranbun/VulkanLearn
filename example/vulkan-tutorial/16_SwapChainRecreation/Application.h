@@ -5,11 +5,13 @@
 #include "Window.h"
 
 #include "VulkanContext.h"
+#include "VulkanLayer.h"
 
 class Application
 {
 public:
-    static Application &Instance();
+    Application();
+    ~Application();
 
     /**
      * @brief Run the application main loop
@@ -18,12 +20,11 @@ public:
 
     void Init();
 
-    AppWindow *RenderWindow() const;
+    AppWindow* RenderWindow() const;
+
+    void OnEvent(Event& event) const;
 
 private:
-    Application();
-    ~Application();
-
     void init();
     /**
      * @brief Main application loop
@@ -40,7 +41,11 @@ private:
 private:
     VulkanFeatureManager featureManager;
     std::unique_ptr<AppWindow> m_window;
-    std::unique_ptr<VulkanContext> m_vkContext;
+    // std::unique_ptr<VulkanContext> m_vkContext;
+
+    std::unique_ptr<VulkanLayer> m_vulkanLayer;
+
 };
+
 
 #endif

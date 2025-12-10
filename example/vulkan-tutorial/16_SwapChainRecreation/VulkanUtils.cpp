@@ -32,7 +32,7 @@ namespace VulkanUtils
     }
 
 
-    VkExtent2D chooseSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities)
+    VkExtent2D chooseSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities, void* renderwindow)
     {
         /// 交换链图像的分辨率
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
@@ -41,8 +41,7 @@ namespace VulkanUtils
         }
         else
         {
-            auto & app = Application::Instance();
-            auto window = static_cast<GLFWwindow *>(app.RenderWindow()->getNativeWindow());
+            auto window = static_cast<GLFWwindow*>(renderwindow);
 
             int width, height;
             glfwGetFramebufferSize(window, &width, &height);

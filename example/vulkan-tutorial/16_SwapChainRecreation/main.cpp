@@ -1,19 +1,13 @@
 
 #include <iostream>
-#include "Application.h"
 
-#include "window_pro.h"
+#include "Application.h"
 
 int main(int argc, char *argv[])
 {
-    WP.title = "SwapChainRecreation";
-
-    auto &app = Application::Instance();
-
-    app.Init();
-
     try
     {
+        const Application app;
         app.run();
     }
     catch (const std::exception &e)

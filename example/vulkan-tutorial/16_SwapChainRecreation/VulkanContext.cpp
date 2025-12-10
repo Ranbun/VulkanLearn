@@ -1,16 +1,15 @@
 #include "VulkanContext.h"
 
 #include <algorithm>
-#include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <optional>
 #include <set>
 #include <stdexcept>
-#include <filesystem>
 
-#include "Application.h"
 #include "VulkanFeatureManager.h"
 #include "VulkanUtils.h"
+#include "GLFW/glfw3.h"
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
@@ -25,8 +24,8 @@ struct SwapChainSupportDetails {
 };
 
 
-VulkanContext::VulkanContext(const VulkanFeatureManager &feature) : m_instance(VK_NULL_HANDLE),
-                                                                    m_featureManager(feature) {
+VulkanContext::VulkanContext(const VulkanFeatureManager &feature, WindowFunc getWindos) : m_instance(VK_NULL_HANDLE),
+    m_featureManager(feature), m_getWindowFunc(std::move(getWindos)) {
     init();
 }
 
@@ -35,6 +34,8 @@ VulkanContext::~VulkanContext() {
 }
 
 void VulkanContext::cleanup() {
+    vkDeviceWaitIdle(m_logicDevice);
+
     cleanSwapChain();
 
     for (auto index = 0; index < MAX_FRAMES_IN_FLIGHT; index++) {
@@ -81,6 +82,10 @@ void VulkanContext::cleanup() {
         vkDestroyInstance(m_instance, nullptr);
     }
 };
+
+void VulkanContext::OnResize(uint32_t width, uint32_t height) {
+    framebufferResized = true;
+}
 
 void VulkanContext::init() {
     createInstance();
@@ -329,8 +334,7 @@ void VulkanContext::createLogicDevice() {
 };
 
 void VulkanContext::createSurface() {
-    auto &app = Application::Instance();
-    auto *window = static_cast<GLFWwindow *>(app.RenderWindow()->getNativeWindow());
+    auto *window = static_cast<GLFWwindow *>(m_getWindowFunc());
 
     if (auto res = glfwCreateWindowSurface(m_instance, window, nullptr, &m_surface); res != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface!");
@@ -347,7 +351,7 @@ void VulkanContext::createSwapChain() {
     SwapChainSupportDetails details = querySwapChainSupportDetailsFunc(m_physicalDevice);
 
     using namespace VulkanUtils;
-    auto extent = chooseSwapChainExtent(details.capabilities);
+    auto extent = chooseSwapChainExtent(details.capabilities, m_getWindowFunc());
     auto surfaceFormat = chooseSwapChainSurfaceFormat(details.formats);
     auto presentMode = chooseSwapChainPresentMode(details.presentModes);
 
@@ -880,6 +884,14 @@ void VulkanContext::createSyncObjects() {
 }
 
 void VulkanContext::recreateSwapChain() {
+    int width = 0, height = 0;
+    auto *window = static_cast<GLFWwindow *>(m_getWindowFunc());
+    glfwGetFramebufferSize(window, &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(window, &width, &height);
+        glfwWaitEvents();
+    }
+
     vkDeviceWaitIdle(m_logicDevice);
 
     cleanSwapChain();
@@ -890,6 +902,8 @@ void VulkanContext::recreateSwapChain() {
 }
 
 void VulkanContext::cleanSwapChain() const {
+    vkDeviceWaitIdle(m_logicDevice);
+
     for (const auto &framebuffer: m_swapChainFramebuffers) {
         if (framebuffer != VK_NULL_HANDLE) {
             vkDestroyFramebuffer(m_logicDevice, framebuffer, nullptr);
@@ -907,13 +921,7 @@ void VulkanContext::cleanSwapChain() const {
     }
 }
 
-void VulkanContext::waitIdle() const {
-    vkDeviceWaitIdle(m_logicDevice);
-}
-
 void VulkanContext::drawFrame() {
-    m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-
     const auto &frameRenderFence = m_inFlightFences.at(m_currentFrame);
     auto &imageAvailableSem = m_imageAvailableSemaphores.at(m_currentFrame);
     auto &renderFinishedSem = m_renderFinishedSemaphores.at(m_currentFrame);
@@ -923,30 +931,25 @@ void VulkanContext::drawFrame() {
 
     /// 获取交换链图像
     uint32_t imageIndex = 0;
-    auto swapChainFlag = vkAcquireNextImageKHR(m_logicDevice, m_swapChain, UINT64_MAX, imageAvailableSem,
-                                               VK_NULL_HANDLE,
-                                               &imageIndex);
+    const auto swapChainFlag = vkAcquireNextImageKHR(m_logicDevice, m_swapChain, UINT64_MAX, imageAvailableSem,
+                                                     VK_NULL_HANDLE,
+                                                     &imageIndex);
 
     switch (swapChainFlag) {
         case VK_ERROR_OUT_OF_DATE_KHR:
-        case VK_SUBOPTIMAL_KHR:
             recreateSwapChain();
-            framebufferResized = false;
             return;
         case VK_SUCCESS:
+        case VK_SUBOPTIMAL_KHR:
             break;
-    }
-
-    if (framebufferResized) {
-        framebufferResized = false;
-        recreateSwapChain();
+        default:
+            throw std::runtime_error("failed to acquire swap chain image!");
     }
 
     vkResetFences(m_logicDevice, 1, &frameRenderFence);
 
     /// 记录命令缓冲
     vkResetCommandBuffer(commandBuffer, 0);
-
     recordCommandBuffer(commandBuffer, imageIndex);
 
     /// 提交命令缓冲
@@ -978,5 +981,24 @@ void VulkanContext::drawFrame() {
         .pImageIndices = &imageIndex,
         .pResults = nullptr
     };
-    vkQueuePresentKHR(m_presentQueue, &presentInfo);
+
+    const auto queueFlag = vkQueuePresentKHR(m_presentQueue, &presentInfo);
+    switch (queueFlag) {
+        case VK_ERROR_OUT_OF_DATE_KHR:
+        case VK_SUBOPTIMAL_KHR:
+            framebufferResized = false;
+            recreateSwapChain();
+            break;
+        case VK_SUCCESS:
+            break;
+        default:
+            throw std::runtime_error("failed to present swap chain image!");
+    }
+
+    if (framebufferResized) {
+        framebufferResized = false;
+        recreateSwapChain();
+    }
+
+    m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }

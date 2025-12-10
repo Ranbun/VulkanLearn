@@ -14,23 +14,19 @@ struct SwapChainSupportDetails;
 /// 可以同时处理的帧数
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
+using WindowFunc = std::function<void *()>;
+
 class VulkanContext
 {
 public:
-    explicit VulkanContext(const VulkanFeatureManager &feature);
+    explicit VulkanContext(const VulkanFeatureManager &feature, WindowFunc getWindos = nullptr);
     ~VulkanContext();
     VulkanContext(const VulkanContext &) = delete;
     VulkanContext &operator=(const VulkanContext &) = delete;
 
     void drawFrame();
-    void waitIdle() const;
 
-    VkInstance getInstance() const { return m_instance; }
-    VkDevice getDevice() const { return m_logicDevice; }
-
-    void resize(uint32_t width, uint32_t height) {
-        framebufferResized = true;
-    }
+    void OnResize(uint32_t width, uint32_t height);
 
 private:
     /**
@@ -136,6 +132,7 @@ private:
 
     std::function<QueueFamilyIndices(VkPhysicalDevice &)> findQueueFamiliesFunc;
     std::function<SwapChainSupportDetails(VkPhysicalDevice &)> querySwapChainSupportDetailsFunc;
+    std::function<void *()> m_getWindowFunc;
 };
 
 #endif

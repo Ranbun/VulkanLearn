@@ -12,7 +12,7 @@ namespace VulkanUtils
 {
     VkSurfaceFormatKHR chooseSwapChainSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats);
     VkPresentModeKHR chooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes);
-    VkExtent2D chooseSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    VkExtent2D chooseSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities, void* renderwindow);
     std::vector<char> readFile(const std::string& filename);
 }
 
