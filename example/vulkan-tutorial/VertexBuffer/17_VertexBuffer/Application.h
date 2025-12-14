@@ -9,7 +9,7 @@
 class Application
 {
 public:
-    Application(int width, int height, const std::string &title);
+    Application(int width, int height, const std::string& title);
     ~Application();
 
     /**
@@ -17,14 +17,14 @@ public:
      */
     void run() const;
 
-    void Init(int width, int height, const std::string &title);
+    void Init(int width, int height, const std::string& title);
 
     AppWindow* renderWindow() const;
 
     void OnEvent(Event& event);
 
 private:
-    void init(int width, int height, const std::string &title);
+    void init(int width, int height, const std::string& title);
     /**
      * @brief Main application loop
      */
@@ -42,13 +42,8 @@ private:
     std::unique_ptr<AppWindow> m_window;
     std::unique_ptr<VulkanLayer> m_vulkanLayer;
 
-    bool m_running {true};
-
+    bool m_running{true};
 };
-
-
-
-
 
 
 #endif

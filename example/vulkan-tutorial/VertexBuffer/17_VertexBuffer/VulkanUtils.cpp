@@ -5,10 +5,14 @@
 #include <GLFW/glfw3.h>
 #include "Application.h"
 
-namespace VulkanUtils {
-    VkSurfaceFormatKHR chooseSwapChainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats) {
-        for (auto &format: formats) {
-            if (format.format == VK_FORMAT_B8G8R8_SRGB && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+namespace VulkanUtils
+{
+    VkSurfaceFormatKHR chooseSwapChainSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats)
+    {
+        for (auto& format : formats)
+        {
+            if (format.format == VK_FORMAT_B8G8R8_SRGB && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            {
                 return format;
             }
         }
@@ -16,9 +20,12 @@ namespace VulkanUtils {
         return formats.front();
     }
 
-    VkPresentModeKHR chooseSwapChainPresentMode(const std::vector<VkPresentModeKHR> &presentModes) {
-        for (auto const &presentMode: presentModes) {
-            if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+    VkPresentModeKHR chooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes)
+    {
+        for (auto const& presentMode : presentModes)
+        {
+            if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+            {
                 return presentMode;
             }
         }
@@ -26,12 +33,16 @@ namespace VulkanUtils {
     }
 
 
-    VkExtent2D chooseSwapChainExtent(const VkSurfaceCapabilitiesKHR &capabilities, void *renderwindow) {
+    VkExtent2D chooseSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities, void* renderWindow)
+    {
         /// 交换链图像的分辨率
-        if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+        if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+        {
             return capabilities.currentExtent;
-        } else {
-            auto window = static_cast<GLFWwindow *>(renderwindow);
+        }
+        else
+        {
+            auto window = static_cast<GLFWwindow*>(renderWindow);
 
             int width, height;
             glfwGetFramebufferSize(window, &width, &height);
@@ -51,11 +62,13 @@ namespace VulkanUtils {
         }
     }
 
-    std::vector<char> readFile(const std::string &filename) {
+    std::vector<char> readFile(const std::string& filename)
+    {
         // use 'ate' read file form tail
         std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-        if (!file.is_open()) {
+        if (!file.is_open())
+        {
             throw std::runtime_error("Could not open file");
         }
 
@@ -70,12 +83,15 @@ namespace VulkanUtils {
         return buffer;
     }
 
-    uint32_t findMemoryType(uint32_t typeFilter, VkPhysicalDevice physicalDevice, VkMemoryPropertyFlags properties) {
+    uint32_t findMemoryType(uint32_t typeFilter, VkPhysicalDevice physicalDevice, VkMemoryPropertyFlags properties)
+    {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
-        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+        {
+            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            {
                 return i; ///< 只需要有一个类型可以使用就行
             }
         }

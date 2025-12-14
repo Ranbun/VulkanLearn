@@ -20,10 +20,10 @@ using WindowFunc = std::function<void *()>;
 class VulkanContext
 {
 public:
-    explicit VulkanContext(const VulkanFeatureManager &feature, WindowFunc getWindos = nullptr);
+    explicit VulkanContext(const VulkanFeatureManager& feature, WindowFunc getWindows = nullptr);
     ~VulkanContext();
-    VulkanContext(const VulkanContext &) = delete;
-    VulkanContext &operator=(const VulkanContext &) = delete;
+    VulkanContext(const VulkanContext&) = delete;
+    VulkanContext& operator=(const VulkanContext&) = delete;
 
     void drawFrame();
 
@@ -73,7 +73,7 @@ private:
 
     void createGraphicsPipeline();
 
-    VkShaderModule createShaderModule(const std::vector<char> &code) const;
+    VkShaderModule createShaderModule(const std::vector<char>& code) const;
 
     void createRenderPass();
 
@@ -101,7 +101,7 @@ private:
     void setupDebugMessenger();
 
 private:
-    const VulkanFeatureManager &m_featureManager;
+    const VulkanFeatureManager& m_featureManager;
     std::unique_ptr<VulkanDebugger> m_vulkanDebugger{nullptr};
 
     VkInstance m_instance{VK_NULL_HANDLE};
@@ -137,10 +137,10 @@ private:
 
     uint32_t m_currentFrame = 0;
 
-    bool framebufferResized  = false;
+    bool framebufferResized = false;
 
-    std::function<QueueFamilyIndices(VkPhysicalDevice &)> findQueueFamiliesFunc;
-    std::function<SwapChainSupportDetails(VkPhysicalDevice &)> querySwapChainSupportDetailsFunc;
+    std::function<QueueFamilyIndices(VkPhysicalDevice&)> findQueueFamiliesFunc;
+    std::function<SwapChainSupportDetails(VkPhysicalDevice&)> querySwapChainSupportDetailsFunc;
     std::function<void *()> m_getWindowFunc;
 };
 

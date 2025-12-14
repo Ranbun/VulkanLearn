@@ -8,9 +8,10 @@ class VulkanContext;
 
 using WindowFunc = std::function<void *()>;
 
-class VulkanLayer : public Layer {
+class VulkanLayer : public Layer
+{
 public:
-    VulkanLayer(const std::string &name, const VulkanFeatureManager &feature_manager, WindowFunc func);
+    VulkanLayer(const std::string& name, const VulkanFeatureManager& feature_manager, WindowFunc func);
 
     ~VulkanLayer() override;
 
@@ -20,7 +21,7 @@ public:
 
     void OnUpdate(float ts) override;
 
-    void OnEvent(Event &event) override;
+    void OnEvent(Event& event) override;
 
 private:
     std::unique_ptr<VulkanContext> m_vkContext;

@@ -39,7 +39,7 @@ public:
 
 private:
     void initWindow(int width, int height, const std::string &title);
-    void cleanup();
+    void cleanup() const;
 
     WindowData m_Data;
     GLFWwindow *m_window;

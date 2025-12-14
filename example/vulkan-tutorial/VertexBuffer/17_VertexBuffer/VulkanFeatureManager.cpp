@@ -3,17 +3,20 @@
 #include <iostream>
 
 
-VulkanFeatureManager::VulkanFeatureManager() {}
+VulkanFeatureManager::VulkanFeatureManager()
+{
+}
+
 void VulkanFeatureManager::requestFeature(EngineFeature feature)
 {
     switch (feature)
     {
-        case EngineFeature::SwapChain:
+    case EngineFeature::SwapChain:
         {
             requestDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
             break;
         }
-        case EngineFeature::DebugUtils:
+    case EngineFeature::DebugUtils:
         {
             requestInstanceExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             break;
@@ -21,7 +24,7 @@ void VulkanFeatureManager::requestFeature(EngineFeature feature)
     }
 }
 
-void VulkanFeatureManager::requestInstanceExtension(const char *extName)
+void VulkanFeatureManager::requestInstanceExtension(const char* extName)
 {
     if (!m_uniqueInstanceExtensions.contains(extName))
     {
@@ -30,9 +33,8 @@ void VulkanFeatureManager::requestInstanceExtension(const char *extName)
     }
 }
 
-void VulkanFeatureManager::requestDeviceExtension(const char *extName)
+void VulkanFeatureManager::requestDeviceExtension(const char* extName)
 {
-
     if (!m_uniqueDeviceExtensions.contains(extName))
     {
         m_deviceExtensions.emplace_back(extName);
@@ -40,13 +42,14 @@ void VulkanFeatureManager::requestDeviceExtension(const char *extName)
     }
 }
 
-const std::vector<const char *> &VulkanFeatureManager::getEnabledInstanceExtensions() const
+const std::vector<const char*>& VulkanFeatureManager::getEnabledInstanceExtensions() const
 {
     return m_instanceExtensions;
 }
-const std::vector<const char *> &VulkanFeatureManager::getEnabledDeviceExtensions() const { return m_deviceExtensions; }
 
-const std::vector<const char *> &VulkanFeatureManager::getValidationLayers() const { return m_validationLayers; }
+const std::vector<const char*>& VulkanFeatureManager::getEnabledDeviceExtensions() const { return m_deviceExtensions; }
+
+const std::vector<const char*>& VulkanFeatureManager::getValidationLayers() const { return m_validationLayers; }
 
 void VulkanFeatureManager::enableValidationLayers(bool enable)
 {
@@ -70,7 +73,7 @@ bool VulkanFeatureManager::validateDeviceSupport(VkPhysicalDevice device) const
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
     std::set<std::string> requiredExtensions(m_uniqueDeviceExtensions.begin(), m_uniqueDeviceExtensions.end());
-    for (const auto &extension: availableExtensions)
+    for (const auto& extension : availableExtensions)
     {
         requiredExtensions.erase(extension.extensionName);
     }
@@ -78,7 +81,7 @@ bool VulkanFeatureManager::validateDeviceSupport(VkPhysicalDevice device) const
     if (!requiredExtensions.empty())
     {
         std::cout << "Device Missing Extensions:" << std::endl;
-        for (auto &extension: requiredExtensions)
+        for (auto& extension : requiredExtensions)
         {
             std::cerr << "\t" << extension << std::endl;
         }
@@ -99,7 +102,7 @@ bool VulkanFeatureManager::checkValidationLayerSupport() const
     std::set<std::string> requirementLayers{m_validationLayers.begin(), m_validationLayers.end()};
 
     /// check validations
-    for (auto &layer: availableLayers)
+    for (auto& layer : availableLayers)
     {
         requirementLayers.erase(std::string(layer.layerName));
     }
@@ -107,7 +110,7 @@ bool VulkanFeatureManager::checkValidationLayerSupport() const
     if (!requirementLayers.empty())
     {
         std::cout << "Some Layers is not supported!" << std::endl;
-        for (auto &layer: requirementLayers)
+        for (auto& layer : requirementLayers)
         {
             std::cout << "\t" << layer << std::endl;
         }
@@ -116,6 +119,7 @@ bool VulkanFeatureManager::checkValidationLayerSupport() const
 
     return true;
 }
+
 bool VulkanFeatureManager::checkInstanceExtensionSupport() const
 {
     /// Vulkan Instance Extensions
@@ -124,9 +128,11 @@ bool VulkanFeatureManager::checkInstanceExtensionSupport() const
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
 
-    std::set<std::string> requirementInstanceExtensions{m_uniqueInstanceExtensions.begin(),
-                                                        m_uniqueInstanceExtensions.end()};
-    for (auto &extension: availableExtensions)
+    std::set<std::string> requirementInstanceExtensions{
+        m_uniqueInstanceExtensions.begin(),
+        m_uniqueInstanceExtensions.end()
+    };
+    for (auto& extension : availableExtensions)
     {
         requirementInstanceExtensions.erase(extension.extensionName);
     }
@@ -134,7 +140,7 @@ bool VulkanFeatureManager::checkInstanceExtensionSupport() const
     if (!requirementInstanceExtensions.empty())
     {
         std::cout << "Some Extensions is Not supported: " << std::endl;
-        for (auto &extension: requirementInstanceExtensions)
+        for (auto& extension : requirementInstanceExtensions)
         {
             std::cerr << "\t" << extension << std::endl;
         }

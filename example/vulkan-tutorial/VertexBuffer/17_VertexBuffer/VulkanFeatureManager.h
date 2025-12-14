@@ -27,12 +27,12 @@ public:
 
     void requestFeature(EngineFeature feature);
 
-    void requestInstanceExtension(const char *extName);
-    void requestDeviceExtension(const char *extName);
+    void requestInstanceExtension(const char* extName);
+    void requestDeviceExtension(const char* extName);
 
-    const std::vector<const char *> &getEnabledInstanceExtensions() const;
-    const std::vector<const char *> &getEnabledDeviceExtensions() const;
-    const std::vector<const char *> &getValidationLayers() const;
+    const std::vector<const char*>& getEnabledInstanceExtensions() const;
+    const std::vector<const char*>& getEnabledDeviceExtensions() const;
+    const std::vector<const char*>& getValidationLayers() const;
 
     void enableValidationLayers(bool enable);
 
@@ -46,9 +46,9 @@ public:
     bool checkValidationLayerSupport() const;
 
 private:
-    std::vector<const char *> m_instanceExtensions;
-    std::vector<const char *> m_deviceExtensions;
-    std::vector<const char *> m_validationLayers;
+    std::vector<const char*> m_instanceExtensions;
+    std::vector<const char*> m_deviceExtensions;
+    std::vector<const char*> m_validationLayers;
 
     std::set<std::string> m_uniqueInstanceExtensions;
     std::set<std::string> m_uniqueDeviceExtensions;
