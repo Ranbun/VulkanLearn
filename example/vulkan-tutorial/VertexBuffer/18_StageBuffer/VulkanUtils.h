@@ -16,7 +16,22 @@ namespace VulkanUtils
     std::vector<char> readFile(const std::string& filename);
 
     uint32_t findMemoryType(uint32_t typeFilter, VkPhysicalDevice physicalDevice, VkMemoryPropertyFlags properties);
+
+    void createBuffer(VkPhysicalDevice physicalDevice, VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage,
+                      VkMemoryPropertyFlags properties, VkBuffer& buffer,
+                      VkDeviceMemory& bufferMemory);
 }
+
+
+
+class BufferManager
+{
+public:
+    BufferManager(VkDevice device, VkPhysicalDevice physicalDevice);
+    ~BufferManager();
+
+    // TODO: implement !!!
+};
 
 
 #endif

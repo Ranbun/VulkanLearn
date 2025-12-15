@@ -97,4 +97,41 @@ namespace VulkanUtils
         }
         throw std::runtime_error("Could not find suitable memory type");
     }
+
+    void createBuffer(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkDeviceSize size, const VkBufferUsageFlags usage,
+                      const VkMemoryPropertyFlags properties,
+                      VkBuffer& buffer,
+                      VkDeviceMemory& bufferMemory)
+    {
+        const VkBufferCreateInfo bufferCreateInfo
+        {
+            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+            .flags = 0,
+            .size = size,
+            .usage = usage,
+            .sharingMode = VK_SHARING_MODE_EXCLUSIVE
+        };
+
+        if (vkCreateBuffer(device, &bufferCreateInfo, nullptr, &buffer) != VK_SUCCESS)
+        {
+            throw std::runtime_error("Could not create buffer");
+        }
+
+        VkMemoryRequirements memoryRequirements;
+        vkGetBufferMemoryRequirements(device, buffer, &memoryRequirements);
+
+        VkMemoryAllocateInfo memoryAllocateInfo{
+            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+            .pNext = nullptr,
+            .allocationSize = memoryRequirements.size,
+            .memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, physicalDevice, properties)
+        };
+
+        if (vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+        {
+            throw std::runtime_error("Could not allocate buffer memory");
+        }
+
+        vkBindBufferMemory(device, buffer, bufferMemory, 0);
+    }
 }
