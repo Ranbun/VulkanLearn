@@ -72,9 +72,9 @@ void VulkanContext::cleanup()
         }
     }
 
-    if (m_commmandPool != VK_NULL_HANDLE)
+    if (m_commandPool != VK_NULL_HANDLE)
     {
-        vkDestroyCommandPool(m_logicDevice, m_commmandPool, nullptr);
+        vkDestroyCommandPool(m_logicDevice, m_commandPool, nullptr);
     }
 
     if (m_graphicsPipeline != VK_NULL_HANDLE)
@@ -870,7 +870,7 @@ void VulkanContext::createCommandPool()
         .queueFamilyIndex = queueFamilyIndices.graphicsFamily.value()
     };
 
-    if (vkCreateCommandPool(m_logicDevice, &commandPoolCreateInfo, nullptr, &m_commmandPool) != VK_SUCCESS)
+    if (vkCreateCommandPool(m_logicDevice, &commandPoolCreateInfo, nullptr, &m_commandPool) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create command pool!");
     }
@@ -883,7 +883,7 @@ void VulkanContext::createCommandBuffers()
     VkCommandBufferAllocateInfo commandBufferAllocateInfo{
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .pNext = nullptr,
-        .commandPool = m_commmandPool,
+        .commandPool = m_commandPool,
         .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
         .commandBufferCount = static_cast<uint32_t>(m_commandBuffers.size())
     };
@@ -1033,9 +1033,10 @@ void VulkanContext::cleanSwapChain() const
 void VulkanContext::createVertexBuffers()
 {
     m_vertices = {
-        {.pos = {0.0f, -0.5f}, .color = {1.0f, 1.0f, 1.0f}},
-        {.pos = {0.5f, 0.5f}, .color = {0.0f, 1.0f, 0.0f}},
-        {.pos = {-0.5f, 0.5f}, .color = {0.0f, 0.0f, 1.0f}}
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
     };
 
     const VkDeviceSize bufferSize = sizeof(Vertex) * m_vertices.size();
@@ -1062,7 +1063,7 @@ void VulkanContext::createVertexBuffers()
         const VkCommandBufferAllocateInfo allocateInfo = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
             .pNext = nullptr,
-            .commandPool = m_commmandPool,
+            .commandPool = m_commandPool,
             .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
             .commandBufferCount = 1
         };
@@ -1081,7 +1082,7 @@ void VulkanContext::createVertexBuffers()
             .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
             .pInheritanceInfo = nullptr
         };
-        vkBeginCommandBuffer(commandBuffer,&beginInfo);
+        vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
         /// copy image
         const VkBufferCopy copyRegion = {
@@ -1108,7 +1109,7 @@ void VulkanContext::createVertexBuffers()
         vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
         vkQueueWaitIdle(m_graphicsQueue);
 
-        vkFreeCommandBuffers(m_logicDevice, m_commmandPool, 1, &commandBuffer);
+        vkFreeCommandBuffers(m_logicDevice, m_commandPool, 1, &commandBuffer);
     };
 
     copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
@@ -1116,7 +1117,6 @@ void VulkanContext::createVertexBuffers()
     /// destroy buffer & free memory
     vkFreeMemory(m_logicDevice, stagingBufferMemory, nullptr);
     vkDestroyBuffer(m_logicDevice, stagingBuffer, nullptr);
-
 }
 
 void VulkanContext::drawFrame()

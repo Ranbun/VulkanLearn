@@ -1,2 +1,3 @@
 add_subdirectory(17_VertexBuffer)
 add_subdirectory(18_StageBuffer)
+add_subdirectory(19_IndexBuffer)
