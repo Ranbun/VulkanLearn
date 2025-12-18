@@ -92,6 +92,7 @@ private:
     void cleanSwapChain() const;
 
     void createVertexBuffers();
+    void createIndexBuffers();
 
     /**
      * @brief setup messenger
@@ -124,9 +125,12 @@ private:
     std::vector<VkImageView> m_swapChainImageViews{VK_NULL_HANDLE};
 
     /// buffer
+    std::vector<Vertex> m_vertices;
     VkBuffer m_vertexBuffer{VK_NULL_HANDLE};
     VkDeviceMemory m_vertexBufferMemory{VK_NULL_HANDLE};
-    std::vector<Vertex> m_vertices;
+    std::vector<uint16_t> m_indices;
+    VkBuffer m_indexBuffer{VK_NULL_HANDLE};
+    VkDeviceMemory m_indexBufferMemory{VK_NULL_HANDLE};
 
     /// 同步
     std::vector<VkSemaphore> m_imageAvailableSemaphores{VK_NULL_HANDLE};
@@ -140,6 +144,7 @@ private:
     std::function<QueueFamilyIndices(VkPhysicalDevice&)> findQueueFamiliesFunc;
     std::function<SwapChainSupportDetails(VkPhysicalDevice&)> querySwapChainSupportDetailsFunc;
     std::function<void *()> m_getWindowFunc;
+    std::function<void(const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize bufferSize)> m_copyBufferFunc;
 };
 
 #endif

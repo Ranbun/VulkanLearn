@@ -26,7 +26,6 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-
 VulkanContext::VulkanContext(const VulkanFeatureManager& feature, WindowFunc getWindows)
     : m_featureManager(feature)
       , m_getWindowFunc(std::move(getWindows))
@@ -52,6 +51,15 @@ void VulkanContext::cleanup()
     if (m_vertexBufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(m_logicDevice, m_vertexBufferMemory, nullptr);
+    }
+
+    if (m_indexBuffer != VK_NULL_HANDLE)
+    {
+        vkDestroyBuffer(m_logicDevice, m_indexBuffer, nullptr);
+    }
+    if (m_indexBufferMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(m_logicDevice, m_indexBufferMemory, nullptr);
     }
 
     for (auto index = 0; index < MAX_FRAMES_IN_FLIGHT; index++)
@@ -129,6 +137,7 @@ void VulkanContext::init()
     createFramebuffers();
     createCommandPool();
     createVertexBuffers();
+    createIndexBuffers();
     createCommandBuffers();
     createSyncObjects();
 };
@@ -942,7 +951,9 @@ void VulkanContext::recordCommandBuffer(const VkCommandBuffer commandBuffer, con
     VkBuffer vertexBuffers[] = {m_vertexBuffer};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdDraw(commandBuffer, static_cast<uint32_t>(m_vertices.size()), 1, 0, 0);
+    vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    // vkCmdDraw(commandBuffer, static_cast<uint32_t>(m_vertices.size()), 1, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, m_indices.size(), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 
@@ -1058,7 +1069,7 @@ void VulkanContext::createVertexBuffers()
                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
 
-    auto copyBuffer = [this](VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize bufferSize)
+    auto copyBuffer = [this](const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize bufferSize)
     {
         const VkCommandBufferAllocateInfo allocateInfo = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -1112,11 +1123,41 @@ void VulkanContext::createVertexBuffers()
         vkFreeCommandBuffers(m_logicDevice, m_commandPool, 1, &commandBuffer);
     };
 
-    copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
+    m_copyBufferFunc = std::move(copyBuffer);
+    m_copyBufferFunc(stagingBuffer, m_vertexBuffer, bufferSize);
 
     /// destroy buffer & free memory
     vkFreeMemory(m_logicDevice, stagingBufferMemory, nullptr);
     vkDestroyBuffer(m_logicDevice, stagingBuffer, nullptr);
+}
+
+void VulkanContext::createIndexBuffers()
+{
+    m_indices = {0, 1, 2, 2, 3, 0};
+    const VkDeviceSize indexBufferSize = sizeof(m_indices[0]) * m_indices.size();
+
+    VkBuffer indexStageBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory indexStageBufferMemory = VK_NULL_HANDLE;
+
+    VulkanUtils::createBuffer(m_physicalDevice, m_logicDevice, indexBufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                              indexStageBuffer, indexStageBufferMemory);
+
+    void* data = nullptr;
+    vkMapMemory(m_logicDevice, indexStageBufferMemory, 0, indexBufferSize, 0, &data);
+    memcpy(data, m_indices.data(), indexBufferSize);
+    vkUnmapMemory(m_logicDevice, indexStageBufferMemory);
+
+    VulkanUtils::createBuffer(m_physicalDevice, m_logicDevice, indexBufferSize,
+                              VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                              m_indexBuffer, m_indexBufferMemory);
+
+    m_copyBufferFunc(indexStageBuffer, m_indexBuffer, indexBufferSize);
+
+    /// destroy buffer & free memory
+    vkFreeMemory(m_logicDevice, indexStageBufferMemory, nullptr);
+    vkDestroyBuffer(m_logicDevice, indexStageBuffer, nullptr);
 }
 
 void VulkanContext::drawFrame()
