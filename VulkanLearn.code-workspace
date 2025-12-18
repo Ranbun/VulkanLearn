@@ -1,0 +1,75 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "extensions": {
+        "recommendations": [
+            "llvm-vs-code-extensions.vscode-clangd",
+            "vadimcn.vscode-lldb"
+        ],
+    },
+    "settings": {
+        "C_Cpp.intelliSenseEngine": "disabled",
+        // clangd settings
+        "clangd.path": "D:/msys64/clang64/bin/clangd.exe",
+        "clangd.arguments": [
+            "--log=error",
+            "--header-insertion=never",
+            "--clang-tidy=false",
+            "--compile-commands-dir=out/build",
+            "-j=8"
+        ],
+        "clangd.fallbackFlags": [
+            "-std=c++20"
+        ],
+        "clangd.onConfigChanged": "restart",
+        // env settings
+        "terminal.integrated.env.windows": {
+            "PATH": "D:/msys64/clang64/bin;${env:PATH}"
+        },
+        "cSpell.words": [
+            "msys",
+            "vadimcn"
+        ],
+        "editor.formatOnSave": false,
+        "C_cpp.codeAnalysis.runAutomatically": false,
+        "editor.codeLens": false,
+        "editor.inlayHints.enabled": "off",
+        "[cpp]": {
+            "editor.links": false,
+         },
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "build",
+                "type": "shell",
+                "linux": {
+                    "command": "${workspaceFolder}/build_cmake_debug_linux.sh"
+                },
+                "windows": {
+                    "command": "${workspaceFolder}/build_cmake_win.bat"
+                }
+            }
+        ]
+    },
+    "launch": {
+        "configurations": [
+            {
+                "name": "IndexBuffer",
+                "type": "lldb",
+                "request": "launch",
+                "program": "${workspaceRoot}/out/build/example/vulkan-tutorial/VertexBuffer/19_IndexBuffer/IndexBuffer",
+                "args": [],
+                "env": {
+                    "PATH": "D:/msys64/clang64/bin;${env:PATH}"
+                },
+                "cwd": "${workspaceRoot}/out/build/example/vulkan-tutorial/VertexBuffer/19_IndexBuffer/",
+                "preLaunchTask": "build"
+            },
+        ]
+    }
+}
