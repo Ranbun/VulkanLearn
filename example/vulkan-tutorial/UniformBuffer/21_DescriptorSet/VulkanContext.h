@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <memory>
-#include <vulkan/vulkan.h>
 
 #include "Vertex.h"
 #include "VulkanDebugger.h"
@@ -73,7 +72,7 @@ private:
 
     void createGraphicsPipeline();
 
-    VkShaderModule createShaderModule(const std::vector<char> &code) const;
+    [[nodiscard]] VkShaderModule createShaderModule(const std::vector<char> &code) const;
 
     void createRenderPass();
 
@@ -83,7 +82,7 @@ private:
 
     void createCommandBuffers();
 
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) const;
+    void recordCommandBuffer(const VkCommandBuffer &commandBuffer, uint32_t imageIndex) const;
 
     void createSyncObjects();
 
@@ -103,7 +102,7 @@ private:
      * @brief update unform buffer data
      *
      */
-    void updateUniformBuffer(int frame);
+    void updateUniformBuffer(uint32_t frame) const;
 
     void createDescriptorPool();
 

@@ -19,14 +19,14 @@ struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
-    bool isComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
+    [[nodiscard]] bool isComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
 };
 
 struct SwapChainSupportDetails
 {
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
+    VkSurfaceCapabilitiesKHR capabilities{};
+    std::vector<VkSurfaceFormatKHR> formats {};
+    std::vector<VkPresentModeKHR> presentModes {};
 };
 
 VulkanContext::VulkanContext(const VulkanFeatureManager &feature, WindowFunc getWindows) :
@@ -369,10 +369,10 @@ void VulkanContext::createLogicDevice()
                                         .pEnabledFeatures = nullptr};
 
     /// find queue family : create queue
-    auto queueFamily = findQueueFamiliesFunc(m_physicalDevice);
+    auto [graphicsFamily, presentFamily] = findQueueFamiliesFunc(m_physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> queueFamilies{queueFamily.graphicsFamily.value(), queueFamily.presentFamily.value()};
+    std::set<uint32_t> queueFamilies{graphicsFamily.value(), presentFamily.value()};
 
     float queuePriorities = 1.0f; /// 设置队列的优先级 [0.0f - 1.0f]
     for (auto queueFamily: queueFamilies)
@@ -405,13 +405,95 @@ void VulkanContext::createLogicDevice()
         throw std::runtime_error("Failed to create logic device.");
     }
 
-    vkGetDeviceQueue(m_logicDevice, queueFamily.presentFamily.value(), 0, &m_presentQueue);
-    vkGetDeviceQueue(m_logicDevice, queueFamily.graphicsFamily.value(), 0, &m_graphicsQueue);
+    vkGetDeviceQueue(m_logicDevice, presentFamily.value(), 0, &m_presentQueue);
+    vkGetDeviceQueue(m_logicDevice, graphicsFamily.value(), 0, &m_graphicsQueue);
 
     /// 之前的Vulkan分为实例扩展和设备扩展，如果在版本更老Vulkan版本开发，请在创建Device的时候指定验证层和消息传递的扩展
 
     std::cout << "Create VkDevice Success!" << std::endl;
 };
+
+void VulkanContext::drawFrame()
+{
+    const auto &frameRenderFence = m_inFlightFences.at(m_currentFrame);
+    auto &imageAvailableSem = m_imageAvailableSemaphores.at(m_currentFrame);
+    auto &renderFinishedSem = m_renderFinishedSemaphores.at(m_currentFrame);
+    auto &commandBuffer = m_commandBuffers.at(m_currentFrame);
+
+    vkWaitForFences(m_logicDevice, 1, &frameRenderFence, VK_TRUE, UINT64_MAX);
+
+    /// 获取交换链图像
+    uint32_t imageIndex = 0;
+    const auto swapChainFlag = vkAcquireNextImageKHR(m_logicDevice, m_swapChain, UINT64_MAX, imageAvailableSem,
+                                                     VK_NULL_HANDLE, &imageIndex);
+
+    switch (swapChainFlag)
+    {
+        case VK_ERROR_OUT_OF_DATE_KHR:
+            recreateSwapChain();
+            return;
+        case VK_SUCCESS:
+        case VK_SUBOPTIMAL_KHR:
+            break;
+        default:
+            throw std::runtime_error("failed to acquire swap chain image!");
+    }
+    updateUniformBuffer(m_currentFrame);
+
+    vkResetFences(m_logicDevice, 1, &frameRenderFence);
+
+    /// 记录命令缓冲
+    vkResetCommandBuffer(commandBuffer, 0);
+    recordCommandBuffer(commandBuffer, imageIndex);
+
+    /// 提交命令缓冲
+    std::vector<VkPipelineStageFlags> waitStages{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSubmitInfo submitInfo{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+                            .pNext = nullptr,
+                            .waitSemaphoreCount = 1,
+                            .pWaitSemaphores = &imageAvailableSem,
+                            .pWaitDstStageMask = waitStages.data(),
+                            .commandBufferCount = 1,
+                            .pCommandBuffers = &commandBuffer,
+                            .signalSemaphoreCount = 1,
+                            .pSignalSemaphores = &renderFinishedSem};
+
+    if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, frameRenderFence) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to submit command buffer!");
+    }
+
+    /// present frame
+    VkPresentInfoKHR presentInfo{.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+                                 .pNext = nullptr,
+                                 .waitSemaphoreCount = 1,
+                                 .pWaitSemaphores = &renderFinishedSem,
+                                 .swapchainCount = 1,
+                                 .pSwapchains = &m_swapChain,
+                                 .pImageIndices = &imageIndex,
+                                 .pResults = nullptr};
+
+    switch ([[maybe_unused]] const auto queueFlag = vkQueuePresentKHR(m_presentQueue, &presentInfo))
+    {
+        case VK_ERROR_OUT_OF_DATE_KHR:
+        case VK_SUBOPTIMAL_KHR:
+            framebufferResized = false;
+            recreateSwapChain();
+            break;
+        case VK_SUCCESS:
+            break;
+        default:
+            throw std::runtime_error("failed to present swap chain image!");
+    }
+
+    if (framebufferResized)
+    {
+        framebufferResized = false;
+        recreateSwapChain();
+    }
+
+    m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
 
 void VulkanContext::createSurface()
 {
@@ -659,7 +741,7 @@ void VulkanContext::createGraphicsPipeline()
             .alphaToOneEnable = VK_FALSE};
 
     /// 深度和模板测试
-    VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo{
+    [[maybe_unused]] VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
@@ -865,7 +947,7 @@ void VulkanContext::createCommandBuffers()
     }
 }
 
-void VulkanContext::recordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) const
+void VulkanContext::recordCommandBuffer(const VkCommandBuffer &commandBuffer, const uint32_t imageIndex) const
 {
     VkCommandBufferBeginInfo beginInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
                                        .pNext = nullptr,
@@ -1019,7 +1101,7 @@ void VulkanContext::createVertexBuffers()
                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
 
-    auto copyBuffer = [this](const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize bufferSize)
+    auto copyBuffer = [this](const VkBuffer &srcBuffer, const VkBuffer &dstBuffer, const VkDeviceSize bufferSize)
     {
         const VkCommandBufferAllocateInfo allocateInfo = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
                                                           .pNext = nullptr,
@@ -1035,10 +1117,10 @@ void VulkanContext::createVertexBuffers()
         }
 
         /// begine command buffer
-        const VkCommandBufferBeginInfo beginInfo = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-                                                    .pNext = nullptr,
-                                                    .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-                                                    .pInheritanceInfo = nullptr};
+        constexpr VkCommandBufferBeginInfo beginInfo = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+                                                        .pNext = nullptr,
+                                                        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+                                                        .pInheritanceInfo = nullptr};
         vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
         /// copy image
@@ -1099,89 +1181,6 @@ void VulkanContext::createIndexBuffers()
     vkDestroyBuffer(m_logicDevice, indexStageBuffer, nullptr);
 }
 
-void VulkanContext::drawFrame()
-{
-    const auto &frameRenderFence = m_inFlightFences.at(m_currentFrame);
-    auto &imageAvailableSem = m_imageAvailableSemaphores.at(m_currentFrame);
-    auto &renderFinishedSem = m_renderFinishedSemaphores.at(m_currentFrame);
-    auto &commandBuffer = m_commandBuffers.at(m_currentFrame);
-
-    vkWaitForFences(m_logicDevice, 1, &frameRenderFence, VK_TRUE, UINT64_MAX);
-
-    /// 获取交换链图像
-    uint32_t imageIndex = 0;
-    const auto swapChainFlag = vkAcquireNextImageKHR(m_logicDevice, m_swapChain, UINT64_MAX, imageAvailableSem,
-                                                     VK_NULL_HANDLE, &imageIndex);
-
-    switch (swapChainFlag)
-    {
-        case VK_ERROR_OUT_OF_DATE_KHR:
-            recreateSwapChain();
-            return;
-        case VK_SUCCESS:
-        case VK_SUBOPTIMAL_KHR:
-            break;
-        default:
-            throw std::runtime_error("failed to acquire swap chain image!");
-    }
-    updateUniformBuffer(m_currentFrame);
-
-    vkResetFences(m_logicDevice, 1, &frameRenderFence);
-
-    /// 记录命令缓冲
-    vkResetCommandBuffer(commandBuffer, 0);
-    recordCommandBuffer(commandBuffer, imageIndex);
-
-    /// 提交命令缓冲
-    std::vector<VkPipelineStageFlags> waitStages{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSubmitInfo submitInfo{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-                            .pNext = nullptr,
-                            .waitSemaphoreCount = 1,
-                            .pWaitSemaphores = &imageAvailableSem,
-                            .pWaitDstStageMask = waitStages.data(),
-                            .commandBufferCount = 1,
-                            .pCommandBuffers = &commandBuffer,
-                            .signalSemaphoreCount = 1,
-                            .pSignalSemaphores = &renderFinishedSem};
-
-    if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, frameRenderFence) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to submit command buffer!");
-    }
-
-    /// present frame
-    VkPresentInfoKHR presentInfo{.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-                                 .pNext = nullptr,
-                                 .waitSemaphoreCount = 1,
-                                 .pWaitSemaphores = &renderFinishedSem,
-                                 .swapchainCount = 1,
-                                 .pSwapchains = &m_swapChain,
-                                 .pImageIndices = &imageIndex,
-                                 .pResults = nullptr};
-
-    const auto queueFlag = vkQueuePresentKHR(m_presentQueue, &presentInfo);
-    switch (queueFlag)
-    {
-        case VK_ERROR_OUT_OF_DATE_KHR:
-        case VK_SUBOPTIMAL_KHR:
-            framebufferResized = false;
-            recreateSwapChain();
-            break;
-        case VK_SUCCESS:
-            break;
-        default:
-            throw std::runtime_error("failed to present swap chain image!");
-    }
-
-    if (framebufferResized)
-    {
-        framebufferResized = false;
-        recreateSwapChain();
-    }
-
-    m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-}
-
 void VulkanContext::createDescriptorSetLayout()
 {
     VkDescriptorSetLayoutBinding uboLayoutBinding{.binding = 0,
@@ -1190,14 +1189,14 @@ void VulkanContext::createDescriptorSetLayout()
                                                   .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                                                   .pImmutableSamplers = nullptr};
 
-    VkDescriptorSetLayoutCreateInfo descriptorLayoutCreateinfo{
+    const VkDescriptorSetLayoutCreateInfo descriptorLayoutSetCCreateInfo{
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
             .bindingCount = 1,
             .pBindings = &uboLayoutBinding};
 
-    if (vkCreateDescriptorSetLayout(m_logicDevice, &descriptorLayoutCreateinfo, nullptr, &m_descriptorSetLayout) !=
+    if (vkCreateDescriptorSetLayout(m_logicDevice, &descriptorLayoutSetCCreateInfo, nullptr, &m_descriptorSetLayout) !=
         VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create descriptor set layout");
@@ -1206,13 +1205,13 @@ void VulkanContext::createDescriptorSetLayout()
 
 void VulkanContext::createUniformBuffers()
 {
-    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
     m_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
     m_uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
     m_uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
+        constexpr VkDeviceSize bufferSize = sizeof(UniformBufferObject);
         VulkanUtils::createBuffer(m_physicalDevice, m_logicDevice, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                   m_uniformBuffers[i], m_uniformBuffersMemory[i]);
@@ -1220,7 +1219,7 @@ void VulkanContext::createUniformBuffers()
     }
 }
 
-void VulkanContext::updateUniformBuffer(int frame)
+void VulkanContext::updateUniformBuffer(const uint32_t frame) const
 {
     static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -1234,7 +1233,7 @@ void VulkanContext::updateUniformBuffer(int frame)
     ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     ubo.proj = glm::perspective(glm::radians(45.0f),
-                                m_swapChainExtent.width / static_cast<float>(m_swapChainExtent.height), 0.1f, 10.0f);
+                                static_cast<float>(m_swapChainExtent.width) / static_cast<float>(m_swapChainExtent.height), 0.1f, 10.0f);
 
     ubo.proj[1][1] *= -1;
     memcpy(m_uniformBuffersMapped[frame], &ubo, sizeof(ubo));
